@@ -1,0 +1,107 @@
+rabbitmq:
+  replicaCount: 1
+  service:
+    type: NodePort
+  extraSecrets:
+    load-definition:
+      load_definition.json: |
+        {
+          "users": [
+            {
+              "name": "user",
+              "password_hash": "E4KaSlT3L4C7gsBJeCoDbl5VFu+60bBNNmBGAU/iGanplQPe",
+              "hashing_algorithm": "rabbit_password_hashing_sha256",
+              "tags": "administrator"
+            }
+          ],
+          "vhosts": [
+            {
+              "name": "/"
+            }
+          ],
+          "permissions": [
+            {
+              "user": "user",
+              "vhost": "/",
+              "configure": ".*",
+              "write": ".*",
+              "read": ".*"
+            }
+          ],
+          "queues": [
+            {
+              "name": "cdl.document2.data",
+              "vhost": "/",
+              "durable": true,
+              "auto_delete": false,
+              "arguments": {
+                "x-queue-type": "classic"
+              }
+            },
+            {
+              "name": "cdl.data.input",
+              "vhost": "/",
+              "durable": true,
+              "auto_delete": false,
+              "arguments": {
+                "x-queue-type": "classic"
+              }
+            },
+            {
+              "name": "cdl.document.data",
+              "vhost": "/",
+              "durable": true,
+              "auto_delete": false,
+              "arguments": {
+                "x-queue-type": "classic"
+              }
+            },
+            {
+              "name": "cdl.timeseries.data",
+              "vhost": "/",
+              "durable": true,
+              "auto_delete": false,
+              "arguments": {
+                "x-queue-type": "classic"
+              }
+            }
+          ],
+          "exchanges": [
+            {
+              "name": "cdl.events",
+              "vhost": "/",
+              "type": "fanout",
+              "durable": true,
+              "auto_delete": false,
+              "internal": false,
+              "arguments": {}
+            },
+            {
+              "name": "cdl.schema.replication",
+              "vhost": "/",
+              "type": "fanout",
+              "durable": true,
+              "auto_delete": false,
+              "internal": false,
+              "arguments": {}
+            }
+          ],
+        }
+  loadDefinition:
+    enabled: true
+    existingSecret: load-definition
+  extraConfiguration: |
+    load_definitions = /app/load_definition.json
+
+kafka:
+  replicaCount: 1
+  zookeeper:
+    enabled: true
+
+postgresql:
+  initdbScriptsConfigMap: infrastructure-postgres-migrations
+  postgresqlPassword: CHANGEME
+  postgresqlDatabase: CDL
+  service:
+    type: NodePort
+    nodePort: 32000

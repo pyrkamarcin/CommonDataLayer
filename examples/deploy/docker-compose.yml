@@ -1,0 +1,122 @@
+###
+# This is example docker compose that sets up local developer environment.
+# Please refer to SETUP.md for instructions on how to run it.
+###
+
+version: '3'
+
+services:
+  zoo1:
+    image: zookeeper:3.4.9
+    ports:
+      - "2181:2181"
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_PORT: 2181
+      ZOO_SERVERS: server.1=zoo1:2888:3888
+    volumes:
+      - ./docker-volume/zoo1/data:/data
+      - ./docker-volume/zoo1/datalog:/datalog
+
+  kafka1:
+    image: confluentinc/cp-kafka:5.5.1
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:9093,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181"
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    volumes:
+      - ./docker-volume/kafka1/data:/var/lib/kafka/data
+    depends_on:
+      - zoo1
+
+  rabbit1:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - ./docker-volume/rabbit1:/etc/rabbitmq
+
+  postgres1:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: "1234"
+    volumes:
+      - ./docker-volume/postgres1/db:/var/lib/postgresql/data
+      - ./docker-volume/postgres1/init:/docker-entrypoint-initdb.d
+
+  schema_registry1:
+    image: schema_registry:latest
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      args:
+        - BIN=schema_registry
+    command: /bin/schema_registry
+    ports:
+      - "50101:50101"
+    environment:
+      DB_NAME: "/var/data/schema"
+      REPLICATION_ROLE: "master"
+      KAFKA_BROKERS: "kafka1:9093"
+      KAFKA_GROUP_ID: "schema_registry"
+      KAFKA_TOPICS: "cdl.schema_registry.internal"
+      INPUT_PORT: "50101"
+      RUST_LOG: info,schema_registry=trace
+    volumes:
+    - ./docker-volume/schema_registry1/db:/var/data/schema
+    depends_on:
+      - kafka1
+
+  data_router1:
+    image: data_router:latest
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      args:
+        - BIN=data_router
+    command: /bin/data_router
+    environment:
+      INPUT_ADDR: "amqp://guest:guest@rabbit1:5672/%2f"
+      INPUT_QUEUE: "cdl.data.input"
+      KAFKA_BROKERS: "kafka1:9093"
+      KAFKA_ERROR_CHANNEL: "cdl.reports"
+      SCHEMA_REGISTRY_ADDR: "http://schema_registry1:50101"
+      CACHE_CAPACITY: "1000"
+      RUST_LOG: info,data_router=trace
+    depends_on:
+      - kafka1
+      - rabbit1
+      - schema_registry1
+
+  postgres_command1:
+    image: command_service:latest
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      args:
+        - BIN=command_service
+    command: "/bin/command_service postgres"
+    environment:
+      KAFKA_INPUT_GROUP_ID: "postgres_command"
+      KAFKA_INPUT_BROKERS: "kafka1:9093"
+      KAFKA_INPUT_TOPIC: "cdl.document.input"
+      POSTGRES_OUTPUT_URL: "postgresql://postgres:1234@postgres1:5432/postgres"
+      REPORT_BROKER: "kafka1:9093"
+      REPORT_TOPIC: "cdl.reports"
+      RUST_LOG: info,command_service=trace
+    depends_on:
+      - postgres1
+      - data_router1

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-postgres-command-service
+  labels:
+    app: {{ .Release.Name }}-postgres-command-service
+    repository.type: document
+    repository.name: postgres
+spec:
+  replicas: {{ .Values.commandServiceReplicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-postgres-command-service
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-postgres-command-service
+        repository.type: document
+        repository.name: postgres
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '51805'
+        prometheus.io/path: '/metrics'
+    spec:
+      containers:
+      - name: cdl-postgres-command-service
+        image: "{{ .Values.global.imageRepositoryPath }}cdl_command_service:{{ .Values.global.imageVersion }}"
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+        command: ["/bin/command_service","postgres"]
+        env:
+        - name: KAFKA_INPUT_BROKERS
+          value: {{ .Values.global.kafkaBrokers }}
+        - name: KAFKA_INPUT_GROUP_ID
+          value: "cdl-postgres-command-service"   
+        - name: KAFKA_INPUT_TOPIC
+          value: {{ .Values.inputTopic }}
+        - name: POSTGRES_OUTPUT_URL
+          value: {{ .Values.postgresConnectionString }}    
+        - name: RUST_LOG
+          value: "info,command_service=debug" 
+        - name: REPORT_BROKER
+          value: {{ .Values.global.kafkaBrokers }}
+        - name: REPORT_TOPIC
+          value: {{ .Values.global.reportTopic }}
+        ports:
+        - containerPort: 51805
+      imagePullSecrets:
+      - name: {{ .Values.global.cdlImagePullSecrets }} 
+
+

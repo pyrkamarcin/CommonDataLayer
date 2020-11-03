@@ -1,0 +1,78 @@
+{
+  "data": [
+    {
+      "object_id": "2a4dde1b-83e0-4f98-a718-c9e90e00a239",
+      "version": 1603285701,
+      "schema_id": "a46a7fc0-0ca3-4852-affc-d589355524c5",
+      "payload": {
+        "name": "Renee",
+        "surname": "Dunman",
+        "address": {
+          "city": "Ellenville (NY)",
+          "line1": "28 Center St",
+          "line2": "Apt 13",
+          "postal_code": "12428"
+        },
+        "department": "BA",
+        "start_of_employment": "2012-07-13",
+        "end_of_employment": "2020-04-23"
+      }
+    },
+    {
+      "object_id": "2a4dde1b-83e0-4f98-a718-c9e90e00a239",
+      "version": 1603285702,
+      "schema_id": "a46a7fc0-0ca3-4852-affc-d589355524c5",
+      "payload": {
+        "name": "Renee",
+        "surname": "Dunman",
+        "address": {
+          "city": "Ellenville (NY)",
+          "line1": "28 Center St",
+          "line2": "",
+          "postal_code": "12428"
+        },
+        "department": "BA",
+        "start_of_employment": "2012-07-13",
+        "end_of_employment": "2020-04-23"
+      }
+    },
+    {
+      "object_id": "2a4dde1b-83e0-4f98-a718-c9e90e00a239",
+      "version": 1603285791,
+      "schema_id": "a46a7fc0-0ca3-4852-affc-d589355524c5",
+      "payload": {
+        "name": "Renee",
+        "surname": "Dunman",
+        "address": {
+          "city": "Ellenville (NY)",
+          "line1": "28 Center St",
+          "line2": null,
+          "postal_code": "12428"
+        },
+        "department": "BA",
+        "start_of_employment": "2012-07-13",
+        "end_of_employment": "2020-04-23"
+      }
+    }
+  ],
+  "expected": [
+    {
+      "object_id": "2a4dde1b-83e0-4f98-a718-c9e90e00a239",
+      "version": 1603285791,
+      "schema_id": "a46a7fc0-0ca3-4852-affc-d589355524c5",
+      "payload": {
+        "name": "Renee",
+        "surname": "Dunman",
+        "address": {
+          "city": "Ellenville (NY)",
+          "line1": "28 Center St",
+          "line2": null,
+          "postal_code": "12428"
+        },
+        "department": "BA",
+        "start_of_employment": "2012-07-13",
+        "end_of_employment": "2020-04-23"
+      }
+    }
+  ]
+}

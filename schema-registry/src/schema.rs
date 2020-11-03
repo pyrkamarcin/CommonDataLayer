@@ -1,0 +1,30 @@
+use crate::{db::SchemaDb, error::RegistryResult, types::VersionedUuid};
+use jsonschema::JSONSchema;
+use serde_json::Value;
+use uuid::Uuid;
+
+pub fn build_full_schema(mut schema: Value, db: &SchemaDb) -> RegistryResult<Value> {
+    if let Some(defs) = schema
+        .get_mut("definitions")
+        .and_then(|val| val.as_object_mut())
+    {
+        let schemas_to_retrieve: Vec<(String, Uuid)> = defs
+            .iter()
+            .filter_map(|(key, value)| {
+                value
+                    .as_str()
+                    .and_then(|val| Uuid::parse_str(val).ok())
+                    .map(|id| (key.clone(), id))
+            })
+            .collect();
+
+        for (key, id) in schemas_to_retrieve {
+            let schema = db.get_schema_definition(&VersionedUuid::any(id))?;
+            defs[&key] = schema.definition;
+        }
+    }
+
+    JSONSchema::compile(&schema, None)?;
+
+    Ok(schema)
+}

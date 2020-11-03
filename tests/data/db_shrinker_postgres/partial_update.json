@@ -1,0 +1,60 @@
+{
+  "data": [
+    {
+      "object_id": "199192e2-d755-4749-8e24-7168388664ed",
+      "version": 1603285780,
+      "schema_id": "a46a7fc0-0ca3-4852-affc-d589355524c5",
+      "payload": {
+        "name": "Dede",
+        "surname": "Mastin",
+        "address": {
+          "city": "San Gabriel (CA)",
+          "line1": "115 E Broadway",
+          "line2": "",
+          "postal_code": "91776"
+        },
+        "department": "ADM",
+        "start_of_employment": "2002-04-07",
+        "end_of_employment": "2004-12-31"
+      }
+    },
+    {
+      "object_id": "199192e2-d755-4749-8e24-7168388664ed",
+      "version": 1603285781,
+      "schema_id": "a46a7fc0-0ca3-4852-affc-d589355524c5",
+      "payload": {
+        "start_of_employment": "2006-01-01",
+        "end_of_employment": "2010-02-21"
+      }
+    },
+    {
+      "object_id": "199192e2-d755-4749-8e24-7168388664ed",
+      "version": 1603285790,
+      "schema_id": "a46a7fc0-0ca3-4852-affc-d589355524c5",
+      "payload": {
+        "start_of_employment": "2016-01-01",
+        "end_of_employment": "2020-04-23"
+      }
+    }
+  ],
+  "expected": [
+    {
+      "object_id": "199192e2-d755-4749-8e24-7168388664ed",
+      "version": 1603285790,
+      "schema_id": "a46a7fc0-0ca3-4852-affc-d589355524c5",
+      "payload": {
+        "name": "Dede",
+        "surname": "Mastin",
+        "address": {
+          "city": "San Gabriel (CA)",
+          "line1": "115 E Broadway",
+          "line2": "",
+          "postal_code": "91776"
+        },
+        "department": "ADM",
+        "start_of_employment": "2016-01-01",
+        "end_of_employment": "2020-04-23"
+      }
+    }
+  ]
+}

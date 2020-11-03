@@ -1,0 +1,29 @@
+[package]
+name = "benchmarking"
+authors = ["CDL Team"]
+version = "0.1.0"
+edition = "2018"
+license = "Apache-2.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "upload_to_kafka"
+path = "src/upload_to_kafka.rs"
+
+[[bin]]
+name = "upload_to_rabbitmq"
+path = "src/upload_to_rabbitmq.rs"
+
+[dependencies]
+anyhow      = "1.0"
+pbr         = "1.0"
+rand        = "0.7"
+rdkafka     = "0.24"
+tokio-amqp  = "0.1"
+lapin       = "1.2"
+structopt   = "0.3"
+serde_json  = "1.0"
+serde       = { version = "1.0", features = ["derive"] }
+uuid        = { version = "0.8", features = ["v4", "serde"] }
+tokio       = { version = "0.2", features = ["macros", "sync"] }
