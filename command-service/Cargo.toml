@@ -12,7 +12,7 @@ name = "command_service"
 path = "src/lib.rs"
 
 [[bin]]
-name = "command_service"
+name = "command-service"
 path = "src/main.rs"
 
 [dependencies]
