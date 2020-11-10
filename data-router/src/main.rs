@@ -20,6 +20,9 @@ use utils::{
 };
 use uuid::Uuid;
 
+const SERVICE_NAME: &str = "data-router";
+const RABBIT_CONSUMER_TAG: &str = "CDL_DATA_ROUTER";
+
 #[derive(Deserialize, Debug, Serialize)]
 struct Config {
     pub input_addr: String,
@@ -37,7 +40,7 @@ async fn main() -> anyhow::Result<()> {
     metrics::serve();
 
     let consumer =
-        CommonConsumer::new_rabbit(&config.input_addr, "CDL_DATA_ROUTER", &config.input_queue)
+        CommonConsumer::new_rabbit(&config.input_addr, RABBIT_CONSUMER_TAG, &config.input_queue)
             .await?;
     let producer = Arc::new(
         CommonPublisher::new_kafka(&config.kafka_brokers)
@@ -45,7 +48,7 @@ async fn main() -> anyhow::Result<()> {
             .unwrap(),
     );
     let cache = Arc::new(Mutex::new(LruCache::new(config.cache_capacity)));
-    let consumer = Box::leak(Box::new(consumer));
+    let consumer = consumer.leak();
     let message_stream = consumer.consume().await;
     pin!(message_stream);
     while let Some(message) = message_stream.next().await {
@@ -100,7 +103,7 @@ async fn handle_message(
         send_message(
             producer.as_ref(),
             &config.kafka_error_channel,
-            &"data-router",
+            SERVICE_NAME,
             format!("{:?}", error).into(),
         )
         .await;

@@ -1,7 +1,7 @@
 use anyhow::Context;
 use async_stream::try_stream;
 use futures_util::stream::{Stream, StreamExt};
-use lapin::{options::BasicConsumeOptions, types::FieldTable, Channel, Connection};
+use lapin::{options::BasicConsumeOptions, types::FieldTable};
 use rdkafka::{
     consumer::{DefaultConsumerContext, StreamConsumer},
     ClientConfig,
@@ -19,8 +19,6 @@ pub enum CommonConsumer {
         consumer: Arc<StreamConsumer<DefaultConsumerContext>>,
     },
     RabbitMq {
-        _connection: Box<Connection>,
-        _channel: Box<Channel>,
         consumer: lapin::Consumer,
     },
 }
@@ -67,11 +65,7 @@ impl CommonConsumer {
                 FieldTable::default(),
             )
             .await?;
-        Ok(CommonConsumer::RabbitMq {
-            _channel: Box::new(channel),
-            _connection: Box::new(connection),
-            consumer,
-        })
+        Ok(CommonConsumer::RabbitMq { consumer })
     }
 
     pub async fn consume(
@@ -88,8 +82,6 @@ impl CommonConsumer {
                 }
                 CommonConsumer::RabbitMq {
                     consumer,
-                    _connection,
-                    _channel,
                 } => {
                     while let Some(message) = consumer.next().await {
                         let message = message?;
@@ -98,5 +90,13 @@ impl CommonConsumer {
                 }
             }
         }
+    }
+
+    /// Leaks consumer to guarantee consumer never be dropped.
+    /// Static consumer lifetime is required for consumed messages to be passed to spawned futures.
+    ///
+    /// Use with causion as it can cause memory leaks.
+    pub fn leak(self) -> &'static mut CommonConsumer {
+        Box::leak(Box::new(self))
     }
 }

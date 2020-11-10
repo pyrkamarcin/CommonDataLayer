@@ -1,4 +1,4 @@
-use lapin::{options::BasicPublishOptions, BasicProperties, Channel, Connection};
+use lapin::{options::BasicPublishOptions, BasicProperties, Channel};
 use rdkafka::{
     producer::{FutureProducer, FutureRecord},
     ClientConfig,
@@ -9,13 +9,8 @@ use tokio_amqp::LapinTokioExt;
 use super::CommunicationResult;
 
 pub enum CommonPublisher {
-    Kafka {
-        producer: FutureProducer,
-    },
-    RabbitMq {
-        _connection: Box<Connection>,
-        channel: Channel,
-    },
+    Kafka { producer: FutureProducer },
+    RabbitMq { channel: Channel },
 }
 impl CommonPublisher {
     pub async fn new_rabbit(connection_string: &str) -> CommunicationResult<CommonPublisher> {
@@ -26,10 +21,7 @@ impl CommonPublisher {
         .await?;
         let channel = connection.create_channel().await?;
 
-        Ok(CommonPublisher::RabbitMq {
-            _connection: Box::new(connection),
-            channel,
-        })
+        Ok(CommonPublisher::RabbitMq { channel })
     }
 
     pub async fn new_kafka(brokers: &str) -> CommunicationResult<CommonPublisher> {
@@ -62,10 +54,7 @@ impl CommonPublisher {
                 delivery_status.await.map_err(|x| x.0)?;
                 Ok(())
             }
-            CommonPublisher::RabbitMq {
-                _connection,
-                channel,
-            } => {
+            CommonPublisher::RabbitMq { channel } => {
                 channel
                     .basic_publish(
                         topic_or_exchange,

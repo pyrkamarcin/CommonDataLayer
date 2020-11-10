@@ -66,7 +66,7 @@ impl KafkaInput {
     }
 
     pub async fn listen(self) -> Result<(), Error> {
-        let consumer = Box::leak(Box::new(self.consumer));
+        let consumer = self.consumer.leak();
         let message_stream = consumer.consume().await;
         pin!(message_stream);
 
