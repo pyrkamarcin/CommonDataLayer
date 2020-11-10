@@ -3,7 +3,7 @@ name: Publish to docker.io on HEAD changes
 on:
   push:
     branches:
-      - master
+      - main
     paths-ignore:
       - ".github/"
       - "benchmarking/"
