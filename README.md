@@ -12,7 +12,7 @@ scalability, and ease-of-modification as key tenets of its design, among others.
 
 ## How does it work?
 
-Data intake is all performed over Message Queue and via the Data Router. Message Query (MQ) is an abstract entity and the CDL currently supports [kafka][kafka] and [RabbitMQ][rmq]. CDL listens over a single topic queue for messages keyed on strings, each providing a schema ID. The schema ID is used to load the appropriate topic (stored per-schema in the schema registry), which is used to route the message along to the correct repository.
+Data intake is all performed over Message Queue and via the Data Router. Message Queue (MQ) is an abstract entity and the CDL currently supports [kafka][kafka] and [RabbitMQ][rmq]. CDL listens over a single topic queue for messages keyed on strings, each providing a schema ID. The schema ID is used to load the appropriate topic (stored per-schema in the schema registry), which is used to route the message along to the correct repository.
 
 _Note: the crate for the [schema registry][schema registry] has more information on schemas and views._
 
@@ -58,4 +58,4 @@ See the [Getting-Started.md][Getting Started] to see how to use this service.
 [kafka]: https://kafka.apache.org/
 [rmq]: https://www.rabbitmq.com/
 [schema registry]: ./schema-registry/
-[Getting Started]: https://github.com/epiphany-platform/CommonDataLayer/blob/develop/docs/K8s-Local-Deployment.md
+[Getting Started]: ./docs/Getting-Started.md
