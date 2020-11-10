@@ -13,7 +13,7 @@ name = "schema_registry"
 path = "src/lib.rs"
 
 [[bin]]
-name = "schema_registry"
+name = "schema-registry"
 path = "src/main.rs"
 
 [dependencies]
