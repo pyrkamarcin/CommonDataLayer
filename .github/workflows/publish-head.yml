@@ -2,9 +2,10 @@ name: Publish to docker.io on HEAD changes
 
 on:
   push:
+    tags:
+      - "*"
     branches:
       - main
-    tags:
     paths-ignore:
       - ".github/"
       - "benchmarking/"
