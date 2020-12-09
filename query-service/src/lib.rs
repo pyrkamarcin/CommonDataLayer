@@ -1,11 +1,10 @@
-use error::ClientError;
 use schema::{query_client::QueryClient, ObjectIds, RawStatement, SchemaId};
 use std::collections::HashMap;
 use tonic::transport::Channel;
+use utils::query_utils::error::ClientError;
 
 pub mod druid;
 pub mod ds;
-pub mod error;
 pub mod psql;
 
 pub mod schema {
