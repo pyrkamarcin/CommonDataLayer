@@ -1,15 +1,16 @@
 use crate::communication::resolution::Resolution;
-use crate::communication::GenericMessage;
 use crate::output::victoria_metrics::config::VictoriaMetricsConfig;
 use crate::output::OutputPlugin;
 use itertools::Itertools;
 use log::error;
 use reqwest::Url;
 use reqwest::{Client, StatusCode};
+use serde_json::value::RawValue;
 use serde_json::Value;
 use std::iter;
 use thiserror::Error as DeriveError;
 use url::ParseError;
+use utils::message_types::BorrowedInsertMessage;
 use utils::metrics::counter;
 use uuid::Uuid;
 
@@ -47,22 +48,22 @@ impl VictoriaMetricsOutputPlugin {
 
 #[async_trait::async_trait]
 impl OutputPlugin for VictoriaMetricsOutputPlugin {
-    async fn handle_message(&self, msg: GenericMessage) -> Resolution {
+    async fn handle_message(&self, msg: BorrowedInsertMessage<'_>) -> Resolution {
         let mut url = self.url.clone();
 
         url.set_query(Some(&format!("db={}", msg.schema_id)));
 
-        let GenericMessage {
+        let BorrowedInsertMessage {
             object_id,
             schema_id,
             timestamp,
-            payload,
+            data,
         } = msg;
 
-        match build_line_protocol(schema_id, object_id, timestamp, &payload) {
+        match build_line_protocol(schema_id, object_id, timestamp, data) {
             Ok(line_protocol) => send_data(url, &self.client, line_protocol).await,
             Err(err) => {
-                let context = String::from_utf8_lossy(&payload).to_string();
+                let context = data.to_string();
 
                 error!(
                     "Failed to convert payload to line_protocol, cause `{}`, context `{}`",
@@ -85,9 +86,10 @@ fn build_line_protocol(
     measurement: Uuid,
     tag: Uuid,
     timestamp: i64,
-    payload: &[u8],
+    payload: &RawValue,
 ) -> Result<String, Error> {
-    let fields_raw: Value = serde_json::from_slice(payload).map_err(Error::DataIsNotValidJson)?;
+    let fields_raw: Value =
+        serde_json::from_str(payload.get()).map_err(Error::DataIsNotValidJson)?;
 
     if let Value::Object(obj) = fields_raw {
         if obj.is_empty() {
@@ -151,14 +153,13 @@ mod tests {
 
         #[test_case("{}"                => matches Err(Error::EmptyFields))]
         #[test_case("{ \"y01\": {} }"   => matches Err(Error::InvalidFieldType))]
-        #[test_case("y00=32q,y01=14.0f" => matches Err(Error::DataIsNotValidJson(_)))]
         #[test_case("[ 1, 13 ]"         => matches Err(Error::DataIsNotAJsonObject))]
         fn produces_desired_errors(payload: &str) -> Result<String, Error> {
             build_line_protocol(
                 Uuid::default(),
                 Uuid::default(),
                 i64::default(),
-                payload.as_bytes(),
+                &RawValue::from_string(payload.to_string()).unwrap(),
             )
         }
 
@@ -230,7 +231,7 @@ mod tests {
                 case.schema_id.parse().unwrap(),
                 case.object_id.parse().unwrap(),
                 case.version,
-                case.payload.as_bytes(),
+                &RawValue::from_string(case.payload.to_string()).unwrap(),
             )
             .unwrap()
         }
