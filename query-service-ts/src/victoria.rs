@@ -138,10 +138,10 @@ impl QueryServiceTs for VictoriaQuery {
     ) -> Result<Response<TimeSeries>, Status> {
         let query = [(
             "query",
-            format!("{{_name_=\"{}\"}}", request.into_inner().schema_id),
+            format!("{{__name__=~\"{}_.*\"}}", request.into_inner().schema_id),
         )];
 
-        let response: String = self.query_db("GET", "/query_range", &query).await?;
+        let response: String = self.query_db("GET", "/query", &query).await?;
 
         Ok(tonic::Response::new(TimeSeries {
             timeseries: response,
@@ -154,7 +154,7 @@ impl QueryServiceTs for VictoriaQuery {
     ) -> Result<Response<ValueBytes>, Status> {
         let params: RawStatementParameters =
             serde_json::from_str(&request.into_inner().raw_statement).map_err(|e| {
-                Status::internal(format!("Did not deserialise raw_statement: {}", e))
+                Status::internal(format!("Did not deserialize raw_statement: {}", e))
             })?;
 
         let response = self
@@ -162,8 +162,7 @@ impl QueryServiceTs for VictoriaQuery {
             .await?;
 
         Ok(tonic::Response::new(ValueBytes {
-            value_bytes: serde_json::to_vec(&response)
-                .map_err(|e| Status::internal(format!("Error serializing data: {}", e)))?,
+            value_bytes: response.as_bytes().to_vec(),
         }))
     }
 }
