@@ -12,6 +12,7 @@ use crate::{
     error::{MalformedError, RegistryError, RegistryResult},
     types::DbExport,
     types::SchemaDefinition,
+    types::ViewUpdate,
 };
 use indradb::{
     Datastore, EdgeQueryExt, RangeVertexQuery, SledDatastore, SpecificEdgeQuery,
@@ -99,6 +100,20 @@ impl<D: Datastore> SchemaDb<D> {
         } else {
             Ok(())
         }
+    }
+
+    pub fn get_schema(&self, id: Uuid) -> RegistryResult<Schema> {
+        let conn = self.connect()?;
+        let props = conn
+            .get_all_vertex_properties(SpecificVertexQuery::single(id))?
+            .into_iter()
+            .next()
+            .ok_or(RegistryError::NoSchemaWithId(id))?;
+
+        let schema_id = props.vertex.id;
+        Schema::from_properties(props)
+            .map(|(_, schema)| schema)
+            .ok_or_else(|| MalformedError::MalformedSchema(schema_id).into())
     }
 
     pub fn get_schema_definition(&self, id: &VersionedUuid) -> RegistryResult<SchemaDefinition> {
@@ -308,13 +323,37 @@ impl<D: Datastore> SchemaDb<D> {
         Ok(view_id)
     }
 
-    pub fn update_view(&self, id: Uuid, view: View) -> RegistryResult<View> {
+    pub fn update_view(&self, id: Uuid, view: ViewUpdate) -> RegistryResult<View> {
         let old_view = self.get_view(id)?;
-        self.validate_view(&view.jmespath)?;
 
-        self.set_vertex_properties(id, &view.into_properties())?;
+        if let Some(jmespath) = view.jmespath.as_ref() {
+            self.validate_view(jmespath)?;
+        }
+
+        if let Some(name) = view.name {
+            self.set_vertex_properties(id, &[(View::NAME, Value::String(name))])?;
+        }
+
+        if let Some(jmespath) = view.jmespath {
+            self.set_vertex_properties(id, &[(View::EXPRESSION, Value::String(jmespath))])?;
+        }
 
         Ok(old_view)
+    }
+
+    pub fn get_all_schemas(&self) -> RegistryResult<HashMap<Uuid, Schema>> {
+        let conn = self.connect()?;
+        let all_schemas = conn
+            .get_all_vertex_properties(RangeVertexQuery::new(std::u32::MAX).t(Schema::db_type()))?;
+
+        all_schemas
+            .into_iter()
+            .map(|props| {
+                let schema_id = props.vertex.id;
+                Schema::from_properties(props)
+                    .ok_or_else(|| MalformedError::MalformedSchema(schema_id).into())
+            })
+            .collect()
     }
 
     pub fn get_all_schema_names(&self) -> RegistryResult<HashMap<Uuid, String>> {
