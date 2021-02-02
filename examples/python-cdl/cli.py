@@ -111,6 +111,12 @@ def create_schema():
             'message': 'Name of schema to insert',
         },
         {
+            'type': 'list',
+            'name': 'schema_type',
+            'choices': ['DocumentStorage', 'Timeseries'],
+            'message': 'Type of repository',
+        },
+        {
             'type': 'input',
             'name': 'schema_topic',
             'default': 'cdl.document.input',
