@@ -116,6 +116,8 @@ impl<P: OutputPlugin> MessageQueueInput<P> {
         }
         trace!("Stream closed");
 
+        tokio::time::delay_for(tokio::time::Duration::from_secs(3)).await;
+
         Ok(())
     }
 }
