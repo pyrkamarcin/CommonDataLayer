@@ -1,12 +1,17 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use anyhow::Result;
+use anyhow::{Context as _, Result};
 use rpc::schema_registry::schema_registry_client::SchemaRegistryClient;
 use rpc::tonic::transport::Channel;
 use tokio::sync::Mutex;
+use utils::messaging_system::publisher::CommonPublisher;
 
-use crate::{config::Config, events::EventStream, events::EventSubscriber};
+use crate::{
+    config::{Config, MessageQueueConfig},
+    events::EventStream,
+    events::EventSubscriber,
+};
 
 #[derive(Clone)]
 pub struct Context {
@@ -59,6 +64,19 @@ impl Context {
                 event_map.insert(topic.into(), subscriber);
                 Ok(stream)
             }
+        }
+    }
+
+    pub async fn connect_to_data_router(&self) -> anyhow::Result<CommonPublisher> {
+        match self.config().message_queue.config()? {
+            MessageQueueConfig::Amqp {
+                connection_string, ..
+            } => CommonPublisher::new_amqp(&connection_string)
+                .await
+                .context("Unable to open RabbitMQ publisher for Data Router"),
+            MessageQueueConfig::Kafka { brokers, .. } => CommonPublisher::new_kafka(&brokers)
+                .await
+                .context("Unable to open Kafka publisher for Data Router"),
         }
     }
 }

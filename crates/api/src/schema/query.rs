@@ -1,7 +1,11 @@
+use std::collections::HashMap;
+
 use crate::error::{Error, Result};
 use crate::schema::context::Context;
 use crate::schema::utils::{get_schema, get_view};
+use crate::types::data::CdlObject;
 use crate::types::schema::*;
+
 use juniper::{graphql_object, FieldResult};
 use num_traits::FromPrimitive;
 use rpc::schema_registry::Empty;
@@ -156,5 +160,77 @@ impl Query {
     async fn view(context: &Context, id: Uuid) -> FieldResult<View> {
         let mut conn = context.connect_to_registry().await?;
         get_view(&mut conn, id).await
+    }
+
+    /// Return a single object from the query router
+    async fn object(object_id: Uuid, schema_id: Uuid, context: &Context) -> FieldResult<CdlObject> {
+        let client = reqwest::Client::new();
+
+        let bytes = client
+            .post(&format!(
+                "{}/single/{}",
+                &context.config().query_router_addr,
+                object_id
+            ))
+            .header("SCHEMA_ID", schema_id.to_string())
+            .body("{}")
+            .send()
+            .await?
+            .bytes()
+            .await?;
+
+        Ok(CdlObject {
+            object_id,
+            data: serde_json::from_slice(&bytes[..])?,
+        })
+    }
+
+    /// Return a map of objects selected by ID from the query router
+    async fn objects(
+        object_ids: Vec<Uuid>,
+        schema_id: Uuid,
+        context: &Context,
+    ) -> FieldResult<Vec<CdlObject>> {
+        let client = reqwest::Client::new();
+
+        let id_list = object_ids
+            .into_iter()
+            .map(|id| id.to_string())
+            .collect::<Vec<String>>()
+            .join(",");
+        let values: HashMap<Uuid, serde_json::Value> = client
+            .get(&format!(
+                "{}/multiple/{}",
+                &context.config().query_router_addr,
+                id_list
+            ))
+            .header("SCHEMA_ID", schema_id.to_string())
+            .send()
+            .await?
+            .json()
+            .await?;
+
+        Ok(values
+            .into_iter()
+            .map(|(object_id, data)| CdlObject { object_id, data })
+            .collect::<Vec<CdlObject>>())
+    }
+
+    /// Return a map of all objects (keyed by ID) in a schema from the query router
+    async fn schema_objects(schema_id: Uuid, context: &Context) -> FieldResult<Vec<CdlObject>> {
+        let client = reqwest::Client::new();
+
+        let values: HashMap<Uuid, serde_json::Value> = client
+            .get(&format!("{}/schema", &context.config().query_router_addr,))
+            .header("SCHEMA_ID", schema_id.to_string())
+            .send()
+            .await?
+            .json()
+            .await?;
+
+        Ok(values
+            .into_iter()
+            .map(|(object_id, data)| CdlObject { object_id, data })
+            .collect::<Vec<CdlObject>>())
     }
 }
