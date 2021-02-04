@@ -1,11 +1,12 @@
+use std::collections::HashMap;
 use std::sync::Arc;
 
-use crate::{config::Config, events::EventStream, events::EventSubscriber};
 use anyhow::Result;
 use rpc::schema_registry::schema_registry_client::SchemaRegistryClient;
 use rpc::tonic::transport::Channel;
-use std::collections::HashMap;
 use tokio::sync::Mutex;
+
+use crate::{config::Config, events::EventStream, events::EventSubscriber};
 
 #[derive(Clone)]
 pub struct Context {
@@ -29,7 +30,8 @@ impl Context {
 
     pub async fn connect_to_registry(&self) -> Result<SchemaRegistryConn> {
         // TODO: Make proper connection pool
-        let new_conn = rpc::schema_registry::connect(self.config.registry_addr.clone()).await?;
+        let new_conn =
+            rpc::schema_registry::connect(self.config.schema_registry_addr.clone()).await?;
         Ok(new_conn)
     }
 

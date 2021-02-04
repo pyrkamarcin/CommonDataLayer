@@ -4,7 +4,6 @@ use lru_cache::LruCache;
 use rpc::schema_registry::Id;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::time::{SystemTime, UNIX_EPOCH};
 use std::{
     process,
     sync::{Arc, Mutex},
@@ -21,7 +20,8 @@ use utils::{
     metrics::{self, counter},
 };
 use utils::{
-    message_types::DataRouterInsertMessage, messaging_system::consumer::CommonConsumerConfig,
+    current_timestamp, message_types::DataRouterInsertMessage,
+    messaging_system::consumer::CommonConsumerConfig,
 };
 use uuid::Uuid;
 
@@ -272,11 +272,4 @@ async fn send_message(producer: &CommonPublisher, topic_name: &str, key: &str, p
         process::abort();
     };
     counter!("cdl.data-router.output-singleok", 1);
-}
-
-fn current_timestamp() -> i64 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .expect("Time went backwards")
-        .as_millis() as i64
 }
