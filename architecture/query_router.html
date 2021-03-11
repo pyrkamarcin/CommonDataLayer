@@ -186,16 +186,16 @@ Query Router first queries SR, then basing on received config, finds out specifi
 <li>gRPC with query-services (request-response)</li>
 <li>gRPC with schema-registry (request-response)</li>
 </ul>
-<h3><a class="header" href="#configuration" id="configuration">Configuration</a></h3>
-<p><code>INPUT_PORT SCHEMA_REGISTRY_ADDR CACHE_CAPACITY RUST_LOG</code></p>
+<h3><a class="header" href="#configuration-environment-variables" id="configuration-environment-variables">Configuration (Environment Variables)</a></h3>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>INPUT_PORT</td><td>Port to listen on</td><td>50103</td><td>yes</td><td></td></tr>
+<tr><td>SCHEMA_REGISTRY_ADDR</td><td>Address of schema registry gRPC API</td><td>http://schema_registry:50101</td><td>yes</td><td></td></tr>
+<tr><td>CACHE_CAPACITY</td><td>How many entries the cache can hold</td><td>1024</td><td>yes</td><td></td></tr>
+<tr><td>METRICS_PORT</td><td>Port to listen on for Prometheus requests</td><td>58105</td><td>no</td><td>58105</td></tr>
+<tr><td>RUST_LOG</td><td>Log level</td><td><code>trace</code></td><td>no</td><td></td></tr>
+</tbody></table>
 <h2><a class="header" href="#running" id="running">Running</a></h2>
 <p>To run the <strong>query-router</strong> requires the <a href="schema_registry.html">Schema Registry</a> to be running and the <a href="query_service.html">Query Services</a> or the <a href="https://github.com/epiphany-platform/CommonDataLayer/tree/develop/crates/query-service-ts">Timeseries Query Services</a> connected to their respective repositories.</p>
-<p>Configuration is expected through the following environment variables:</p>
-<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th></tr></thead><tbody>
-<tr><td>SCHEMA_REGISTRY_ADDR</td><td>Address of setup schema registry</td><td>http://schema_registry:50101</td></tr>
-<tr><td>INPUT_PORT</td><td>Port to listen on</td><td>50103</td></tr>
-<tr><td>CACHE_CAPACITY</td><td>How many entries the cache can hold</td><td>1024</td></tr>
-</tbody></table>
 <p><em>Note: Currently, the cache is valid forever: changing a schema's <strong>query-service</strong> address will not update in the <strong>query-router</strong>.</em></p>
 <h2><a class="header" href="#functionality" id="functionality">Functionality</a></h2>
 <p>REST API specification is available in <a href="https://github.com/epiphany-platform/CommonDataLayer/blob/develop/crates/query-router/api.yml">OpenAPI 3.0 spec</a>.</p>

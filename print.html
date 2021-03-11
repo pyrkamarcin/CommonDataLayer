@@ -692,6 +692,35 @@ It is self-describing, interactive and easy to use way to manage your instance.<
     }
 }
 </code></pre>
+<h3><a class="header" href="#configuration-environment-variables" id="configuration-environment-variables">Configuration (Environment Variables)</a></h3>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>INPUT_PORT</td><td>Port to listen on</td><td>50103</td><td>yes</td><td></td></tr>
+<tr><td>SCHEMA_REGISTRY_ADDR</td><td>Address of schema registry gRPC API</td><td>http://schema_registry:50101</td><td>yes</td><td></td></tr>
+<tr><td>QUERY_ROUTER_ADDR</td><td>Address of query router gRPC API</td><td>http://query_router:50101</td><td>yes</td><td></td></tr>
+<tr><td>COMMUNICATION_METHOD</td><td>The method to communicate with external services</td><td><code>kafka</code> / <code>amqp</code> / <code>grpc</code></td><td>yes</td><td></td></tr>
+<tr><td>RUST_LOG</td><td>Log level</td><td><code>trace</code></td><td>no</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#kafka-configuration" id="kafka-configuration">Kafka Configuration</a></h4>
+<p><em>(if <code>COMMUNICATION_METHOD</code> equals <code>kafka</code>)</em></p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>KAFKA_BROKERS</td><td>Address to Kafka brokers</td><td><code>kafka:9093</code></td><td>yes</td><td></td></tr>
+<tr><td>KAFKA_GROUP_ID</td><td>Group ID of the consumer</td><td><code>postgres_command</code></td><td>yes</td><td></td></tr>
+<tr><td>REPORT_SOURCE</td><td>Kafka topic on which API listens for notifications</td><td><code>cdl.notifications</code></td><td>yes</td><td></td></tr>
+<tr><td>INSERT_DESTINATION</td><td>Kafka topic to which API inserts new objects</td><td><code>cdl.data.input</code></td><td>yes</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#amqp-configuration" id="amqp-configuration">AMQP Configuration</a></h4>
+<p><em>(if <code>COMMUNICATION_METHOD</code> equals <code>amqp</code>)</em></p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>AMQP_CONNECTION_STRING</td><td>Connection URL to AMQP Server</td><td><code>amqp://user:CHANGEME@rabbitmq:5672/%2f</code></td><td>yes</td><td></td></tr>
+<tr><td>AMQP_CONSUMER_TAG</td><td>Consumer tag</td><td><code>postgres_command</code></td><td>yes</td><td></td></tr>
+<tr><td>REPORT_SOURCE</td><td>AMQP queue on which API listens for notifications</td><td><code>cdl.notifications</code></td><td>yes</td><td></td></tr>
+<tr><td>INSERT_DESTINATION</td><td>AMQP exchange to which API inserts new objects</td><td><code>cdl.data.input</code></td><td>yes</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#grpc-configuration" id="grpc-configuration">gRPC Configuration</a></h4>
+<p><em>(if <code>COMMUNICATION_METHOD</code> equals <code>grpc</code>)</em></p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>INSERT_DESTINATION</td><td>gRPC service address on which API inserts new objects</td><td><code>http://data_router:50101</code></td><td>yes</td><td></td></tr>
+</tbody></table>
 <h1><a class="header" href="#configuration-layer-1" id="configuration-layer-1">Configuration Layer</a></h1>
 <p>Consists of services responsible for holding state and configuration of CDL.<br />
 Currently only the Schema Registry resides here, which keeps information about schemas and views.</p>
@@ -716,17 +745,36 @@ Currently only the Schema Registry resides here, which keeps information about s
 <ul>
 <li>Kafka (with other schema-registry instances)</li>
 </ul>
-<h3><a class="header" href="#configuration" id="configuration">Configuration</a></h3>
-<p>Basic values used by SR</p>
-<pre><code>INPUT_PORT
-DB_NAME
-REPLICATION_ROLE
-KAFKA_BROKERS
-KAFKA_GROUP_ID
-KAFKA_TOPICS
-POD_NAME
-RUST_LOG
-</code></pre>
+<h3><a class="header" href="#configuration-environment-variables-1" id="configuration-environment-variables-1">Configuration (Environment Variables)</a></h3>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>INPUT_PORT</td><td>Port to listen on</td><td>50103</td><td>yes</td><td></td></tr>
+<tr><td>COMMUNICATION_METHOD</td><td>The method to communicate with external services</td><td><code>kafka</code> / <code>amqp</code> / <code>grpc</code></td><td>yes</td><td></td></tr>
+<tr><td>REPLICATION_ROLE</td><td>(deprecated)</td><td><code>master</code> / <code>slave</code> / <code>none</code></td><td>yes</td><td></td></tr>
+<tr><td>DB_NAME</td><td>Database name</td><td><code>schema-registry</code></td><td>yes</td><td></td></tr>
+<tr><td>POD_NAME</td><td>(deprecated) used to promote to <code>master</code></td><td><code>schema1</code></td><td>no</td><td></td></tr>
+<tr><td>EXPORT_DIR</td><td>Directory to save state of the database. The state is saved in newly created folder with timestamp</td><td><code>/var/db</code></td><td>no</td><td></td></tr>
+<tr><td>IMPORT_FILE</td><td>JSON file from which SR should load initial state. If the state already exists this env variable will be ignored</td><td><code>/var/db/initial-schema.json</code></td><td>no</td><td></td></tr>
+<tr><td>METRICS_PORT</td><td>Port to listen on for Prometheus requests</td><td>58105</td><td>no</td><td>58105</td></tr>
+<tr><td>RUST_LOG</td><td>Log level</td><td><code>trace</code></td><td>no</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#kafka-configuration-1" id="kafka-configuration-1">Kafka Configuration</a></h4>
+<p><em>(if <code>COMMUNICATION_METHOD</code> equals <code>kafka</code>)</em></p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>KAFKA_BROKERS</td><td>Address of Kafka brokers</td><td><code>kafka:9093</code></td><td>yes</td><td></td></tr>
+<tr><td>KAFKA_GROUP_ID</td><td>Group ID of the consumer</td><td><code>schema_registry</code></td><td>yes</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#amqp-configuration-1" id="amqp-configuration-1">AMQP Configuration</a></h4>
+<p><em>(if <code>COMMUNICATION_METHOD</code> equals <code>amqp</code>)</em></p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>AMQP_CONNECTION_STRING</td><td>Connection URL to AMQP Server</td><td><code>amqp://user:CHANGEME@rabbitmq:5672/%2f</code></td><td>yes</td><td></td></tr>
+<tr><td>AMQP_CONSUMER_TAG</td><td>Consumer tag</td><td><code>schema_registry</code></td><td>yes</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#replication-configuration" id="replication-configuration">Replication Configuration</a></h4>
+<p><em>(if <code>COMMUNICATION_METHOD</code> does NOT equal <code>grpc</code>)</em></p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>REPLICATION_SOURCE</td><td>Kafka topic/AMQP queue</td><td><code>cdl.schema_registry.internal</code></td><td>yes</td><td></td></tr>
+<tr><td>REPLICATION_DESTINATION</td><td>Kafka topic/AMQP exchange</td><td><code>cdl.schema_registry.internal</code></td><td>yes</td><td></td></tr>
+</tbody></table>
 <p>Mind that GRPC uses HTTP2 as its transport protocol (L4), so SCHEMA_REGISTRY_ADDR must be provided as <code>http://ip_or_name:port</code></p>
 <h1><a class="header" href="#leader-elector" id="leader-elector">Leader Elector</a></h1>
 <p>TODO</p>
@@ -790,15 +838,34 @@ Otherwise, messages will be split into sub-batches containing messages with the 
 ]
 </code></pre>
 <p>Please mind that internally, each message will get its own timestamp, with which data started being processed by CDL. This information is invisible for user.</p>
-<h3><a class="header" href="#configuration-1" id="configuration-1">Configuration</a></h3>
-<p>To configure data router, set following environment variables. <code>INPUT_ADDR</code> and <code>INPUT_QUEUE</code> is related to the incoming data in the router. <code>KAFKA_BROKERS</code>, <code>KAFKA_ERROR_CHANNEL</code> are related to messages being routed through Kafka to the corresponding command service.</p>
-<pre><code>INPUT_ADDR
-INPUT_QUEUE
-KAFKA_BROKERS
-KAFKA_ERROR_CHANNEL
-SCHEMA_REGISTRY_ADDR
-CACHE_CAPACITY
-</code></pre>
+<h3><a class="header" href="#configuration-environment-variables-2" id="configuration-environment-variables-2">Configuration (Environment Variables)</a></h3>
+<p>To configure the Data Router, set the following environment variables:</p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>COMMUNICATION_METHOD</td><td>The method to communicate with external services</td><td><code>kafka</code> / <code>amqp</code> / <code>grpc</code></td><td>yes</td><td></td></tr>
+<tr><td>INPUT_SOURCE</td><td>Kafka topic or AMQP queue</td><td><code>cdl.data.input</code></td><td>no, when <code>grpc</code> has been chosen</td><td></td></tr>
+<tr><td>SCHEMA_REGISTRY_ADDR</td><td>Address of schema registry gRPC API</td><td>http://schema_registry:50101</td><td>yes</td><td></td></tr>
+<tr><td>CACHE_CAPACITY</td><td>How many entries the cache can hold</td><td>1024</td><td>yes</td><td></td></tr>
+<tr><td>TASK_LIMIT</td><td>Max requests handled in parallel</td><td>128</td><td>yes</td><td>128</td></tr>
+<tr><td>METRICS_PORT</td><td>Port to listen on for Prometheus requests</td><td>58105</td><td>no</td><td>58105</td></tr>
+<tr><td>RUST_LOG</td><td>Log level</td><td><code>trace</code></td><td>no</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#kafka-configuration-2" id="kafka-configuration-2">Kafka Configuration</a></h4>
+<p><em>(if <code>COMMUNICATION_METHOD</code> equals <code>kafka</code>)</em></p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>KAFKA_BROKERS</td><td>Address of Kafka brokers</td><td><code>kafka:9093</code></td><td>yes</td><td></td></tr>
+<tr><td>KAFKA_GROUP_ID</td><td>Group ID of the consumer</td><td><code>data_router</code></td><td>yes</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#amqp-configuration-2" id="amqp-configuration-2">AMQP Configuration</a></h4>
+<p><em>(if <code>COMMUNICATION_METHOD</code> equals <code>amqp</code>)</em></p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>AMQP_CONNECTION_STRING</td><td>Connection URL to AMQP Server</td><td><code>amqp://user:CHANGEME@rabbitmq:5672/%2f</code></td><td>yes</td><td></td></tr>
+<tr><td>AMQP_CONSUMER_TAG</td><td>Consumer tag</td><td><code>data_router</code></td><td>yes</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#grpc-configuration-1" id="grpc-configuration-1">gRPC Configuration</a></h4>
+<p><em>(if <code>COMMUNICATION_METHOD</code> equals <code>grpc</code>)</em></p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>GRPC_PORT</td><td>Port to listen on</td><td>50103</td><td>yes</td><td></td></tr>
+</tbody></table>
 <p>Mind that GRPC uses HTTP2 as its transport protocol (L4), so SCHEMA_REGISTRY_ADDR must be provided as <code>http://ip_or_name:port</code></p>
 <p>See an example <a href="architecture/../deployment/index.html">configuration</a> of deployment of data router and other services.</p>
 <h1><a class="header" href="#storage-layer-1" id="storage-layer-1">Storage Layer</a></h1>
@@ -843,22 +910,56 @@ and is built in such way that it can support multiple databases (one at a time).
 <li>Troika (CDL's binary data repo)</li>
 <li>.. or anything with matching GRPC :)</li>
 </ul>
-<h3><a class="header" href="#configuration-environment-files" id="configuration-environment-files">Configuration (environment files)</a></h3>
-<pre><code>KAFKA_INPUT_GROUP_ID
-KAFKA_INPUT_BROKERS
-KAFKA_INPUT_TOPIC
-POSTGRES_USERNAME
-POSTGRES_PASSWORD
-POSTGRES_HOST
-POSTGRES_PORT
-POSTGRES_DBNAME
-POSTGRES_SCHEMA
-SLEIGH_OUTPUT_ADDR
-DRUID_OUTPUT_BROKER
-DRUID_OUTPUT_TOPIC
-REPORT_BROKER
-REPORT_TOPIC
-</code></pre>
+<h3><a class="header" href="#configuration-environment-variables-3" id="configuration-environment-variables-3">Configuration (Environment Variables)</a></h3>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>COMMUNICATION_METHOD</td><td>The method to communicate with external services</td><td><code>kafka</code> / <code>amqp</code> / <code>grpc</code></td><td>yes</td><td></td></tr>
+<tr><td>REPORT_DESTINATION</td><td>Kafka topic/AMQP exchange/callback URL to send notifications to (reporting disabled when empty)</td><td><code>cdl.notifications</code></td><td>no</td><td></td></tr>
+<tr><td>METRICS_PORT</td><td>Port to listen on for Prometheus requests</td><td>58105</td><td>no</td><td>58105</td></tr>
+<tr><td>RUST_LOG</td><td>Log level</td><td><code>trace</code></td><td>no</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#postgres-configuration" id="postgres-configuration">Postgres Configuration</a></h4>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>POSTGRES_USERNAME</td><td>Username</td><td><code>cdl</code></td><td>yes</td><td></td></tr>
+<tr><td>POSTGRES_PASSWORD</td><td>Password</td><td><code>cdl1234</code></td><td>yes</td><td></td></tr>
+<tr><td>POSTGRES_HOST</td><td>Host of the server</td><td><code>127.0.0.1</code></td><td>yes</td><td></td></tr>
+<tr><td>POSTGRES_PORT</td><td>Port on which the server listens</td><td>5432</td><td>yes</td><td></td></tr>
+<tr><td>POSTGRES_DBNAME</td><td>Database name</td><td><code>cdl</code></td><td>yes</td><td></td></tr>
+<tr><td>POSTGRES_SCHEMA</td><td>SQL Schema available for service</td><td><code>cdl</code></td><td>no</td><td><code>public</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#druid-configuration" id="druid-configuration">Druid Configuration</a></h4>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>DRUID_OUTPUT_BROKERS</td><td>Kafka brokers</td><td><code>kafka:9093</code></td><td>yes</td><td></td></tr>
+<tr><td>DRUID_OUTPUT_TOPIC</td><td>Kafka topic</td><td><code>cdl.timeseries.internal.druid</code></td><td>yes</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#victoria-metrics-configuration" id="victoria-metrics-configuration">Victoria Metrics Configuration</a></h4>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>VICTORIA_METRICS_OUTPUT_URL</td><td>URL to the VM</td><td><code>http://victoria_metrics:8428</code></td><td>yes</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#kafka-configuration-3" id="kafka-configuration-3">Kafka Configuration</a></h4>
+<p><em>(if <code>COMMUNICATION_METHOD</code> equals <code>kafka</code>)</em></p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>KAFKA_BROKERS</td><td>Address of Kafka brokers</td><td><code>kafka:9093</code></td><td>yes</td><td></td></tr>
+<tr><td>KAFKA_GROUP_ID</td><td>Group ID of the consumer</td><td><code>postgres_command</code></td><td>yes</td><td></td></tr>
+<tr><td>ORDERED_SOURCES</td><td>Topics with ordered messages</td><td><code>cdl.timeseries.vm.1.data</code></td><td>no, but one of <code>ORDERED_SOURCES</code> and <code>UNORDERED_SOURCES</code> has to be present</td><td></td></tr>
+<tr><td>UNORDERED_SOURCES</td><td>Topics with unordered messages</td><td><code>cdl.timeseries.vm.2.data</code></td><td>no, but one of <code>ORDERED_SOURCES</code> and <code>UNORDERED_SOURCES</code> has to be present</td><td></td></tr>
+<tr><td>TASK_LIMIT</td><td>Max requests handled in parallel</td><td>32</td><td>yes</td><td>32</td></tr>
+</tbody></table>
+<h4><a class="header" href="#amqp-configuration-3" id="amqp-configuration-3">AMQP Configuration</a></h4>
+<p><em>(if <code>COMMUNICATION_METHOD</code> equals <code>amqp</code>)</em></p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>AMQP_CONNECTION_STRING</td><td>Connection URL to AMQP Server</td><td><code>amqp://user:CHANGEME@rabbitmq:5672/%2f</code></td><td>yes</td><td></td></tr>
+<tr><td>AMQP_CONSUMER_TAG</td><td>Consumer tag</td><td><code>postgres_command</code></td><td>yes</td><td></td></tr>
+<tr><td>ORDERED_SOURCES</td><td>Queues with ordered messages</td><td><code>cdl.timeseries.vm.1.data</code></td><td>no, but one of <code>ORDERED_SOURCES</code> and <code>UNORDERED_SOURCES</code> has to be present</td><td></td></tr>
+<tr><td>UNORDERED_SOURCES</td><td>Queues with unordered messages</td><td><code>cdl.timeseries.vm.2.data</code></td><td>no, but one of <code>ORDERED_SOURCES</code> and <code>UNORDERED_SOURCES</code> has to be present</td><td></td></tr>
+<tr><td>TASK_LIMIT</td><td>Max requests handled in parallel</td><td>32</td><td>yes</td><td>32</td></tr>
+</tbody></table>
+<h4><a class="header" href="#grpc-configuration-2" id="grpc-configuration-2">gRPC Configuration</a></h4>
+<p><em>(if <code>COMMUNICATION_METHOD</code> equals <code>grpc</code>)</em></p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>GRPC_PORT</td><td>Port to listen on</td><td>50103</td><td>yes</td><td></td></tr>
+<tr><td>REPORT_ENDPOINT_URL</td><td>URL to send notifications to</td><td><code>notifications:50102</code></td><td>yes</td><td></td></tr>
+</tbody></table>
 <h1><a class="header" href="#db-shrinker-storage" id="db-shrinker-storage">Db Shrinker Storage</a></h1>
 <h2><a class="header" href="#usage" id="usage">Usage</a></h2>
 <p><code>db-shrinker-postgres &lt;connection-string&gt;</code></p>
@@ -900,8 +1001,21 @@ First path depends on type of repo</p>
 <ul>
 <li>database specific</li>
 </ul>
-<h3><a class="header" href="#configuration-2" id="configuration-2">Configuration</a></h3>
-<p><code>INPUT_PORT RUST_LOG POSTGRES_USERNAME POSTGRES_PASSWORD POSTGRES_HOST POSTGRES_PORT POSTGRES_DBNAME POSTGRES_SCHEMA</code></p>
+<h3><a class="header" href="#configuration-environment-variables-4" id="configuration-environment-variables-4">Configuration (Environment Variables)</a></h3>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>INPUT_PORT</td><td>Port to listen on</td><td>50103</td><td>yes</td><td></td></tr>
+<tr><td>METRICS_PORT</td><td>Port to listen on for Prometheus requests</td><td>58105</td><td>no</td><td>58105</td></tr>
+<tr><td>RUST_LOG</td><td>Log level</td><td><code>trace</code></td><td>no</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#postgres-configuration-1" id="postgres-configuration-1">Postgres Configuration</a></h4>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>POSTGRES_USERNAME</td><td>Username</td><td><code>cdl</code></td><td>yes</td><td></td></tr>
+<tr><td>POSTGRES_PASSWORD</td><td>Password</td><td><code>cdl1234</code></td><td>yes</td><td></td></tr>
+<tr><td>POSTGRES_HOST</td><td>Host of the server</td><td><code>127.0.0.1</code></td><td>yes</td><td></td></tr>
+<tr><td>POSTGRES_PORT</td><td>Port on which the server listens</td><td>5432</td><td>yes</td><td></td></tr>
+<tr><td>POSTGRES_DBNAME</td><td>Database name</td><td><code>cdl</code></td><td>yes</td><td></td></tr>
+<tr><td>POSTGRES_SCHEMA</td><td>SQL Schema available for service</td><td><code>cdl</code></td><td>no</td><td><code>public</code></td></tr>
+</tbody></table>
 <p>See an example <a href="architecture/../deployment/index.html">configuration</a> of deployment of data router and other services. </p>
 <h1><a class="header" href="#retrieval-layer-1" id="retrieval-layer-1">Retrieval Layer</a></h1>
 <p>Services in this layer are responsible for responding on queries from external systems via REST.
@@ -926,16 +1040,16 @@ Query Router first queries SR, then basing on received config, finds out specifi
 <li>gRPC with query-services (request-response)</li>
 <li>gRPC with schema-registry (request-response)</li>
 </ul>
-<h3><a class="header" href="#configuration-3" id="configuration-3">Configuration</a></h3>
-<p><code>INPUT_PORT SCHEMA_REGISTRY_ADDR CACHE_CAPACITY RUST_LOG</code></p>
+<h3><a class="header" href="#configuration-environment-variables-5" id="configuration-environment-variables-5">Configuration (Environment Variables)</a></h3>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>INPUT_PORT</td><td>Port to listen on</td><td>50103</td><td>yes</td><td></td></tr>
+<tr><td>SCHEMA_REGISTRY_ADDR</td><td>Address of schema registry gRPC API</td><td>http://schema_registry:50101</td><td>yes</td><td></td></tr>
+<tr><td>CACHE_CAPACITY</td><td>How many entries the cache can hold</td><td>1024</td><td>yes</td><td></td></tr>
+<tr><td>METRICS_PORT</td><td>Port to listen on for Prometheus requests</td><td>58105</td><td>no</td><td>58105</td></tr>
+<tr><td>RUST_LOG</td><td>Log level</td><td><code>trace</code></td><td>no</td><td></td></tr>
+</tbody></table>
 <h2><a class="header" href="#running-1" id="running-1">Running</a></h2>
 <p>To run the <strong>query-router</strong> requires the <a href="architecture/schema_registry.html">Schema Registry</a> to be running and the <a href="architecture/query_service.html">Query Services</a> or the <a href="https://github.com/epiphany-platform/CommonDataLayer/tree/develop/crates/query-service-ts">Timeseries Query Services</a> connected to their respective repositories.</p>
-<p>Configuration is expected through the following environment variables:</p>
-<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th></tr></thead><tbody>
-<tr><td>SCHEMA_REGISTRY_ADDR</td><td>Address of setup schema registry</td><td>http://schema_registry:50101</td></tr>
-<tr><td>INPUT_PORT</td><td>Port to listen on</td><td>50103</td></tr>
-<tr><td>CACHE_CAPACITY</td><td>How many entries the cache can hold</td><td>1024</td></tr>
-</tbody></table>
 <p><em>Note: Currently, the cache is valid forever: changing a schema's <strong>query-service</strong> address will not update in the <strong>query-router</strong>.</em></p>
 <h2><a class="header" href="#functionality" id="functionality">Functionality</a></h2>
 <p>REST API specification is available in <a href="https://github.com/epiphany-platform/CommonDataLayer/blob/develop/crates/query-router/api.yml">OpenAPI 3.0 spec</a>.</p>

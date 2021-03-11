@@ -188,17 +188,36 @@
 <ul>
 <li>Kafka (with other schema-registry instances)</li>
 </ul>
-<h3><a class="header" href="#configuration" id="configuration">Configuration</a></h3>
-<p>Basic values used by SR</p>
-<pre><code>INPUT_PORT
-DB_NAME
-REPLICATION_ROLE
-KAFKA_BROKERS
-KAFKA_GROUP_ID
-KAFKA_TOPICS
-POD_NAME
-RUST_LOG
-</code></pre>
+<h3><a class="header" href="#configuration-environment-variables" id="configuration-environment-variables">Configuration (Environment Variables)</a></h3>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>INPUT_PORT</td><td>Port to listen on</td><td>50103</td><td>yes</td><td></td></tr>
+<tr><td>COMMUNICATION_METHOD</td><td>The method to communicate with external services</td><td><code>kafka</code> / <code>amqp</code> / <code>grpc</code></td><td>yes</td><td></td></tr>
+<tr><td>REPLICATION_ROLE</td><td>(deprecated)</td><td><code>master</code> / <code>slave</code> / <code>none</code></td><td>yes</td><td></td></tr>
+<tr><td>DB_NAME</td><td>Database name</td><td><code>schema-registry</code></td><td>yes</td><td></td></tr>
+<tr><td>POD_NAME</td><td>(deprecated) used to promote to <code>master</code></td><td><code>schema1</code></td><td>no</td><td></td></tr>
+<tr><td>EXPORT_DIR</td><td>Directory to save state of the database. The state is saved in newly created folder with timestamp</td><td><code>/var/db</code></td><td>no</td><td></td></tr>
+<tr><td>IMPORT_FILE</td><td>JSON file from which SR should load initial state. If the state already exists this env variable will be ignored</td><td><code>/var/db/initial-schema.json</code></td><td>no</td><td></td></tr>
+<tr><td>METRICS_PORT</td><td>Port to listen on for Prometheus requests</td><td>58105</td><td>no</td><td>58105</td></tr>
+<tr><td>RUST_LOG</td><td>Log level</td><td><code>trace</code></td><td>no</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#kafka-configuration" id="kafka-configuration">Kafka Configuration</a></h4>
+<p><em>(if <code>COMMUNICATION_METHOD</code> equals <code>kafka</code>)</em></p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>KAFKA_BROKERS</td><td>Address of Kafka brokers</td><td><code>kafka:9093</code></td><td>yes</td><td></td></tr>
+<tr><td>KAFKA_GROUP_ID</td><td>Group ID of the consumer</td><td><code>schema_registry</code></td><td>yes</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#amqp-configuration" id="amqp-configuration">AMQP Configuration</a></h4>
+<p><em>(if <code>COMMUNICATION_METHOD</code> equals <code>amqp</code>)</em></p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>AMQP_CONNECTION_STRING</td><td>Connection URL to AMQP Server</td><td><code>amqp://user:CHANGEME@rabbitmq:5672/%2f</code></td><td>yes</td><td></td></tr>
+<tr><td>AMQP_CONSUMER_TAG</td><td>Consumer tag</td><td><code>schema_registry</code></td><td>yes</td><td></td></tr>
+</tbody></table>
+<h4><a class="header" href="#replication-configuration" id="replication-configuration">Replication Configuration</a></h4>
+<p><em>(if <code>COMMUNICATION_METHOD</code> does NOT equal <code>grpc</code>)</em></p>
+<table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
+<tr><td>REPLICATION_SOURCE</td><td>Kafka topic/AMQP queue</td><td><code>cdl.schema_registry.internal</code></td><td>yes</td><td></td></tr>
+<tr><td>REPLICATION_DESTINATION</td><td>Kafka topic/AMQP exchange</td><td><code>cdl.schema_registry.internal</code></td><td>yes</td><td></td></tr>
+</tbody></table>
 <p>Mind that GRPC uses HTTP2 as its transport protocol (L4), so SCHEMA_REGISTRY_ADDR must be provided as <code>http://ip_or_name:port</code></p>
 
                     </main>
