@@ -28,7 +28,7 @@ Egest methods (supported repositories):
 
 | Name                 | Short Description                                                                               | Example                   | Mandatory | Default |
 |----------------------|-------------------------------------------------------------------------------------------------|---------------------------|-----------|---------|
-| COMMUNICATION_METHOD | The method to communicate with external services                                                | `kafka` / `amqp` / `grpc` | yes       |         |
+| COMMUNICATION_METHOD | The method of communication with external services                                              | `kafka` / `amqp` / `grpc` | yes       |         |
 | REPORT_DESTINATION   | Kafka topic/AMQP exchange/callback URL to send notifications to (reporting disabled when empty) | `cdl.notifications`       | no        |         |
 | METRICS_PORT         | Port to listen on for Prometheus requests                                                       | 58105                     | no        | 58105   |
 | RUST_LOG             | Log level                                                                                       | `trace`                   | no        |         |
@@ -52,9 +52,9 @@ Egest methods (supported repositories):
 | DRUID_OUTPUT_TOPIC   | Kafka topic       | `cdl.timeseries.internal.druid` | yes       |         |
 
 #### Victoria Metrics Configuration
-| Name                        | Short Description | Example                        | Mandatory | Default |
-|-----------------------------|-------------------|--------------------------------|-----------|---------|
-| VICTORIA_METRICS_OUTPUT_URL | URL to the VM     | `http://victoria_metrics:8428` | yes       |         |
+| Name                        | Short Description           | Example                        | Mandatory | Default |
+|-----------------------------|-----------------------------|--------------------------------|-----------|---------|
+| VICTORIA_METRICS_OUTPUT_URL | Address of Victoria Metrics | `http://victoria_metrics:8428` | yes       |         |
 
 #### Kafka Configuration 
 *(if `COMMUNICATION_METHOD` equals `kafka`)*
