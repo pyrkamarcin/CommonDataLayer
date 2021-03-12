@@ -191,10 +191,10 @@
 <h3><a class="header" href="#configuration-environment-variables" id="configuration-environment-variables">Configuration (Environment Variables)</a></h3>
 <table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
 <tr><td>INPUT_PORT</td><td>Port to listen on</td><td>50103</td><td>yes</td><td></td></tr>
-<tr><td>COMMUNICATION_METHOD</td><td>The method to communicate with external services</td><td><code>kafka</code> / <code>amqp</code> / <code>grpc</code></td><td>yes</td><td></td></tr>
+<tr><td>COMMUNICATION_METHOD</td><td>The method of communication with external services</td><td><code>kafka</code> / <code>amqp</code> / <code>grpc</code></td><td>yes</td><td></td></tr>
 <tr><td>REPLICATION_ROLE</td><td>(deprecated)</td><td><code>master</code> / <code>slave</code> / <code>none</code></td><td>yes</td><td></td></tr>
 <tr><td>DB_NAME</td><td>Database name</td><td><code>schema-registry</code></td><td>yes</td><td></td></tr>
-<tr><td>POD_NAME</td><td>(deprecated) used to promote to <code>master</code></td><td><code>schema1</code></td><td>no</td><td></td></tr>
+<tr><td>POD_NAME</td><td>(deprecated) used to promote to <code>master</code> role</td><td><code>schema1</code></td><td>no</td><td></td></tr>
 <tr><td>EXPORT_DIR</td><td>Directory to save state of the database. The state is saved in newly created folder with timestamp</td><td><code>/var/db</code></td><td>no</td><td></td></tr>
 <tr><td>IMPORT_FILE</td><td>JSON file from which SR should load initial state. If the state already exists this env variable will be ignored</td><td><code>/var/db/initial-schema.json</code></td><td>no</td><td></td></tr>
 <tr><td>METRICS_PORT</td><td>Port to listen on for Prometheus requests</td><td>58105</td><td>no</td><td>58105</td></tr>

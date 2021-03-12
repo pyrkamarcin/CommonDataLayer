@@ -195,7 +195,7 @@ and is built in such way that it can support multiple databases (one at a time).
 </ul>
 <h3><a class="header" href="#configuration-environment-variables" id="configuration-environment-variables">Configuration (Environment Variables)</a></h3>
 <table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
-<tr><td>COMMUNICATION_METHOD</td><td>The method to communicate with external services</td><td><code>kafka</code> / <code>amqp</code> / <code>grpc</code></td><td>yes</td><td></td></tr>
+<tr><td>COMMUNICATION_METHOD</td><td>The method of communication with external services</td><td><code>kafka</code> / <code>amqp</code> / <code>grpc</code></td><td>yes</td><td></td></tr>
 <tr><td>REPORT_DESTINATION</td><td>Kafka topic/AMQP exchange/callback URL to send notifications to (reporting disabled when empty)</td><td><code>cdl.notifications</code></td><td>no</td><td></td></tr>
 <tr><td>METRICS_PORT</td><td>Port to listen on for Prometheus requests</td><td>58105</td><td>no</td><td>58105</td></tr>
 <tr><td>RUST_LOG</td><td>Log level</td><td><code>trace</code></td><td>no</td><td></td></tr>
@@ -216,7 +216,7 @@ and is built in such way that it can support multiple databases (one at a time).
 </tbody></table>
 <h4><a class="header" href="#victoria-metrics-configuration" id="victoria-metrics-configuration">Victoria Metrics Configuration</a></h4>
 <table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
-<tr><td>VICTORIA_METRICS_OUTPUT_URL</td><td>URL to the VM</td><td><code>http://victoria_metrics:8428</code></td><td>yes</td><td></td></tr>
+<tr><td>VICTORIA_METRICS_OUTPUT_URL</td><td>Address of Victoria Metrics</td><td><code>http://victoria_metrics:8428</code></td><td>yes</td><td></td></tr>
 </tbody></table>
 <h4><a class="header" href="#kafka-configuration" id="kafka-configuration">Kafka Configuration</a></h4>
 <p><em>(if <code>COMMUNICATION_METHOD</code> equals <code>kafka</code>)</em></p>

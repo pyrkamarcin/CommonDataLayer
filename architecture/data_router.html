@@ -220,7 +220,7 @@ Otherwise, messages will be split into sub-batches containing messages with the 
 <h3><a class="header" href="#configuration-environment-variables" id="configuration-environment-variables">Configuration (Environment Variables)</a></h3>
 <p>To configure the Data Router, set the following environment variables:</p>
 <table><thead><tr><th>Name</th><th>Short Description</th><th>Example</th><th>Mandatory</th><th>Default</th></tr></thead><tbody>
-<tr><td>COMMUNICATION_METHOD</td><td>The method to communicate with external services</td><td><code>kafka</code> / <code>amqp</code> / <code>grpc</code></td><td>yes</td><td></td></tr>
+<tr><td>COMMUNICATION_METHOD</td><td>The method of communication with external services</td><td><code>kafka</code> / <code>amqp</code> / <code>grpc</code></td><td>yes</td><td></td></tr>
 <tr><td>INPUT_SOURCE</td><td>Kafka topic or AMQP queue</td><td><code>cdl.data.input</code></td><td>no, when <code>grpc</code> has been chosen</td><td></td></tr>
 <tr><td>SCHEMA_REGISTRY_ADDR</td><td>Address of schema registry gRPC API</td><td>http://schema_registry:50101</td><td>yes</td><td></td></tr>
 <tr><td>CACHE_CAPACITY</td><td>How many entries the cache can hold</td><td>1024</td><td>yes</td><td></td></tr>
