@@ -1,0 +1,374 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>00013 - Materialized Views - The Common Data Layer</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="../favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="../favicon.png">
+        
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        
+        <link rel="stylesheet" href="../css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="../fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> Common Data Layer</a></li><li class="chapter-item expanded "><a href="../how_it_works.html"><strong aria-hidden="true">2.</strong> How does it work</a></li><li class="chapter-item expanded "><a href="../getting_started.html"><strong aria-hidden="true">3.</strong> Getting Started</a></li><li class="chapter-item expanded "><a href="../deployment/index.html"><strong aria-hidden="true">4.</strong> Deployment</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../deployment/local/index.html"><strong aria-hidden="true">4.1.</strong> Local deployment</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../deployment/local/docker-compose.html"><strong aria-hidden="true">4.1.1.</strong> docker-compose</a></li><li class="chapter-item expanded "><a href="../deployment/local/helm.html"><strong aria-hidden="true">4.1.2.</strong> Helm</a></li></ol></li><li class="chapter-item expanded "><a href="../deployment/production/index.html"><strong aria-hidden="true">4.2.</strong> Production-grade deployment</a></li></ol></li><li class="chapter-item expanded "><a href="../schemas_and_views.html"><strong aria-hidden="true">5.</strong> Schemas and Views</a></li><li class="chapter-item expanded "><a href="../examples/index.html"><strong aria-hidden="true">6.</strong> Examples</a></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">6.1.</strong> TODO</div></li></ol></li><li class="chapter-item expanded "><a href="../features/index.html"><strong aria-hidden="true">7.</strong> Features</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../features/ordering.html"><strong aria-hidden="true">7.1.</strong> Message ordering</a></li></ol></li><li class="chapter-item expanded "><a href="../versioning.html"><strong aria-hidden="true">8.</strong> Versioning</a></li><li class="chapter-item expanded "><a href="../protocol.html"><strong aria-hidden="true">9.</strong> Protocol schema</a></li><li class="chapter-item expanded "><a href="../benchmarks.html"><strong aria-hidden="true">10.</strong> Benchmarks</a></li><li class="chapter-item expanded "><a href="../architecture/index.html"><strong aria-hidden="true">11.</strong> Architecture</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/management.html"><strong aria-hidden="true">11.1.</strong> Management Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/cli.html"><strong aria-hidden="true">11.1.1.</strong> CLI</a></li><li class="chapter-item expanded "><a href="../architecture/web_admin.html"><strong aria-hidden="true">11.1.2.</strong> Admin Web Panel</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/api.html"><strong aria-hidden="true">11.2.</strong> GraphQL API</a></li><li class="chapter-item expanded "><a href="../architecture/configuration.html"><strong aria-hidden="true">11.3.</strong> Configuration Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/schema_registry.html"><strong aria-hidden="true">11.3.1.</strong> Schema Registry</a></li><li class="chapter-item expanded "><a href="../architecture/leader_elector.html"><strong aria-hidden="true">11.3.2.</strong> Leader Elector</a></li><li class="chapter-item expanded "><a href="../architecture/edge_registry.html"><strong aria-hidden="true">11.3.3.</strong> Edge Registry</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/ingestion.html"><strong aria-hidden="true">11.4.</strong> Ingestion Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/data_router.html"><strong aria-hidden="true">11.4.1.</strong> Data Router</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/storage.html"><strong aria-hidden="true">11.5.</strong> Storage Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/command_service.html"><strong aria-hidden="true">11.5.1.</strong> Command Service</a></li><li class="chapter-item expanded "><a href="../architecture/db_shrinker_storage.html"><strong aria-hidden="true">11.5.2.</strong> Db Shrinker Storage</a></li><li class="chapter-item expanded "><a href="../architecture/query_service.html"><strong aria-hidden="true">11.5.3.</strong> Query Service</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">11.6.</strong> Materialization Layer</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/object_builder.html"><strong aria-hidden="true">11.6.1.</strong> Object Builder</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/retrieval.html"><strong aria-hidden="true">11.7.</strong> Retrieval Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/query_router.html"><strong aria-hidden="true">11.7.1.</strong> Query Router</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/utils.html"><strong aria-hidden="true">11.8.</strong> Utils</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">12.</strong> RFCs</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../rfc/CDLF-0000C-00-rfc-01.html"><strong aria-hidden="true">12.1.</strong> 0000C - Alternative communication method</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-0000E-00-rfc-01.html"><strong aria-hidden="true">12.2.</strong> 0000E - MessagePack support</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00010-00-rfc-01.html"><strong aria-hidden="true">12.3.</strong> 00010 - CdlIM Versioning</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00011-00-rfc-01.html"><strong aria-hidden="true">12.4.</strong> 00011 - Materialization - Overview</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00012-00-rfc-01.html"><strong aria-hidden="true">12.5.</strong> 00012 - Edge Registry</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00013-00-rfc-01.html" class="active"><strong aria-hidden="true">12.6.</strong> 00013 - Materialized Views</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00014-00-rfc-01.html"><strong aria-hidden="true">12.7.</strong> 00014 - Commit message formalization</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">The Common Data Layer</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/epiphany-platform/CommonDataLayer" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#materialized-views" id="materialized-views">Materialized views</a></h1>
+<h2><a class="header" href="#motivation" id="motivation">Motivation</a></h2>
+<p>CDL lacks the ability to filter and transform data before returning it to the user. The purpose of this proposal is allowing users to define views which would allow them to receive data in different format then it was inserted to CDL. Because creating some complex views on the fly can be computationally expensive, we are introducing concept of materialized views – views which will be precalculated, but may not always contain the latest data. Materialized views will be refreshed automatically on user defined conditions (for now those setting will be defined per deployment). </p>
+<hr />
+<p>:warning: Implementing this proposal requires implementation of  <a href="https://github.com/epiphany-platform/CommonDataLayer/blob/develop/docs/rfc/CDLF-00012-00-rfc-01.md">CDLF-00012-00</a></p>
+<hr />
+<h2><a class="header" href="#proposed-changes" id="proposed-changes">Proposed changes</a></h2>
+<ul>
+<li>Add 3 new components: 
+<ul>
+<li>Partial Update Engine – responsible for deciding if materialized view data needs to be updated, if we need to recalculate whole view or if we can keep it up to date by changing only few entries </li>
+<li>Object builder – responsible for fetching data from various repositories and joining it together </li>
+<li>Materializers – responsible for storing materialized view data in user specified service (e.g. Elasticsearch, Postgres) </li>
+</ul>
+</li>
+<li>Change view definition structure stored in schema registry </li>
+</ul>
+<h2><a class="header" href="#feature-list" id="feature-list">Feature list</a></h2>
+<ul>
+<li>Automated materialized view updates - Partial Update Engine </li>
+<li>Limit how often views can be recalculated – Partial Update Engine </li>
+<li>Limit how much resources are used for view updates - Partial Update Engine &amp; Object builder </li>
+<li>Filtering(SQL counterparts): 
+<ul>
+<li>By relation – object builder (JOIN) </li>
+<li>By object id – object builder (WHERE) </li>
+<li>By schema id – schema registry (view definition) (FROM) </li>
+<li>By custom field – object builder (WHERE) </li>
+<li>By grouped field – materializers (HAVING) </li>
+</ul>
+</li>
+<li>Grouping, window functions – materializers </li>
+<li>Joins – Object builder </li>
+<li>Data transformations - materializers </li>
+</ul>
+<h2><a class="header" href="#message-flow" id="message-flow">Message Flow</a></h2>
+<p>Following diagram presents message flow in cdl related to materialized view functionality. Some components which do not participate in the process are omitted.</p>
+<p><img src="https://user-images.githubusercontent.com/9082099/109971040-128d9600-7cf6-11eb-8a11-10e41334a757.png" alt="image (6)" /></p>
+<p>Data router receives new message: </p>
+<ul>
+<li>When message is standard input data: 
+<ul>
+<li>Data router asks schema registry for the repository data needs to be inserted (or uses cache) (1)</li>
+<li>Data router passes message to proper repository (2)</li>
+<li>Repository inserts data into database and send notification to notification storage (e.g.  Kafka) (3)</li>
+</ul>
+</li>
+<li>When message is information about relation between two objects: 
+<ul>
+<li>Data router passes message to Edge registry (4)</li>
+<li>Edge registry sends notification to notification storage (5)</li>
+</ul>
+</li>
+</ul>
+<p>When there are new notifications in notification service (this will not happen right away; Partial Update Engine might be in sleep phase): </p>
+<ul>
+<li>Partial Update Engine fetches information about changed objects and relations. It decides when materialized view needs to be partially recalculated (6)</li>
+<li>Partial Update Engine sends to object builder (8): 
+<ul>
+<li>view id </li>
+<li>array of ids on which we need to calculate the view(schema_id, object_id pairs)</li>
+</ul>
+</li>
+<li>Object builder fetches view definition (or uses cache) (9)</li>
+<li>Object builder asks edge registry for relation graph for specified objects (10)</li>
+<li>Object builder fetches object information from repositories, performs filtering, join operations etc. (11) </li>
+<li>Object builder sends transformed object data and array of ids to materializers (12)</li>
+</ul>
+<h2><a class="header" href="#schema-repository" id="schema-repository">Schema repository</a></h2>
+<p>Schema repository is responsible for storing information about schemas and views. Exact structure of view definition will be designed once we agree on general solution. </p>
+<h2><a class="header" href="#partial-update-engine" id="partial-update-engine">Partial Update Engine</a></h2>
+<p>Partial Update Engine is responsible for decision on when partial view should be recalculated. It requests object builder to build partial view based on information of outdated records. </p>
+<p>Partial Update Engine Loop: </p>
+<ul>
+<li>
+<p>Fetch definition of all views (7; can use cache) </p>
+</li>
+<li>
+<p>Process all pending notifications: 
+For each notification take every view definition and check if view data is affected by the change. Return list of object_id, schema_id pairs - called change list later in this document. </p>
+<p>Notifications: </p>
+<ul>
+<li>Add relation between objects</li>
+<li>Delete relation between objects </li>
+<li>Insert/update object </li>
+</ul>
+<p>If notification mentions object which can be used by view new record is added to the change list. For relation related notifications it is fine to add only one side of relation. </p>
+</li>
+<li>
+<p>Run reduce on generated change lists – so there are no duplicates</p>
+</li>
+<li>
+<p>Split change lists if they are too large – max list size defined in config </p>
+</li>
+<li>
+<p>Queue all views for which we generated change records to be refreshed </p>
+</li>
+<li>
+<p>Go to sleep for X seconds – time defined in config </p>
+</li>
+</ul>
+<h2><a class="header" href="#object-builder" id="object-builder">Object Builder</a></h2>
+<p>Object builder responsibility is creating complex objects according to recipes - view definitions. </p>
+<p>Object Builder Loop:</p>
+<ul>
+<li>Wait for request to build a view </li>
+<li>Fetch view definition from schema registry (9) </li>
+<li>Fetch relation graph from Edge registry (10) </li>
+<li>Fetch objects from repositories (11) </li>
+<li>Perform filtering by custom fields, join operations </li>
+<li>Send data to materializers component </li>
+</ul>
+<p>It is important to note that object builder output contains view id, change list received from partial update engine, and requested objects with information how they were created (each returned object contains ids of every object which was used for its creation). </p>
+<h2><a class="header" href="#materializers" id="materializers">Materializers</a></h2>
+<p><img src="https://user-images.githubusercontent.com/9082099/109971136-2f29ce00-7cf6-11eb-8e61-bbc018f83f15.png" alt="image (5)" /></p>
+<p>There are two approaches on how materializers can look like. The main difference between them is if we allow grouping, window functions, filtering on grouped entities to happen in external services (e.g., Elasticsearch, Postgres). Problem with grouping is that merging multiple rows into one makes it almost impossible to apply partial updates.</p>
+<h3><a class="header" href="#approach-i" id="approach-i">Approach I</a></h3>
+<p>Materializer is just a single connector service and a database. Its job is to update the database on changes received from object builder in a transactional way: delete all records based on objects from change list, add records returned from object builder. </p>
+<p>Grouping, advanced filtering and similar operations are done on the fly as user requests the data – they are mostly cheap operations. If that's not enough users can always create pipelines to do more data transformations. </p>
+<h3><a class="header" href="#approach-ii" id="approach-ii">Approach II</a></h3>
+<p>This approach requires us to store another copy of data. First phase materializer is a component which extends the job of materializers from Approach I, but it uses storage which is internal to CDL. Then it performs data transformation (grouping, window functions, filtering on grouped records) on whole view (not just part of it) and pushes result down the pipeline to another  service which recreates the views in external storage. </p>
+<h2><a class="header" href="#final-notes" id="final-notes">Final notes</a></h2>
+<h3><a class="header" href="#what-about-fetching-view-data-which-are-not-materialized-views-calculated-on-the-fly" id="what-about-fetching-view-data-which-are-not-materialized-views-calculated-on-the-fly">What about fetching view data which are not materialized (views calculated on the fly)?</a></h3>
+<p>Adding another specialized materializer solves this case easily. However, since message flow is bit different in this case (processing request starts from this specialized materializer) this case is not described in this document to not obscure general idea. </p>
+<h2><a class="header" href="#alternative-solutions" id="alternative-solutions">Alternative solutions</a></h2>
+<h3><a class="header" href="#partial-update-engine-periodically-querying-repositories-for-updated-records" id="partial-update-engine-periodically-querying-repositories-for-updated-records">Partial Update Engine periodically querying repositories for updated records</a></h3>
+<p>This approach should work correctly, but it has some minor drawback: </p>
+<ul>
+<li>Even if cdl is idle (not data changes) partial update engine needs to do its work </li>
+<li>Requires repositories to store last changed time which currently is not a requirement </li>
+</ul>
+<p>Anyway, those are minor drawback, we could as well use this solution. </p>
+<h1><a class="header" href="#rfc-changelog" id="rfc-changelog">RFC Changelog</a></h1>
+<ul>
+<li><code>19.03.2021</code> - Followed rename from <code>edge-repository</code> to <code>edge-registry</code></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../rfc/CDLF-00012-00-rfc-01.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../rfc/CDLF-00014-00-rfc-01.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../rfc/CDLF-00012-00-rfc-01.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="../rfc/CDLF-00014-00-rfc-01.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
