@@ -5,13 +5,13 @@ use crate::{
     types::{NewSchema, NewSchemaVersion},
     AmqpConfig, KafkaConfig,
 };
+use clap::Clap;
 use rpc::schema_registry::types::SchemaType;
 use serde::{Deserialize, Serialize};
 use std::{
     sync::{mpsc, Arc},
     thread,
 };
-use structopt::clap::arg_enum;
 use tokio::{runtime::Handle, sync::oneshot};
 use tracing::info;
 use uuid::Uuid;
@@ -47,14 +47,12 @@ pub enum ReplicationEvent {
     },
 }
 
-arg_enum! {
-    #[derive(Clone, Debug, Deserialize, PartialEq)]
-    #[serde(rename_all = "snake_case")]
-    pub enum ReplicationRole {
-        Master,
-        Slave,
-        None,
-    }
+#[derive(Clap, Clone, Debug, Deserialize, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum ReplicationRole {
+    Master,
+    Slave,
+    None,
 }
 
 pub struct ReplicationState {

@@ -1,19 +1,22 @@
-use anyhow::Context;
+use clap::Clap;
 use futures::{Future, FutureExt};
 use k8s_openapi::api::core::v1::Pod;
 use kube::{
     api::{DeleteParams, ListParams, Patch, PatchParams},
     Api, Client, Resource,
 };
-use serde::Deserialize;
 use std::{fs, time::Duration};
 use tracing::{debug, info, warn};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clap)]
 pub struct Config {
+    #[clap(long, env)]
     pub heartbeat_secs: u64,
+    #[clap(long, env)]
     pub schema_app_name: String,
+    #[clap(long, env)]
     pub schema_addr: String,
+    #[clap(long, env)]
     pub schema_port: u16,
 }
 
@@ -22,7 +25,7 @@ async fn main() -> anyhow::Result<()> {
     utils::set_aborting_panic_hook();
     utils::tracing::init();
 
-    let config = envy::from_env::<Config>().context("Env vars not set correctly")?;
+    let config = Config::parse();
     debug!("Environment {:?}", config);
 
     let namespace = get_k8s_namespace();
