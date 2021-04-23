@@ -2,13 +2,13 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use bb8::{Pool, PooledConnection};
+
+use crate::{config::Config, events::EventStream, events::EventSubscriber};
 use rpc::edge_registry::edge_registry_client::EdgeRegistryClient;
 use rpc::object_builder::object_builder_client::ObjectBuilderClient;
 use rpc::schema_registry::schema_registry_client::SchemaRegistryClient;
 use rpc::tonic::transport::Channel;
 use tokio::sync::Mutex;
-
-use crate::{config::Config, events::EventStream, events::EventSubscriber};
 
 pub type SchemaRegistryPool = Pool<SchemaRegistryConnectionManager>;
 pub type EdgeRegistryPool = Pool<EdgeRegistryConnectionManager>;
@@ -81,7 +81,7 @@ impl bb8::ManageConnection for SchemaRegistryConnectionManager {
     }
 
     async fn is_valid(&self, conn: &mut PooledConnection<'_, Self>) -> Result<(), Self::Error> {
-        conn.heartbeat(rpc::schema_registry::Empty {})
+        conn.ping(rpc::schema_registry::Empty {})
             .await
             .map_err(rpc::error::schema_registry_error)?;
 
