@@ -1,28 +1,61 @@
-pub mod args;
-
 use std::{collections::HashMap, convert::TryInto};
 
 use anyhow::Context;
 use async_trait::async_trait;
+use bb8::{Pool, PooledConnection};
+use serde::Serialize;
+use serde_json::Value;
+use tonic::transport::Channel;
+use uuid::Uuid;
+
+use crate::args::Args;
 use rpc::common::MaterializedView;
 use rpc::common::RowDefinition as RpcRowDefinition;
 use rpc::object_builder::{object_builder_server::ObjectBuilder, Empty, View};
 use rpc::schema_registry::{schema_registry_client::SchemaRegistryClient, types::SchemaType};
-use serde::Serialize;
-use serde_json::Value;
-use tonic::transport::Channel;
 use utils::communication::{consumer::ConsumerHandler, message::CommunicationMessage};
 use utils::{
     metrics::{self, counter},
     types::materialization,
 };
-use uuid::Uuid;
 
-use crate::args::Args;
+pub mod args;
 
 #[derive(Clone)]
 pub struct ObjectBuilderImpl {
-    schema_registry: SchemaRegistryClient<Channel>,
+    pool: Pool<SchemaRegistryConnectionManager>,
+}
+
+#[derive(Clone)]
+pub struct SchemaRegistryConnectionManager {
+    pub address: String,
+}
+
+pub type SchemaRegistryPool = Pool<SchemaRegistryConnectionManager>;
+pub type SchemaRegistryConn = SchemaRegistryClient<Channel>;
+
+#[async_trait::async_trait]
+impl bb8::ManageConnection for SchemaRegistryConnectionManager {
+    type Connection = SchemaRegistryConn;
+    type Error = rpc::error::ClientError;
+
+    async fn connect(&self) -> Result<Self::Connection, Self::Error> {
+        tracing::debug!("Connecting to registry");
+
+        rpc::schema_registry::connect(self.address.clone()).await
+    }
+
+    async fn is_valid(&self, conn: &mut PooledConnection<'_, Self>) -> Result<(), Self::Error> {
+        conn.ping(rpc::schema_registry::Empty {})
+            .await
+            .map_err(rpc::error::schema_registry_error)?;
+
+        Ok(())
+    }
+
+    fn has_broken(&self, _conn: &mut Self::Connection) -> bool {
+        false
+    }
 }
 
 #[derive(Serialize, Debug)]
@@ -42,10 +75,14 @@ struct RowDefinition {
 
 impl ObjectBuilderImpl {
     pub async fn new(args: &Args) -> anyhow::Result<Self> {
-        let schema_registry =
-            rpc::schema_registry::connect(args.schema_registry_addr.clone()).await?;
+        let pool = Pool::builder()
+            .build(SchemaRegistryConnectionManager {
+                address: args.schema_registry_addr.clone(),
+            })
+            .await
+            .unwrap();
 
-        Ok(Self { schema_registry })
+        Ok(Self { pool })
     }
 }
 
@@ -132,7 +169,7 @@ impl ConsumerHandler for ObjectBuilderImpl {
 
         let rpc_output: MaterializedView = output.try_into()?;
 
-        rpc::materializer::connect(view.materializer_addr)
+        rpc::materializer::connect(view.materializer_address)
             .await?
             .upsert_view(utils::tracing::grpc::inject_span(rpc_output))
             .await?;
@@ -154,12 +191,14 @@ impl ObjectBuilderImpl {
         // TODO: Handle more than one schema
         // TODO: Handle empty filter for seeding view (maybe in another method)
         let (schema_id, schema) = schemas.into_iter().next().unwrap();
-
         let objects = self.get_objects(schema_id, schema).await?;
         tracing::debug!(?objects, "Objects");
 
-        let fields_defs: HashMap<String, materialization::FieldDefinition> =
-            serde_json::from_str(&view.fields)?;
+        let fields_defs: HashMap<String, materialization::FieldDefinition> = view
+            .fields
+            .into_iter()
+            .map(|(key, field)| Ok((key, serde_json::from_str(&field)?)))
+            .collect::<anyhow::Result<HashMap<_, _>>>()?;
 
         let rows = objects
             .into_iter()
@@ -219,7 +258,7 @@ impl ObjectBuilderImpl {
         schema_id: Uuid,
         schema: materialization::Schema,
     ) -> anyhow::Result<HashMap<Uuid, Value>> {
-        let schema_meta = self.get_base_schema(schema_id).await?;
+        let schema_meta = self.get_schema_metadata(schema_id).await?;
 
         let query_address = schema_meta.query_address.clone();
         let schema_type = schema_meta.schema_type().into();
@@ -255,8 +294,9 @@ impl ObjectBuilderImpl {
     #[tracing::instrument(skip(self))]
     async fn get_view(&self, view_id: &Uuid) -> anyhow::Result<rpc::schema_registry::View> {
         let view = self
-            .schema_registry
-            .clone()
+            .pool
+            .get()
+            .await?
             .get_view(rpc::schema_registry::Id {
                 id: view_id.to_string(),
             })
@@ -267,14 +307,14 @@ impl ObjectBuilderImpl {
     }
 
     #[tracing::instrument(skip(self))]
-    // TODO: Change name to `get_schema_metadata`
-    async fn get_base_schema(
+    async fn get_schema_metadata(
         &self,
         schema_id: Uuid,
-    ) -> anyhow::Result<rpc::schema_registry::Schema> {
+    ) -> anyhow::Result<rpc::schema_registry::SchemaMetadata> {
         let schema = self
-            .schema_registry
-            .clone()
+            .pool
+            .get()
+            .await?
             .get_schema_metadata(rpc::schema_registry::Id {
                 id: schema_id.to_string(),
             })

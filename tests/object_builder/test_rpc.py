@@ -32,7 +32,11 @@ def prepare(request, tmp_path):
 
     insert_data(postgres_config, data)
 
-    sr = SchemaRegistry(str(tmp_path), kafka_config.brokers, initial_schema = "data/object_builder/initial-schema.kafka.json")
+    sr = SchemaRegistry(
+        str(tmp_path),
+        kafka_config.brokers,
+        postgres_config,
+        initial_schema="data/object_builder/initial-schema.kafka.json")
     qs = QueryService(db_config=postgres_config)
 
     ob = ObjectBuilder(f"http://localhost:{sr.input_port}", kafka_config)
@@ -49,7 +53,7 @@ def prepare(request, tmp_path):
     qs.stop()
     sr.stop()
 
-    # cleanup environmeFt
+    # cleanup environment
     delete_kafka_topic(kafka_config, TOPIC)
     clear_data(postgres_config)
 
