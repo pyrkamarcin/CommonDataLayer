@@ -3737,6 +3737,7 @@ dependencies = [
  "anyhow",
  "async-stream",
  "async-trait",
+ "clap",
  "futures-util",
  "hyper",
  "lapin",
