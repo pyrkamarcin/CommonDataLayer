@@ -16,7 +16,7 @@ use crate::types::view::{NewView, View, ViewUpdate};
 use crate::types::DbExport;
 use crate::types::VersionedUuid;
 use crate::utils::build_full_schema;
-use crate::{config::Config, types::view::FullView};
+use crate::{settings::Settings, types::view::FullView};
 use utils::types::materialization::{FieldDefinition, Filter, Relation};
 
 const SCHEMAS_LISTEN_CHANNEL: &str = "schemas";
@@ -28,20 +28,20 @@ pub struct SchemaRegistryDb {
 }
 
 impl SchemaRegistryDb {
-    pub async fn new(config: &Config) -> RegistryResult<Self> {
+    pub async fn new(config: &Settings) -> RegistryResult<Self> {
         let options = PgConnectOptions::new()
-            .host(&config.db_host)
-            .port(config.db_port)
-            .username(&config.db_username)
-            .password(&config.db_password)
-            .database(&config.db_name);
+            .host(&config.postgres.host)
+            .port(config.postgres.port)
+            .username(&config.postgres.username)
+            .password(&config.postgres.password)
+            .database(&config.postgres.dbname);
 
         Ok(Self {
             pool: PgPoolOptions::new()
                 .connect_with(options)
                 .await
                 .map_err(RegistryError::ConnectionError)?,
-            db_schema: config.db_schema.clone(),
+            db_schema: config.postgres.schema.clone(),
         })
     }
 
