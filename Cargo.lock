@@ -109,17 +109,23 @@ dependencies = [
  "async-stream",
  "async-trait",
  "bb8",
+ "cdl_dto",
+ "communication_utils",
  "futures",
  "itertools 0.10.0",
+ "metrics_utils",
+ "misc_utils",
  "reqwest",
  "rpc",
  "semver 0.11.0",
  "serde 1.0.126",
  "serde_json",
+ "settings_utils",
  "thiserror",
  "tokio",
  "tracing",
  "tracing-futures",
+ "tracing_utils",
  "utils",
  "uuid",
  "warp",
@@ -451,6 +457,7 @@ name = "cdl-cli"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "cdl_dto",
  "clap",
  "rpc",
  "semver 0.11.0",
@@ -458,7 +465,22 @@ dependencies = [
  "serde_json",
  "tokio",
  "tonic",
+ "tracing_utils",
  "utils",
+ "uuid",
+]
+
+[[package]]
+name = "cdl_dto"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-graphql",
+ "rpc",
+ "serde 1.0.126",
+ "serde_json",
+ "thiserror",
+ "tonic",
  "uuid",
 ]
 
@@ -536,21 +558,51 @@ dependencies = [
  "async-trait",
  "bb8",
  "bb8-postgres",
+ "cdl_dto",
+ "communication_utils",
  "fnv",
  "futures",
+ "metrics_utils",
+ "misc_utils",
  "rdkafka",
  "reqwest",
  "rpc",
  "serde 1.0.126",
  "serde_json",
+ "settings_utils",
+ "task_utils",
  "test-case",
  "thiserror",
  "tokio",
  "tonic",
  "tracing",
+ "tracing_utils",
  "url",
  "utils",
  "uuid",
+]
+
+[[package]]
+name = "communication_utils"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "futures-util",
+ "lapin",
+ "misc_utils",
+ "rdkafka",
+ "reqwest",
+ "rpc",
+ "task_utils",
+ "thiserror",
+ "tokio",
+ "tokio-amqp",
+ "tonic",
+ "tracing",
+ "tracing-futures",
+ "tracing_utils",
+ "url",
 ]
 
 [[package]]
@@ -799,12 +851,19 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "cdl_dto",
+ "communication_utils",
  "lru-cache",
+ "metrics_utils",
+ "misc_utils",
  "rpc",
  "serde 1.0.126",
  "serde_json",
+ "settings_utils",
+ "task_utils",
  "tokio",
  "tracing",
+ "tracing_utils",
  "url",
  "utils",
  "uuid",
@@ -820,6 +879,7 @@ dependencies = [
  "serde_json",
  "test-case",
  "tracing",
+ "tracing_utils",
  "utils",
  "uuid",
 ]
@@ -910,16 +970,21 @@ dependencies = [
  "anyhow",
  "async-trait",
  "bb8-postgres",
+ "communication_utils",
  "futures",
  "itertools 0.10.0",
+ "metrics_utils",
+ "misc_utils",
  "rpc",
  "serde 1.0.126",
  "serde_json",
+ "settings_utils",
  "thiserror",
  "tokio",
  "tonic",
  "tracing",
  "tracing-futures",
+ "tracing_utils",
  "utils",
  "uuid",
 ]
@@ -1594,13 +1659,17 @@ dependencies = [
  "bb8-postgres",
  "futures",
  "itertools 0.10.0",
+ "metrics_utils",
+ "misc_utils",
  "rpc",
  "serde 1.0.126",
  "serde_json",
+ "settings_utils",
  "tokio",
  "tonic",
  "tracing",
  "tracing-futures",
+ "tracing_utils",
  "utils",
  "uuid",
 ]
@@ -1612,13 +1681,17 @@ dependencies = [
  "anyhow",
  "async-trait",
  "futures",
+ "metrics_utils",
+ "misc_utils",
  "rpc",
  "serde 1.0.126",
  "serde_json",
+ "settings_utils",
  "tokio",
  "tonic",
  "tracing",
  "tracing-futures",
+ "tracing_utils",
  "utils",
  "uuid",
 ]
@@ -1729,6 +1802,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "metrics_utils"
+version = "0.1.0"
+dependencies = [
+ "metrics",
+ "metrics-exporter-prometheus",
+ "settings_utils",
+ "tracing",
+]
+
+[[package]]
 name = "mime"
 version = "0.3.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1764,6 +1847,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b9f1c5b025cda876f66ef43a113f91ebc9f4ccef34843000e0adf6ebbab84e21"
 dependencies = [
  "winapi",
+]
+
+[[package]]
+name = "misc_utils"
+version = "0.1.0"
+dependencies = [
+ "tracing",
 ]
 
 [[package]]
@@ -2000,15 +2090,21 @@ dependencies = [
  "anyhow",
  "async-trait",
  "bb8",
+ "cdl_dto",
+ "communication_utils",
  "futures",
+ "metrics_utils",
+ "misc_utils",
  "rpc",
  "serde 1.0.126",
  "serde_json",
+ "settings_utils",
  "thiserror",
  "tokio",
  "tonic",
  "tracing",
  "tracing-futures",
+ "tracing_utils",
  "utils",
  "uuid",
 ]
@@ -2163,13 +2259,18 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "cdl_dto",
+ "metrics_utils",
+ "misc_utils",
  "rdkafka",
  "rpc",
  "serde 1.0.126",
  "serde_json",
+ "settings_utils",
  "tokio",
  "tokio-stream",
  "tracing",
+ "tracing_utils",
  "utils",
  "uuid",
 ]
@@ -2518,12 +2619,16 @@ dependencies = [
  "anyhow",
  "futures-util",
  "lru-cache",
+ "metrics_utils",
+ "misc_utils",
  "rpc",
  "serde 1.0.126",
  "serde_json",
+ "settings_utils",
  "tokio",
  "tracing",
  "tracing-futures",
+ "tracing_utils",
  "utils",
  "uuid",
  "warp",
@@ -2537,15 +2642,19 @@ dependencies = [
  "bb8",
  "bb8-postgres",
  "futures-util",
+ "metrics_utils",
+ "misc_utils",
  "reqwest",
  "rpc",
  "serde 1.0.126",
  "serde_json",
+ "settings_utils",
  "thiserror",
  "tokio",
  "tonic",
  "tracing",
  "tracing-futures",
+ "tracing_utils",
  "utils",
  "uuid",
 ]
@@ -2556,14 +2665,18 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bb8",
+ "metrics_utils",
+ "misc_utils",
  "reqwest",
  "rpc",
  "serde 1.0.126",
  "serde_json",
+ "settings_utils",
  "tokio",
  "tonic",
  "tracing",
  "tracing-futures",
+ "tracing_utils",
  "utils",
 ]
 
@@ -2836,7 +2949,7 @@ dependencies = [
  "sqlx",
  "thiserror",
  "tonic",
- "tracing_tools",
+ "tracing_utils",
 ]
 
 [[package]]
@@ -2896,14 +3009,19 @@ dependencies = [
  "anyhow",
  "async-trait",
  "bb8",
+ "cdl_dto",
+ "communication_utils",
  "futures-util",
  "jmespatch",
  "jsonschema",
  "maplit",
+ "metrics_utils",
+ "misc_utils",
  "rpc",
  "semver 0.11.0",
  "serde 1.0.126",
  "serde_json",
+ "settings_utils",
  "sqlx",
  "thiserror",
  "tokio",
@@ -2911,6 +3029,7 @@ dependencies = [
  "tonic",
  "tracing",
  "tracing-futures",
+ "tracing_utils",
  "url",
  "utils",
  "uuid",
@@ -3055,6 +3174,21 @@ dependencies = [
  "itoa",
  "ryu",
  "serde 1.0.126",
+]
+
+[[package]]
+name = "settings_utils"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "communication_utils",
+ "config",
+ "derive_more",
+ "dirs",
+ "lapin",
+ "serde 1.0.126",
+ "task_utils",
+ "url",
 ]
 
 [[package]]
@@ -3318,6 +3452,13 @@ name = "tap"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
+
+[[package]]
+name = "task_utils"
+version = "0.1.0"
+dependencies = [
+ "tokio",
+]
 
 [[package]]
 name = "tcp-stream"
@@ -3757,7 +3898,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tracing_tools"
+name = "tracing_utils"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -3924,6 +4065,8 @@ dependencies = [
  "async-graphql",
  "async-stream",
  "async-trait",
+ "cdl_dto",
+ "communication_utils",
  "config",
  "derive_more",
  "dirs",
@@ -3931,13 +4074,14 @@ dependencies = [
  "hyper",
  "lapin",
  "lazy_static",
- "metrics",
- "metrics-exporter-prometheus",
+ "misc_utils",
  "rdkafka",
  "reqwest",
  "rpc",
  "serde 1.0.126",
  "serde_json",
+ "settings_utils",
+ "task_utils",
  "test-case",
  "thiserror",
  "tokio",
@@ -3945,7 +4089,7 @@ dependencies = [
  "tonic",
  "tracing",
  "tracing-futures",
- "tracing_tools",
+ "tracing_utils",
  "url",
  "uuid",
 ]
