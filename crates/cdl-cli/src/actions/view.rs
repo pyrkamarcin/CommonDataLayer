@@ -23,7 +23,7 @@ pub async fn get_view(view_id: Uuid, registry_addr: String) -> anyhow::Result<()
     Ok(())
 }
 
-#[allow(clippy::clippy::too_many_arguments)]
+#[allow(clippy::too_many_arguments)]
 pub async fn add_view_to_schema(
     view_id: Option<Uuid>,
     base_schema_id: Uuid,
@@ -64,7 +64,7 @@ pub async fn add_view_to_schema(
     Ok(())
 }
 
-#[allow(clippy::clippy::too_many_arguments)]
+#[allow(clippy::too_many_arguments)]
 pub async fn update_view(
     view_id: Uuid,
     name: Option<String>,
