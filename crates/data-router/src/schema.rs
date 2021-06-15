@@ -23,7 +23,7 @@ pub async fn get_schema_insert_destination(
         return Ok(dest);
     }
 
-    let mut client = rpc::schema_registry::connect(schema_addr.to_owned()).await?;
+    let mut client = rpc::schema_registry::connect(&schema_addr).await?;
     let insert_destination = client
         .get_schema_metadata(Id {
             id: schema_id.to_string(),

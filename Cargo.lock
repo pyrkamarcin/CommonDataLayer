@@ -435,6 +435,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b700ce4376041dcd0a327fd0097c41095743c4c8af8887265942faf1100bd040"
 
 [[package]]
+name = "cache"
+version = "0.1.0"
+dependencies = [
+ "lru-cache",
+]
+
+[[package]]
 name = "cc"
 version = "1.0.68"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4082,6 +4089,30 @@ checksum = "bc5cf98d8186244414c848017f0e2676b3fcb46807f6668a97dfe67359a3c4b7"
 dependencies = [
  "getrandom 0.2.3",
  "serde 1.0.126",
+]
+
+[[package]]
+name = "validator"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cdl_dto",
+ "communication_utils",
+ "lru-cache",
+ "metrics_utils",
+ "misc_utils",
+ "rpc",
+ "serde 1.0.126",
+ "serde_json",
+ "settings_utils",
+ "task_utils",
+ "tokio",
+ "tracing",
+ "tracing_utils",
+ "url",
+ "utils",
+ "uuid",
 ]
 
 [[package]]

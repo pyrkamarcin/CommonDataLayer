@@ -14,14 +14,14 @@ pub struct SchemaRegistryConnectionManager {
     pub address: String,
 }
 
-pub async fn connect(addr: String) -> Result<SchemaRegistryClient<Channel>, ClientError> {
+pub async fn connect(addr: &str) -> Result<SchemaRegistryClient<Channel>, ClientError> {
     connect_inner(addr)
         .await
         .map_err(|err| ClientError::ConnectionError { source: err })
 }
 
 async fn connect_inner(
-    addr: String,
+    addr: &str,
 ) -> Result<SchemaRegistryClient<Channel>, tonic::transport::Error> {
     let conn = tonic::transport::Endpoint::new(addr)?.connect().await?;
 
