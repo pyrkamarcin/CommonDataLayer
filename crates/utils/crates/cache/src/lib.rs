@@ -13,9 +13,9 @@ pub struct DynamicCache<Key, Value, Fut>
 impl<Key, Value, Fut> DynamicCache<Key, Value, Fut>
     where Key: Eq + Hash + ToOwned<Owned = Key>,
           Fut: Future<Output = Result<Value, ()>>, {
-    pub fn new(capacity: usize, on_missing: Box<dyn Fn(&Key) -> Result<Value, ()>>) -> Self {
+    pub fn new(capacity: usize, on_missing: impl Fn(&Key) -> Fut + 'static) -> Self {
         Self {
-            on_missing,
+            on_missing: Box::new(on_missing),
             inner: LruCache::new(capacity),
         }
     }
@@ -23,9 +23,10 @@ impl<Key, Value, Fut> DynamicCache<Key, Value, Fut>
     pub async fn get(&mut self, key: impl AsRef<Key>) -> Result<&mut Value, ()> {
         let key = key.as_ref();
 
-        if let Some(val) = self.inner.get_mut(key) {
-            return Ok(val)
+        if self.inner.contains_key(key) {
+            return Ok(self.inner.get_mut(key).unwrap());
         }
+
         let val = (self.on_missing)(key).await?;
         self.inner.insert(key.to_owned(), val);
         self.inner.get_mut(key).ok_or(())

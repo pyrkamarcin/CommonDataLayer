@@ -16,11 +16,15 @@ impl Handler {
     }
 }
 
+#[async_trait::async_trait]
 impl ParallelConsumerHandler for Handler {
     async fn handle<'a>(&'a self, msg: &'a dyn CommunicationMessage) -> anyhow::Result<()> {
         let message: BorrowedInsertMessage = serde_json::from_str(msg.payload()?)?;
-        let mut sr: SchemaRegistryClient<Channel> = rpc::schema_registry::connect(&self.schema_registry_url)?;
+        let mut sr: SchemaRegistryClient<Channel> = rpc::schema_registry::connect(self.schema_registry_url.to_owned())?;
 
-        let schema = sr.get_schema_definition(message.schema_id).await?;
+        let schema = sr.get_schema_definition(message.schema_id).await?.into_inner();
+
+
     }
 }
+
