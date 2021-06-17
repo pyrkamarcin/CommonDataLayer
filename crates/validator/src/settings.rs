@@ -1,7 +1,9 @@
-use settings_utils::{LogSettings, MonitoringSettings, GRpcSettings, AmqpSettings, ConsumerKafkaSettings};
-use communication_utils::publisher::CommonPublisher;
-use task_utils::task_limiter::TaskLimiter;
 use communication_utils::parallel_consumer::ParallelCommonConsumer;
+use communication_utils::publisher::CommonPublisher;
+use settings_utils::{
+    AmqpSettings, ConsumerKafkaSettings, GRpcSettings, LogSettings, MonitoringSettings,
+};
+use task_utils::task_limiter::TaskLimiter;
 
 #[derive(Deserialize, Debug, Serialize)]
 pub struct Settings {

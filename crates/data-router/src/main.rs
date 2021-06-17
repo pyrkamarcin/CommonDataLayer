@@ -1,8 +1,8 @@
+use crate::{handler::Handler, settings::Settings};
 use lru_cache::LruCache;
-use std::sync::{Arc, Mutex};
-use crate::{settings::Settings, handler::Handler};
 use metrics_utils as metrics;
 use settings_utils::load_settings;
+use std::sync::{Arc, Mutex};
 use utils::parallel_task_queue::ParallelTaskQueue;
 
 mod handler;
