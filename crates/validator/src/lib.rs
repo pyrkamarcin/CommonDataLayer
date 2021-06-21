@@ -35,18 +35,19 @@ impl ParallelConsumerHandler for Handler {
         let message: BorrowedInsertMessage = serde_json::from_str(payload)?;
 
         let mut validator = self.validator.lock().await;
-        let schema = validator.cache.get(message.schema_id).await?;
 
-        if schema.is_valid(&to_value(message.data)?) {
+        if validator
+            .validate_value(message.schema_id, &to_value(message.data)?)
+            .await?
+        {
             self.producer
                 .publish_message(&self.send_to, msg.key()?, payload.as_bytes().to_vec())
                 .await?;
         } else {
             tracing::trace!(
-                "Value '{}' is not valid cdl object `{}` '{}'",
+                "value '{}' is not valid cdl object of schema `{}`",
                 message.data,
                 message.schema_id,
-                schema.schema()
             )
         }
 
@@ -67,14 +68,13 @@ pub struct Schema {
 }
 
 pub struct ValidatorCacheSupplier {
-    schema_registry_url: Arc<String>,
+    schema_registry_url: String,
 }
 
 #[async_trait::async_trait]
 impl CacheSupplier<Uuid, Schema> for ValidatorCacheSupplier {
     async fn retrieve(&self, key: Uuid) -> anyhow::Result<Schema> {
-        let json = get_schema_from_registry(key, Arc::clone(&self.schema_registry_url).to_string())
-            .await?;
+        let json = get_schema_from_registry(key, self.schema_registry_url.clone()).await?;
         Ok(SchemaTryBuilder {
             json: Box::new(json),
             validator_builder: |json: &Value| JSONSchema::compile(json),
@@ -84,7 +84,7 @@ impl CacheSupplier<Uuid, Schema> for ValidatorCacheSupplier {
 }
 
 impl ValidatorCacheSupplier {
-    fn new(schema_registry_url: Arc<String>) -> Self {
+    fn new(schema_registry_url: String) -> Self {
         Self {
             schema_registry_url,
         }
@@ -92,13 +92,18 @@ impl ValidatorCacheSupplier {
 }
 
 impl Validator {
-    pub fn new(cache_capacity: usize, schema_registry_url: Arc<String>) -> Self {
+    pub fn new(cache_capacity: usize, schema_registry_url: String) -> Self {
         Self {
             cache: DynamicCache::new(
                 cache_capacity,
                 Box::new(ValidatorCacheSupplier::new(schema_registry_url)),
             ),
         }
+    }
+
+    pub async fn validate_value(&mut self, id: Uuid, value: &Value) -> anyhow::Result<bool> {
+        let schema = self.cache.get(id).await?;
+        Ok(schema.is_valid(value))
     }
 }
 

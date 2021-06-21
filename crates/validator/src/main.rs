@@ -23,8 +23,10 @@ async fn main() -> anyhow::Result<()> {
     let consumer = settings.consumer().await?;
     let producer = Arc::new(settings.producer().await?);
 
-    let schema_registry_url = Arc::new(settings.services.schema_registry_url);
-    let validator = Validator::new(settings.cache_capacity, schema_registry_url);
+    let validator = Validator::new(
+        settings.cache_capacity,
+        settings.services.schema_registry_url,
+    );
 
     consumer
         .par_run(Handler::new(validator, producer, settings.send_to))

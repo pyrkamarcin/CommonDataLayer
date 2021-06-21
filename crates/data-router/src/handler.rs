@@ -1,4 +1,5 @@
-use anyhow::Context;
+use crate::settings::ValidatorContainer;
+use anyhow::{Context, Error};
 use async_trait::async_trait;
 use cache::DynamicCache;
 use cdl_dto::ingestion::{BorrowedInsertMessage, DataRouterInsertMessage};
@@ -8,9 +9,8 @@ use communication_utils::{
 };
 use metrics_utils::{self as metrics, counter};
 use misc_utils::current_timestamp;
-use serde_json::Value;
 use std::sync::Arc;
-use tokio::sync::Mutex;
+use tokio::sync::{Mutex, MutexGuard};
 use tracing::{error, trace};
 use utils::parallel_task_queue::ParallelTaskQueue;
 use uuid::Uuid;
@@ -19,6 +19,7 @@ pub struct Handler {
     pub cache: Arc<Mutex<DynamicCache<Uuid, String>>>,
     pub producer: Arc<CommonPublisher>,
     pub task_queue: Arc<ParallelTaskQueue>,
+    pub validator: Arc<Mutex<Box<dyn ValidatorContainer + Send + Sync>>>,
 }
 
 #[async_trait]
@@ -38,25 +39,24 @@ impl ParallelConsumerHandler for Handler {
         let message_key = get_order_group_id(message).unwrap_or_default();
         counter!("cdl.data-router.input-msg", 1);
         let result = async {
-            let json_something: Value = serde_json::from_str(message.payload()?)
-                .context("Payload deserialization failed")?;
-            if json_something.is_array() {
+            let payload = message.payload()?;
+
+            let mut validator = self.validator.lock().await;
+
+            if matches!(payload.chars().find(|c| !c.is_whitespace()), Some('[')) {
                 trace!("Processing multimessage");
 
-                let maybe_array: Vec<DataRouterInsertMessage> = serde_json::from_str(
-                    message.payload()?,
-                )
-                .context("Payload deserialization failed, message is not a valid cdl message ")?;
+                let maybe_array: Vec<DataRouterInsertMessage> = serde_json::from_str(payload)
+                    .context(
+                        "Payload deserialization failed, message is not a valid cdl message ",
+                    )?;
 
                 let mut result = Ok(());
 
                 for entry in maybe_array.iter() {
-                    let r = route(&self.cache, entry, &message_key, &self.producer)
-                        .await
-                        .context("Tried to send message and failed");
-
-                    counter!("cdl.data-router.input-multimsg", 1);
-                    counter!("cdl.data-router.processed", 1);
+                    let r = self
+                        .validate_and_send(&message_key, &mut validator, &entry)
+                        .await;
 
                     if r.is_err() {
                         result = r;
@@ -68,16 +68,12 @@ impl ParallelConsumerHandler for Handler {
                 trace!("Processing single message");
 
                 let owned: DataRouterInsertMessage =
-                    serde_json::from_str::<DataRouterInsertMessage>(message.payload()?).context(
+                    serde_json::from_str::<DataRouterInsertMessage>(payload).context(
                         "Payload deserialization failed, message is not a valid cdl message",
                     )?;
-                let result = route(&self.cache, &owned, &message_key, &self.producer)
-                    .await
-                    .context("Tried to send message and failed");
-                counter!("cdl.data-router.input-singlemsg", 1);
-                counter!("cdl.data-router.processed", 1);
 
-                result
+                self.validate_and_send(&message_key, &mut validator, &owned)
+                    .await
             }
         }
         .await;
@@ -142,5 +138,32 @@ async fn send_message(
         );
     } else {
         counter!("cdl.data-router.output-singleok", 1);
+    }
+}
+
+impl Handler {
+    async fn validate_and_send(
+        &self,
+        message_key: &str,
+        validator: &mut MutexGuard<'_, Box<dyn ValidatorContainer + Send + Sync>>,
+        owned: &'_ DataRouterInsertMessage<'_>,
+    ) -> Result<(), Error> {
+        match validator.validate_value(owned.schema_id, owned.data).await {
+            Ok(resolution) => {
+                if resolution {
+                    let r = route(&self.cache, &owned, &message_key, &self.producer)
+                        .await
+                        .context("Tried to send message and failed");
+                    counter!("cdl.data-router.input-singlemsg", 1);
+                    counter!("cdl.data-router.processed", 1);
+
+                    r
+                } else {
+                    counter!("cdl.data-router.invalid", 1);
+                    Ok(())
+                }
+            }
+            Err(error) => Err(error),
+        }
     }
 }

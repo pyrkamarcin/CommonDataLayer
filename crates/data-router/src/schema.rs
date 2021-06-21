@@ -31,9 +31,9 @@ impl CacheSupplier<Uuid, String> for InsertDestinationCacheSupplier {
 }
 
 impl InsertDestinationCacheSupplier {
-    pub fn new(schema_registry_url: Arc<String>) -> Self {
-        Self {
+    pub fn new(schema_registry_url: Arc<String>) -> Box<Self> {
+        Box::new(Self {
             schema_registry_url,
-        }
+        })
     }
 }

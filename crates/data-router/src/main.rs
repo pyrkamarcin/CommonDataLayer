@@ -28,19 +28,22 @@ async fn main() -> anyhow::Result<()> {
     let consumer = settings.consumer().await?;
     let producer = Arc::new(settings.producer().await?);
 
-    let schema_registry_url = Arc::new(settings.services.schema_registry_url);
+    let schema_registry_url = Arc::new(settings.services.schema_registry_url.clone());
     let cache = Arc::new(Mutex::new(DynamicCache::new(
-        settings.cache_capacity,
-        Box::new(InsertDestinationCacheSupplier::new(schema_registry_url)),
+        settings.routing_cache_capacity,
+        InsertDestinationCacheSupplier::new(schema_registry_url),
     )));
 
     let task_queue = Arc::new(ParallelTaskQueue::default());
+
+    let validator = settings.validator();
 
     consumer
         .par_run(Handler {
             cache,
             producer,
             task_queue,
+            validator: Arc::new(Mutex::new(validator)),
         })
         .await?;
 
