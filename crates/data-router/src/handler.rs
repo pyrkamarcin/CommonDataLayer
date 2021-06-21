@@ -1,12 +1,6 @@
-use std::sync::{Arc, Mutex};
-
 use anyhow::Context;
 use async_trait::async_trait;
-use lru_cache::LruCache;
-use serde_json::Value;
-use tracing::{error, trace};
-use uuid::Uuid;
-
+use cache::DynamicCache;
 use cdl_dto::ingestion::{BorrowedInsertMessage, DataRouterInsertMessage};
 use communication_utils::{
     get_order_group_id, message::CommunicationMessage, parallel_consumer::ParallelConsumerHandler,
@@ -14,12 +8,16 @@ use communication_utils::{
 };
 use metrics_utils::{self as metrics, counter};
 use misc_utils::current_timestamp;
+use serde_json::Value;
+use std::sync::Arc;
+use tokio::sync::Mutex;
+use tracing::{error, trace};
 use utils::parallel_task_queue::ParallelTaskQueue;
+use uuid::Uuid;
 
 pub struct Handler {
-    pub cache: Arc<Mutex<LruCache<Uuid, String>>>,
+    pub cache: Arc<Mutex<DynamicCache<Uuid, String>>>,
     pub producer: Arc<CommonPublisher>,
-    pub schema_registry_addr: Arc<String>,
     pub task_queue: Arc<ParallelTaskQueue>,
 }
 
@@ -53,15 +51,9 @@ impl ParallelConsumerHandler for Handler {
                 let mut result = Ok(());
 
                 for entry in maybe_array.iter() {
-                    let r = route(
-                        &self.cache,
-                        entry,
-                        &message_key,
-                        &self.producer,
-                        &self.schema_registry_addr,
-                    )
-                    .await
-                    .context("Tried to send message and failed");
+                    let r = route(&self.cache, entry, &message_key, &self.producer)
+                        .await
+                        .context("Tried to send message and failed");
 
                     counter!("cdl.data-router.input-multimsg", 1);
                     counter!("cdl.data-router.processed", 1);
@@ -79,15 +71,9 @@ impl ParallelConsumerHandler for Handler {
                     serde_json::from_str::<DataRouterInsertMessage>(message.payload()?).context(
                         "Payload deserialization failed, message is not a valid cdl message",
                     )?;
-                let result = route(
-                    &self.cache,
-                    &owned,
-                    &message_key,
-                    &self.producer,
-                    &self.schema_registry_addr,
-                )
-                .await
-                .context("Tried to send message and failed");
+                let result = route(&self.cache, &owned, &message_key, &self.producer)
+                    .await
+                    .context("Tried to send message and failed");
                 counter!("cdl.data-router.input-singlemsg", 1);
                 counter!("cdl.data-router.processed", 1);
 
@@ -110,13 +96,12 @@ impl ParallelConsumerHandler for Handler {
     }
 }
 
-#[tracing::instrument(skip(producer))]
+#[tracing::instrument(skip(cache, producer))]
 async fn route(
-    cache: &Mutex<LruCache<Uuid, String>>,
+    cache: &Mutex<DynamicCache<Uuid, String>>,
     event: &DataRouterInsertMessage<'_>,
     message_key: &str,
     producer: &CommonPublisher,
-    schema_registry_addr: &str,
 ) -> anyhow::Result<()> {
     let payload = BorrowedInsertMessage {
         object_id: event.object_id,
@@ -125,9 +110,8 @@ async fn route(
         data: event.data,
     };
 
-    let insert_destination =
-        crate::schema::get_schema_insert_destination(cache, event.schema_id, schema_registry_addr)
-            .await?;
+    let mut cache = cache.lock().await;
+    let insert_destination = cache.get(event.schema_id).await?;
 
     send_message(
         producer,

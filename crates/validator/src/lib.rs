@@ -1,31 +1,29 @@
-#![feature(trait_alias, async_closure)]
-
-use anyhow::Context;
 use cache::{CacheSupplier, DynamicCache};
 use cdl_dto::ingestion::BorrowedInsertMessage;
 use communication_utils::message::CommunicationMessage;
 use communication_utils::parallel_consumer::ParallelConsumerHandler;
+use communication_utils::publisher::CommonPublisher;
 use jsonschema::JSONSchema;
-use rpc::schema_registry::schema_registry_client::SchemaRegistryClient;
+use ouroboros::self_referencing;
 use rpc::schema_registry::VersionedId;
-use rpc::tonic::transport::Channel;
-use serde_json::Value;
-use std::error::Error;
-use std::future::Future;
-use std::marker::PhantomPinned;
-use std::pin::Pin;
-use std::ptr::NonNull;
+use rpc::tonic::Request;
+use serde_json::{to_value, Value};
 use std::sync::Arc;
+use tokio::sync::Mutex;
 use uuid::Uuid;
 
 pub struct Handler {
-    schema_registry_url: Arc<String>,
+    validator: Arc<Mutex<Validator>>,
+    producer: Arc<CommonPublisher>,
+    send_to: String,
 }
 
 impl Handler {
-    pub fn new(schema_registry_url: Arc<String>) -> Self {
+    pub fn new(validator: Validator, producer: Arc<CommonPublisher>, send_to: String) -> Self {
         Self {
-            schema_registry_url,
+            validator: Arc::new(Mutex::new(validator)),
+            producer,
+            send_to,
         }
     }
 }
@@ -33,84 +31,97 @@ impl Handler {
 #[async_trait::async_trait]
 impl ParallelConsumerHandler for Handler {
     async fn handle<'a>(&'a self, msg: &'a dyn CommunicationMessage) -> anyhow::Result<()> {
-        // let message: BorrowedInsertMessage = serde_json::from_str(msg.payload()?)?;
-        // let mut sr: SchemaRegistryClient<Channel> =
-        //     rpc::schema_registry::connect(self.schema_registry_url.to_owned()).await?;
-        //
-        // let def = sr
-        //     .get_schema_definition(VersionedId {
-        //         id: message.schema_id.to_string(),
-        //         version_req: None,
-        //     })
-        //     .await?
-        //     .into_inner();
-        //
-        // let schema =
-        //     jsonschema::JSONSchema::compile(&serde_json::from_slice(def.definition.as_slice())?)?;
-        //
-        // if let Err(err) = schema.validate(&serde_json::from_str(message.data.get())?) {
-        //     println!("Oh no ");
-        // }
+        let payload = msg.payload()?;
+        let message: BorrowedInsertMessage = serde_json::from_str(payload)?;
+
+        let mut validator = self.validator.lock().await;
+        let schema = validator.cache.get(message.schema_id).await?;
+
+        if schema.is_valid(&to_value(message.data)?) {
+            self.producer
+                .publish_message(&self.send_to, msg.key()?, payload.as_bytes().to_vec())
+                .await?;
+        } else {
+            tracing::trace!(
+                "Value '{}' is not valid cdl object `{}` '{}'",
+                message.data,
+                message.schema_id,
+                schema.schema()
+            )
+        }
 
         Ok(())
     }
 }
 
-// https://github.com/Stranger6667/jsonschema-rs/issues/145
-// JSON schema isn't owned, so we have to store it's value along the way - self referential mess
 pub struct Validator {
-    cache: DynamicCache<Uuid, JSONSchema<'static>>,
+    cache: DynamicCache<Uuid, Schema>,
+}
+
+#[self_referencing]
+pub struct Schema {
+    pub json: Box<Value>,
+    #[borrows(json)]
+    #[covariant]
+    pub validator: JSONSchema<'this>,
 }
 
 pub struct ValidatorCacheSupplier {
-    schema_retriever: Box<
-        dyn Fn(Uuid) -> Pin<Box<dyn Future<Output = anyhow::Result<&'static Value>> + Send + Sync>>
-            + Send
-            + Sync,
-    >,
+    schema_registry_url: Arc<String>,
 }
 
 #[async_trait::async_trait]
-impl CacheSupplier<Uuid, JSONSchema<'static>> for ValidatorCacheSupplier {
-    async fn retrieve(&self, key: Uuid) -> anyhow::Result<JSONSchema<'static>> {
-        let schema = (self.schema_retriever)(key).await?;
-        let json_schema = JSONSchema::compile(schema).context("Couldn't convert schema")?;
-        Ok(json_schema)
+impl CacheSupplier<Uuid, Schema> for ValidatorCacheSupplier {
+    async fn retrieve(&self, key: Uuid) -> anyhow::Result<Schema> {
+        let json = get_schema_from_registry(key, Arc::clone(&self.schema_registry_url).to_string())
+            .await?;
+        Ok(SchemaTryBuilder {
+            json: Box::new(json),
+            validator_builder: |json: &Value| JSONSchema::compile(json),
+        }
+        .try_build()?)
     }
 }
 
 impl ValidatorCacheSupplier {
-    fn new(
-        schema_retriever: Box<
-            dyn Fn(
-                    Uuid,
-                )
-                    -> Pin<Box<dyn Future<Output = anyhow::Result<&'static Value>> + Send + Sync>>
-                + Send
-                + Sync,
-        >,
-    ) -> Self {
-        Self { schema_retriever }
+    fn new(schema_registry_url: Arc<String>) -> Self {
+        Self {
+            schema_registry_url,
+        }
     }
 }
 
 impl Validator {
-    pub fn new(
-        cache_capacity: usize,
-        get_schema: Box<
-            dyn Fn(
-                    Uuid,
-                )
-                    -> Pin<Box<dyn Future<Output = anyhow::Result<&'static Value>> + Send + Sync>>
-                + Send
-                + Sync,
-        >,
-    ) -> Self {
+    pub fn new(cache_capacity: usize, schema_registry_url: Arc<String>) -> Self {
         Self {
             cache: DynamicCache::new(
                 cache_capacity,
-                Box::new(ValidatorCacheSupplier::new(get_schema)),
+                Box::new(ValidatorCacheSupplier::new(schema_registry_url)),
             ),
         }
     }
+}
+
+impl Schema {
+    pub fn schema(&self) -> &Value {
+        self.borrow_json().as_ref()
+    }
+
+    pub fn is_valid(&self, other: &Value) -> bool {
+        self.borrow_validator().is_valid(other)
+    }
+}
+pub async fn get_schema_from_registry(
+    id: Uuid,
+    schema_registry_url: String,
+) -> anyhow::Result<Value> {
+    let mut conn = rpc::schema_registry::connect(schema_registry_url).await?;
+    let schema_def = conn
+        .get_schema_definition(Request::new(VersionedId {
+            id: id.to_string(),
+            version_req: None,
+        }))
+        .await?
+        .into_inner();
+    Ok(serde_json::from_slice(&schema_def.definition)?)
 }

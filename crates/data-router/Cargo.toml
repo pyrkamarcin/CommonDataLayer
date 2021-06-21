@@ -11,6 +11,8 @@ path = "src/main.rs"
 
 [dependencies]
 # Workspace
+validator = { path = "../validator" }
+cache = { path = "../utils/crates/cache" }
 cdl_dto     = { path = "../dto" }
 misc_utils  = { path = "../utils/crates/misc" }
 rpc         = { path = "../rpc" }

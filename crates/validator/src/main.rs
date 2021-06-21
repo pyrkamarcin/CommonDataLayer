@@ -1,11 +1,8 @@
-use lru_cache::LruCache;
-use std::sync::{Arc, Mutex};
-
 use crate::settings::Settings;
 use metrics_utils as metrics;
 use settings_utils::load_settings;
-use utils::parallel_task_queue::ParallelTaskQueue;
-use validator::Handler;
+use std::sync::Arc;
+use validator::{Handler, Validator};
 
 mod settings;
 
@@ -26,12 +23,12 @@ async fn main() -> anyhow::Result<()> {
     let consumer = settings.consumer().await?;
     let producer = Arc::new(settings.producer().await?);
 
-    // let cache = Arc::new(Mutex::new(LruCache::new(settings.cache_capacity)));
     let schema_registry_url = Arc::new(settings.services.schema_registry_url);
+    let validator = Validator::new(settings.cache_capacity, schema_registry_url);
 
-    let task_queue = Arc::new(ParallelTaskQueue::default());
-
-    consumer.par_run(Handler::new(schema_registry_url)).await?;
+    consumer
+        .par_run(Handler::new(validator, producer, settings.send_to))
+        .await?;
 
     tokio::time::sleep(tokio::time::Duration::from_secs(3)).await;
 
