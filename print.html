@@ -474,20 +474,30 @@ and are not versioned, though this feature may be added in the future.</p>
 <h1><a class="header" href="#features" id="features">Features</a></h1>
 <h2><a class="header" href="#guidelines" id="guidelines">Guidelines</a></h2>
 <ul>
-<li><code>name or description</code> field demonstrates only brief info about the feature itself, to learn more, please follow to the RFC in question.</li>
-<li>There may be multiple RFCs/documents for each feature, but usually only one will be linked here.</li>
-<li>Generally, the state of the feature looks should follow these guidelines:
+<li>
+<p><code>name or description</code> field demonstrates only brief info about the feature itself, to learn more, please follow to the RFC in question.</p>
+</li>
+<li>
+<p>There may be multiple RFCs/documents for each feature, but usually only one will be linked here.</p>
+</li>
+<li>
+<p>Generally, the state of the feature looks should follow these guidelines:</p>
 <ul>
 <li><code>[discussion/idea/request]-&gt;[TechSpec/RFC] and optionally [PoC] -&gt; [RC] -&gt; [Ready]</code></li>
 <li><code>RC</code> means that the feature is waiting for the release</li>
 <li><code>Ready</code> means that the feature is tested, merged and released</li>
 <li><code>Retired</code> means that the feature was dropped due to various factors, including but not limited to lack of support, legacy code or lack of usage.</li>
+<li><code>Suggestion</code> means the feature was requested or suggested, and is in preplanning or plannig stage. This shoud result in a Technical Specification or in a doc.</li>
 <li>Features in <code>TechSpec</code> phase can have missing or broken document links, since documentation is usually waiting for pull request or have additional comments pending.</li>
 </ul>
 </li>
+<li>
+<p>in case there is a developmnent release we will mark it as XXX-rc, those are not fully fledged releases, a lot of the things can be broken there or undergoing testing
+this is basically a beta branch that may or may not result in stabilization and/or release. As such State for those features will remain <code>RC</code> until released to master</p>
+</li>
 </ul>
 <h2><a class="header" href="#feature-list" id="feature-list">Feature List</a></h2>
-<table><thead><tr><th>Feature ID</th><th>name or description</th><th>State</th><th>CDL version</th><th>latest RFC</th></tr></thead><tbody>
+<table><thead><tr><th>Feature ID</th><th>name or description</th><th>State</th><th>CDL version</th><th>latestRFC</th></tr></thead><tbody>
 <tr><td>CDLF-00001-00</td><td>Basic Document Repository</td><td>Retired</td><td>0.0.1</td><td>N/A</td></tr>
 <tr><td>CDLF-00002-00</td><td>Basic Binary Repository</td><td>Retired</td><td>0.0.1</td><td>N/A</td></tr>
 <tr><td>CDLF-00003-00</td><td>Basic Timeseries Repository</td><td>Retired</td><td>0.0.1</td><td>N/A</td></tr>
@@ -496,17 +506,26 @@ and are not versioned, though this feature may be added in the future.</p>
 <tr><td>CDLF-00006-00</td><td>Automatic Query Destination</td><td>Ready</td><td>0.0.1</td><td>N/A</td></tr>
 <tr><td>CDLF-00007-00</td><td>System Metrics Support</td><td>Ready</td><td>0.0.1</td><td>N/A</td></tr>
 <tr><td>CDLF-00008-00</td><td>Victoria Metrics Support</td><td>Ready</td><td>0.0.9</td><td>N/A</td></tr>
-<tr><td>CDLF-00009-00</td><td>CDL Input Message Batching</td><td>RC</td><td>-----</td><td>N/A</td></tr>
+<tr><td>CDLF-00009-00</td><td>CDL Input Message Batching</td><td>RC</td><td>0.3.1-rc</td><td>N/A</td></tr>
 <tr><td>CDLF-0000A-00</td><td>Message Ordering</td><td>RC</td><td>0.0.9</td><td><a href="features/./ordering.html">DOC</a></td></tr>
-<tr><td>CDLF-0000B-00</td><td>Access Groups</td><td>TechSpec</td><td>-----</td><td></td></tr>
-<tr><td>CDLF-0000C-00</td><td>Full GRPC communication support</td><td>PoC</td><td>-----</td><td><a href="https://github.com/epiphany-platform/CommonDataLayer/blob/develop/docs/rfc/CDLF-0000C-00-rfc-01.md">RFC</a></td></tr>
-<tr><td>CDLF-0000D-00</td><td>Service Mesh (istio)</td><td>PoC</td><td>-----</td><td>N/A</td></tr>
-<tr><td>CDLF-0000E-00</td><td>CIM MessagePack Format</td><td>TechSpec</td><td>-----</td><td><a href="https://github.com/epiphany-platform/CommonDataLayer/tree/develop/docs/rfc/docs/rfc/CDLF-0000E-00-rfc-01.md">RFC</a></td></tr>
-<tr><td>CDLF-0000F-00</td><td>Configuration Service</td><td>TechSpec</td><td>-----</td><td><a href="https://github.com/epiphany-platform/CommonDataLayer/blob/develop/docs/rfc/CDLF-0000F-00-rfc-01.md">RFC</a></td></tr>
-<tr><td>CDLF-00010-00</td><td>Protocol Versioning</td><td>TechSpec</td><td>-----</td><td><a href="https://github.com/epiphany-platform/CommonDataLayer/blob/develop/docs/rfc/CDLF-00010-00-rfc-01.md">RFC</a></td></tr>
-<tr><td>CDLF-00011-00</td><td>Basic Materialization</td><td>TechSpec</td><td>-----</td><td><a href="https://github.com/epiphany-platform/CommonDataLayer/blob/develop/docs/rfc/CDLF-00011-00-rfc-01.md">RFC</a> <a href="features/./materialization.html">DOC</a></td></tr>
-<tr><td>CDLF-00012-00</td><td>Edge registry</td><td>RFC</td><td>-----</td><td><a href="https://github.com/epiphany-platform/CommonDataLayer/blob/develop/docs/rfc/CDLF-00012-00-rfc-01.md">RFC</a></td></tr>
-<tr><td>CDLF-00013-00</td><td>Materialized views</td><td>RFC</td><td>-----</td><td><a href="https://github.com/epiphany-platform/CommonDataLayer/blob/develop/docs/rfc/CDLF-00013-00-rfc-01.md">RFC</a></td></tr>
+<tr><td>CDLF-0000B-00</td><td>Access Groups</td><td>Suggestion</td><td>-----</td><td>N/A</td></tr>
+<tr><td>CDLF-0000C-00</td><td>Full GRPC communication support</td><td>PoC</td><td>0.3.1-rc</td><td><a href="features/../rfc/CDLF-0000C-00-rfc-01.html">RFC</a></td></tr>
+<tr><td>CDLF-0000D-00</td><td>Service Mesh (istio)</td><td>Abandoned</td><td>-----</td><td>N/A</td></tr>
+<tr><td>CDLF-0000E-00</td><td>CIM MessagePack Format</td><td>TechSpec</td><td>-----</td><td><a href="features/../rfc/CDLF-0000E-00-rfc-01.html">RFC</a></td></tr>
+<tr><td>CDLF-0000F-00</td><td>Configuration Service</td><td>TechSpec</td><td>-----</td><td></td></tr>
+<tr><td>CDLF-00010-00</td><td>Protocol Versioning</td><td>TechSpec</td><td>-----</td><td><a href="features/../rfc/CDLF-00010-00-rfc-01.html">RFC</a></td></tr>
+<tr><td>CDLF-00011-00</td><td>Basic Materialization</td><td>TechSpec</td><td>0.3.1-rc</td><td><a href="features/../rfc/CDLF-00011-00-rfc-01.html">RFC</a></td></tr>
+<tr><td>CDLF-00012-00</td><td>Edge registry</td><td>RC</td><td>0.3.1-rc</td><td><a href="features/../rfc/CDLF-00012-00-rfc-01.html">RFC</a></td></tr>
+<tr><td>CDLF-00013-00</td><td>Materialized views</td><td>RC</td><td>0.3.1-rc</td><td><a href="features/../rfc/CDLF-00013-00-rfc-01.html">RFC</a></td></tr>
+<tr><td>CDLF-00014-00</td><td>Materialization - Filters</td><td>RC</td><td>0.4.0-rc</td><td></td></tr>
+<tr><td>CDLF-00015-00</td><td>Typeless Routing</td><td>Suggestion</td><td>-----</td><td></td></tr>
+<tr><td>CDLF-00016-00</td><td>Materialization - Computation</td><td>TechSpec</td><td>-----</td><td></td></tr>
+<tr><td>CDLF-00017-00</td><td>Materialization - Materialized Types</td><td>TechSpec</td><td>-----</td><td></td></tr>
+<tr><td>CDLF-00018-00</td><td>Materializer - OnDemand</td><td>RC</td><td>0.3.1-rc</td><td></td></tr>
+<tr><td>CDLF-00019-00</td><td>Materializer - General</td><td>RC</td><td>0.3.1-rc</td><td></td></tr>
+<tr><td>CDLF-0001A-00</td><td>Materialization - Notifications</td><td>RC</td><td>0.3.1-rc</td><td></td></tr>
+<tr><td>CDLF-0001B-00</td><td>Object-side configuration</td><td>Suggestion</td><td>-----</td><td></td></tr>
+<tr><td>CDLF-0001B-00</td><td>CIM Object Valdiation</td><td>Suggestion</td><td>-----</td><td></td></tr>
 </tbody></table>
 <h2><a class="header" href="#references" id="references">References:</a></h2>
 <p><a href="https://github.com/epiphany-platform/CommonDataLayer/tree/develop/docs/rfc">CDL RFC directory</a></p>
@@ -2882,69 +2901,7 @@ For each notification take every view definition and check if view data is affec
 <ul>
 <li><code>19.03.2021</code> - Followed rename from <code>edge-repository</code> to <code>edge-registry</code></li>
 </ul>
-<h1><a class="header" href="#front-matter-4" id="front-matter-4">Front Matter</a></h1>
-<pre><code>Title           : Commit message formalization and enforcement
-Author(s)       : Łukasz Biel
-Team            : CommonDataLayer
-Reviewer        : CommonDataLayer
-Created         : 2021-03-17
-Last updated    : 2021-03-17
-Version         : 1.0.0
-CDL feature ID  : CDLF-00014-00
-</code></pre>
-<h1><a class="header" href="#commit-message-formalization" id="commit-message-formalization">Commit message formalization:</a></h1>
-<h2><a class="header" href="#goal" id="goal">Goal:</a></h2>
-<p>To have some standard. It can't be too strict because we are a small team, and this adds extra overhead.</p>
-<h2><a class="header" href="#what-we-do-now" id="what-we-do-now">What we do now:</a></h2>
-<p>We are using vaguely defined <code>angular commit message spec.</code> This means our commits have titles with some markings, and that's it.</p>
-<p>Tags that are used so far:
-<code>test</code>
-<code>ci</code>
-<code>chore</code>
-<code>refactor</code>
-<code>fix</code>
-<code>feature</code>
-<code>docs</code>
-<code>rfc</code></p>
-<p>Some of these overlap, we foregone using the scope of the commit.</p>
-<h2><a class="header" href="#what-we-should-be-doing" id="what-we-should-be-doing">What we should be doing:</a></h2>
-<p>Document the process. Create a set of <code>tags</code> that are in use.
-Some tags are duplicates. Thus I propose to use only:</p>
-<ul>
-<li><code>chore</code> - dependency updates, ci updates, refactorings, other changes that don't affect <code>CDL</code> functionality</li>
-<li><code>test</code> - adding or removing tests; it does not include changes to deployment or CI. These go under <code>chore.</code></li>
-<li><code>fix</code> - fixing a bug in <strong>code</strong></li>
-<li><code>feat</code> - adding new feature to <strong>CDL</strong></li>
-<li><code>docs</code> - adding documentation (readmes, mdbook, plantuml etc.)</li>
-</ul>
-<p>On merge, we will squash commits and use one of 5 tags. We will not be using the scope as it's basically useless - most of our changes affect everything.
-The summary should describe which components were changed.</p>
-<p>In the meantime, we started enforcing names on PR's.
-I propose that we drop tags in PR titles altogether and use labels.</p>
-<p>As for the long commit message:</p>
-<p>for dependabot - we can leave them as is.
-For our work - we should make sure that commits titled wip aren't included; thus, it may be a good idea to have some standard there.</p>
-<p>I propose we use the format as follows:</p>
-<pre><code>parent-tag: summary
-
-* tag: summary
-* tag: summary
-</code></pre>
-<p>Parent tag is the main goal of the work, and the list contains all things we did during implementation. E.g.:</p>
-<pre><code>feature: add lazers to CDL
-
-* chore: add deployment target on the moon
-* docs: document usage of lazers (and how to keep them away from cats)
-</code></pre>
-<h1><a class="header" href="#commit-message-enforcement" id="commit-message-enforcement">Commit message enforcement</a></h1>
-<p>This is a tough topic. We cannot enforce anything via default GitHub means. There are two options:</p>
-<ul>
-<li>We enforce a standard on ourselves and take care of it.</li>
-<li>We build a bot and perform merges only via its API.</li>
-</ul>
-<p>The first proposal is what we do now. We sometimes miss a commit, but with a concrete set of guidelines (see above), we should not have conflicts.
-The second proposal requires extra work. We could use a bot at some point for other things than merging as well.
-We can create a task with a clear description of what it would do and backlog it.</p>
+<h1><a class="header" href="#00014---commit-message-formalization" id="00014---commit-message-formalization">00014 - Commit message formalization</a></h1>
 
                     </main>
 

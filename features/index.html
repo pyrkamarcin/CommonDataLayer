@@ -170,20 +170,30 @@
                         <h1><a class="header" href="#features" id="features">Features</a></h1>
 <h2><a class="header" href="#guidelines" id="guidelines">Guidelines</a></h2>
 <ul>
-<li><code>name or description</code> field demonstrates only brief info about the feature itself, to learn more, please follow to the RFC in question.</li>
-<li>There may be multiple RFCs/documents for each feature, but usually only one will be linked here.</li>
-<li>Generally, the state of the feature looks should follow these guidelines:
+<li>
+<p><code>name or description</code> field demonstrates only brief info about the feature itself, to learn more, please follow to the RFC in question.</p>
+</li>
+<li>
+<p>There may be multiple RFCs/documents for each feature, but usually only one will be linked here.</p>
+</li>
+<li>
+<p>Generally, the state of the feature looks should follow these guidelines:</p>
 <ul>
 <li><code>[discussion/idea/request]-&gt;[TechSpec/RFC] and optionally [PoC] -&gt; [RC] -&gt; [Ready]</code></li>
 <li><code>RC</code> means that the feature is waiting for the release</li>
 <li><code>Ready</code> means that the feature is tested, merged and released</li>
 <li><code>Retired</code> means that the feature was dropped due to various factors, including but not limited to lack of support, legacy code or lack of usage.</li>
+<li><code>Suggestion</code> means the feature was requested or suggested, and is in preplanning or plannig stage. This shoud result in a Technical Specification or in a doc.</li>
 <li>Features in <code>TechSpec</code> phase can have missing or broken document links, since documentation is usually waiting for pull request or have additional comments pending.</li>
 </ul>
 </li>
+<li>
+<p>in case there is a developmnent release we will mark it as XXX-rc, those are not fully fledged releases, a lot of the things can be broken there or undergoing testing
+this is basically a beta branch that may or may not result in stabilization and/or release. As such State for those features will remain <code>RC</code> until released to master</p>
+</li>
 </ul>
 <h2><a class="header" href="#feature-list" id="feature-list">Feature List</a></h2>
-<table><thead><tr><th>Feature ID</th><th>name or description</th><th>State</th><th>CDL version</th><th>latest RFC</th></tr></thead><tbody>
+<table><thead><tr><th>Feature ID</th><th>name or description</th><th>State</th><th>CDL version</th><th>latestRFC</th></tr></thead><tbody>
 <tr><td>CDLF-00001-00</td><td>Basic Document Repository</td><td>Retired</td><td>0.0.1</td><td>N/A</td></tr>
 <tr><td>CDLF-00002-00</td><td>Basic Binary Repository</td><td>Retired</td><td>0.0.1</td><td>N/A</td></tr>
 <tr><td>CDLF-00003-00</td><td>Basic Timeseries Repository</td><td>Retired</td><td>0.0.1</td><td>N/A</td></tr>
@@ -192,17 +202,26 @@
 <tr><td>CDLF-00006-00</td><td>Automatic Query Destination</td><td>Ready</td><td>0.0.1</td><td>N/A</td></tr>
 <tr><td>CDLF-00007-00</td><td>System Metrics Support</td><td>Ready</td><td>0.0.1</td><td>N/A</td></tr>
 <tr><td>CDLF-00008-00</td><td>Victoria Metrics Support</td><td>Ready</td><td>0.0.9</td><td>N/A</td></tr>
-<tr><td>CDLF-00009-00</td><td>CDL Input Message Batching</td><td>RC</td><td>-----</td><td>N/A</td></tr>
+<tr><td>CDLF-00009-00</td><td>CDL Input Message Batching</td><td>RC</td><td>0.3.1-rc</td><td>N/A</td></tr>
 <tr><td>CDLF-0000A-00</td><td>Message Ordering</td><td>RC</td><td>0.0.9</td><td><a href="./ordering.html">DOC</a></td></tr>
-<tr><td>CDLF-0000B-00</td><td>Access Groups</td><td>TechSpec</td><td>-----</td><td></td></tr>
-<tr><td>CDLF-0000C-00</td><td>Full GRPC communication support</td><td>PoC</td><td>-----</td><td><a href="https://github.com/epiphany-platform/CommonDataLayer/blob/develop/docs/rfc/CDLF-0000C-00-rfc-01.md">RFC</a></td></tr>
-<tr><td>CDLF-0000D-00</td><td>Service Mesh (istio)</td><td>PoC</td><td>-----</td><td>N/A</td></tr>
-<tr><td>CDLF-0000E-00</td><td>CIM MessagePack Format</td><td>TechSpec</td><td>-----</td><td><a href="https://github.com/epiphany-platform/CommonDataLayer/tree/develop/docs/rfc/docs/rfc/CDLF-0000E-00-rfc-01.md">RFC</a></td></tr>
-<tr><td>CDLF-0000F-00</td><td>Configuration Service</td><td>TechSpec</td><td>-----</td><td><a href="https://github.com/epiphany-platform/CommonDataLayer/blob/develop/docs/rfc/CDLF-0000F-00-rfc-01.md">RFC</a></td></tr>
-<tr><td>CDLF-00010-00</td><td>Protocol Versioning</td><td>TechSpec</td><td>-----</td><td><a href="https://github.com/epiphany-platform/CommonDataLayer/blob/develop/docs/rfc/CDLF-00010-00-rfc-01.md">RFC</a></td></tr>
-<tr><td>CDLF-00011-00</td><td>Basic Materialization</td><td>TechSpec</td><td>-----</td><td><a href="https://github.com/epiphany-platform/CommonDataLayer/blob/develop/docs/rfc/CDLF-00011-00-rfc-01.md">RFC</a> <a href="./materialization.html">DOC</a></td></tr>
-<tr><td>CDLF-00012-00</td><td>Edge registry</td><td>RFC</td><td>-----</td><td><a href="https://github.com/epiphany-platform/CommonDataLayer/blob/develop/docs/rfc/CDLF-00012-00-rfc-01.md">RFC</a></td></tr>
-<tr><td>CDLF-00013-00</td><td>Materialized views</td><td>RFC</td><td>-----</td><td><a href="https://github.com/epiphany-platform/CommonDataLayer/blob/develop/docs/rfc/CDLF-00013-00-rfc-01.md">RFC</a></td></tr>
+<tr><td>CDLF-0000B-00</td><td>Access Groups</td><td>Suggestion</td><td>-----</td><td>N/A</td></tr>
+<tr><td>CDLF-0000C-00</td><td>Full GRPC communication support</td><td>PoC</td><td>0.3.1-rc</td><td><a href="../rfc/CDLF-0000C-00-rfc-01.html">RFC</a></td></tr>
+<tr><td>CDLF-0000D-00</td><td>Service Mesh (istio)</td><td>Abandoned</td><td>-----</td><td>N/A</td></tr>
+<tr><td>CDLF-0000E-00</td><td>CIM MessagePack Format</td><td>TechSpec</td><td>-----</td><td><a href="../rfc/CDLF-0000E-00-rfc-01.html">RFC</a></td></tr>
+<tr><td>CDLF-0000F-00</td><td>Configuration Service</td><td>TechSpec</td><td>-----</td><td></td></tr>
+<tr><td>CDLF-00010-00</td><td>Protocol Versioning</td><td>TechSpec</td><td>-----</td><td><a href="../rfc/CDLF-00010-00-rfc-01.html">RFC</a></td></tr>
+<tr><td>CDLF-00011-00</td><td>Basic Materialization</td><td>TechSpec</td><td>0.3.1-rc</td><td><a href="../rfc/CDLF-00011-00-rfc-01.html">RFC</a></td></tr>
+<tr><td>CDLF-00012-00</td><td>Edge registry</td><td>RC</td><td>0.3.1-rc</td><td><a href="../rfc/CDLF-00012-00-rfc-01.html">RFC</a></td></tr>
+<tr><td>CDLF-00013-00</td><td>Materialized views</td><td>RC</td><td>0.3.1-rc</td><td><a href="../rfc/CDLF-00013-00-rfc-01.html">RFC</a></td></tr>
+<tr><td>CDLF-00014-00</td><td>Materialization - Filters</td><td>RC</td><td>0.4.0-rc</td><td></td></tr>
+<tr><td>CDLF-00015-00</td><td>Typeless Routing</td><td>Suggestion</td><td>-----</td><td></td></tr>
+<tr><td>CDLF-00016-00</td><td>Materialization - Computation</td><td>TechSpec</td><td>-----</td><td></td></tr>
+<tr><td>CDLF-00017-00</td><td>Materialization - Materialized Types</td><td>TechSpec</td><td>-----</td><td></td></tr>
+<tr><td>CDLF-00018-00</td><td>Materializer - OnDemand</td><td>RC</td><td>0.3.1-rc</td><td></td></tr>
+<tr><td>CDLF-00019-00</td><td>Materializer - General</td><td>RC</td><td>0.3.1-rc</td><td></td></tr>
+<tr><td>CDLF-0001A-00</td><td>Materialization - Notifications</td><td>RC</td><td>0.3.1-rc</td><td></td></tr>
+<tr><td>CDLF-0001B-00</td><td>Object-side configuration</td><td>Suggestion</td><td>-----</td><td></td></tr>
+<tr><td>CDLF-0001B-00</td><td>CIM Object Valdiation</td><td>Suggestion</td><td>-----</td><td></td></tr>
 </tbody></table>
 <h2><a class="header" href="#references" id="references">References:</a></h2>
 <p><a href="https://github.com/epiphany-platform/CommonDataLayer/tree/develop/docs/rfc">CDL RFC directory</a></p>
