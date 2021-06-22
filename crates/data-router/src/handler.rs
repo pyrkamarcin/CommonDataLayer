@@ -160,6 +160,11 @@ impl Handler {
                     r
                 } else {
                     counter!("cdl.data-router.invalid", 1);
+                    trace!(
+                        "value '{}' is not valid cdl object of schema `{}`",
+                        owned.data,
+                        owned.schema_id
+                    );
                     Ok(())
                 }
             }

@@ -1,4 +1,4 @@
-cache_capacity = 1000
+routing_cache_capacity = 1000
 async_task_limit = 32
 
 [kafka]
@@ -7,6 +7,10 @@ group_id = "data_router"
 
 [monitoring]
 otel_service_name = "data-router"
+
+[validation]
+enabled = false
+cache_capacity = 1024
 
 [log]
 rust_log = "info,data_router=debug"

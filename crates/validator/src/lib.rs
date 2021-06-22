@@ -1,5 +1,5 @@
 use cache::{CacheSupplier, DynamicCache};
-use cdl_dto::ingestion::BorrowedInsertMessage;
+use cdl_dto::ingestion::DataRouterInsertMessage;
 use communication_utils::message::CommunicationMessage;
 use communication_utils::parallel_consumer::ParallelConsumerHandler;
 use communication_utils::publisher::CommonPublisher;
@@ -32,7 +32,7 @@ impl Handler {
 impl ParallelConsumerHandler for Handler {
     async fn handle<'a>(&'a self, msg: &'a dyn CommunicationMessage) -> anyhow::Result<()> {
         let payload = msg.payload()?;
-        let message: BorrowedInsertMessage = serde_json::from_str(payload)?;
+        let message: DataRouterInsertMessage = serde_json::from_str(payload)?;
 
         let mut validator = self.validator.lock().await;
 
@@ -41,7 +41,11 @@ impl ParallelConsumerHandler for Handler {
             .await?
         {
             self.producer
-                .publish_message(&self.send_to, msg.key()?, payload.as_bytes().to_vec())
+                .publish_message(
+                    &self.send_to,
+                    msg.key().unwrap_or(""),
+                    payload.as_bytes().to_vec(),
+                )
                 .await?;
         } else {
             tracing::trace!(

@@ -46,7 +46,7 @@ pub struct ServicesSettings {
 #[derive(Deserialize, Debug, Serialize)]
 pub struct ValidationSettings {
     pub enabled: bool,
-    pub validation_cache_capacity: usize,
+    pub cache_capacity: usize,
 }
 
 const fn default_async_task_limit() -> usize {
@@ -100,7 +100,7 @@ impl Settings {
             if validation.enabled {
                 return Box::new(ObjectValidator {
                     inner: Validator::new(
-                        validation.validation_cache_capacity,
+                        validation.cache_capacity,
                         self.services.schema_registry_url.clone(),
                     ),
                 });
