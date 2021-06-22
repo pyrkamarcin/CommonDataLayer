@@ -53,6 +53,7 @@
     - [query-service](configuration/query-service.md)
     - [query-service-ts](configuration/query-service-ts.md)
     - [schema-registry](configuration/schema-registry.md)
+    - [validator](configuration/validator.md)
 - [RFCs]()
    - [0000C - Alternative communication method](./rfc/CDLF-0000C-00-rfc-01.md)
    - [0000E - MessagePack support](./rfc/CDLF-0000E-00-rfc-01.md)

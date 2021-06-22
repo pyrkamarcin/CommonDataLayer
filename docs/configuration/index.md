@@ -15,6 +15,7 @@ Example configuration is present in this directory:
 * [query-service](./query-service.md)
 * [query-service-ts](./query-service-ts.md)
 * [schema-registry](./schema-registry.md)
+* [validator](./validator.md)
 
 Configuration is loaded in order:
 

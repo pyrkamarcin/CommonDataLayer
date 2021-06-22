@@ -1,7 +1,8 @@
 ```toml
 communication_method = "kafka"
-routing_cache_capacity = 1000
+cache_capacity = 1024
 async_task_limit = 32
+send_to = ""
 
 [kafka]
 brokers = ""
@@ -21,10 +22,6 @@ nowait = false
 
 [grpc]
 address = ""
-
-[validation]
-enabled = true
-cache_capacity = 1024
 
 [monitoring]
 metrics_port = 0
