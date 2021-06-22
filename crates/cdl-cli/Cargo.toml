@@ -12,7 +12,6 @@ path = "src/main.rs"
 [dependencies]
 # Workspace
 rpc         = { path = "../rpc" }
-utils       = { path = "../utils" }
 cdl_dto     = { path = "../dto" }
 tracing_utils           = { path = "../utils/crates/tracing" }
 

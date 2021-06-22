@@ -116,7 +116,6 @@ dependencies = [
  "communication_utils",
  "futures",
  "itertools 0.10.0",
- "metrics_utils",
  "misc_utils",
  "reqwest",
  "rpc",
@@ -129,7 +128,6 @@ dependencies = [
  "tracing",
  "tracing-futures",
  "tracing_utils",
- "utils",
  "uuid",
  "warp",
 ]
@@ -472,7 +470,6 @@ dependencies = [
  "tokio",
  "tonic",
  "tracing_utils",
- "utils",
  "uuid",
 ]
 
@@ -905,7 +902,6 @@ dependencies = [
  "test-case",
  "tracing",
  "tracing_utils",
- "utils",
  "uuid",
 ]
 
@@ -2320,7 +2316,6 @@ dependencies = [
  "tokio-stream",
  "tracing",
  "tracing_utils",
- "utils",
  "uuid",
 ]
 
@@ -2678,7 +2673,6 @@ dependencies = [
  "tracing",
  "tracing-futures",
  "tracing_utils",
- "utils",
  "uuid",
  "warp",
 ]
@@ -2726,7 +2720,6 @@ dependencies = [
  "tracing",
  "tracing-futures",
  "tracing_utils",
- "utils",
 ]
 
 [[package]]
@@ -4212,7 +4205,6 @@ dependencies = [
  "tracing",
  "tracing_utils",
  "url",
- "utils",
  "uuid",
 ]
 

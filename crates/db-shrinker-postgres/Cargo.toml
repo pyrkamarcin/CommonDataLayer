@@ -11,7 +11,6 @@ path = "src/main.rs"
 
 [dependencies]
 # Workspace
-utils       = { path = "../utils" }
 tracing_utils           = { path = "../utils/crates/tracing" }
 
 # Crates.io
