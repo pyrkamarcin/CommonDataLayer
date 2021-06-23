@@ -50,7 +50,7 @@ spec:
         {{- end }}
         - name: DATA_ROUTER_SERVICES__SCHEMA_REGISTRY_URL
           value: "http://{{ .Release.Name }}-schema-registry:6400"
-        - name: DATA_ROUTER_CACHE_CAPACITY
+        - name: DATA_ROUTER_ROUTING_CACHE_CAPACITY
           value: "500"
         - name: DATA_ROUTER_LOG__RUST_LOG
           value: "info,data_router=debug"

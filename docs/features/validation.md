@@ -2,9 +2,9 @@
 
 Validation is mechanic of checking CDL input data against schema, in order to verify that it follows desired format.
 CDL support validation in 3 places:
-- schema-registry [active]
-- data-router [pasive]
-- validator [pasive]
+- schema-registry (active)
+- data-router (pasive)
+- validator (pasive)
 
 Active validation is request-response. You can query `SR` in order to check whether given object follows it's schema.
 
