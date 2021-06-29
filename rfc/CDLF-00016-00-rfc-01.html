@@ -1,0 +1,340 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>00016 - Schema-Registry-less CDL deployment - The Common Data Layer</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="../favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="../favicon.png">
+        
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        
+        <link rel="stylesheet" href="../css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="../fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> Common Data Layer</a></li><li class="chapter-item expanded "><a href="../how_it_works.html"><strong aria-hidden="true">2.</strong> How does it work</a></li><li class="chapter-item expanded "><a href="../getting_started.html"><strong aria-hidden="true">3.</strong> Getting Started</a></li><li class="chapter-item expanded "><a href="../deployment/index.html"><strong aria-hidden="true">4.</strong> Deployment</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../deployment/local/index.html"><strong aria-hidden="true">4.1.</strong> Local deployment</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../deployment/local/docker-compose.html"><strong aria-hidden="true">4.1.1.</strong> docker-compose</a></li><li class="chapter-item expanded "><a href="../deployment/local/helm.html"><strong aria-hidden="true">4.1.2.</strong> Helm</a></li></ol></li><li class="chapter-item expanded "><a href="../deployment/production/index.html"><strong aria-hidden="true">4.2.</strong> Production-grade deployment</a></li></ol></li><li class="chapter-item expanded "><a href="../schemas_and_views.html"><strong aria-hidden="true">5.</strong> Schemas and Views</a></li><li class="chapter-item expanded "><a href="../examples/index.html"><strong aria-hidden="true">6.</strong> Examples</a></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">6.1.</strong> TODO</div></li></ol></li><li class="chapter-item expanded "><a href="../features/index.html"><strong aria-hidden="true">7.</strong> Features</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../features/ordering.html"><strong aria-hidden="true">7.1.</strong> Message ordering</a></li><li class="chapter-item expanded "><a href="../features/materialization.html"><strong aria-hidden="true">7.2.</strong> Materialization</a></li><li class="chapter-item expanded "><a href="../features/client_routing.html"><strong aria-hidden="true">7.3.</strong> Client routing</a></li></ol></li><li class="chapter-item expanded "><a href="../versioning.html"><strong aria-hidden="true">8.</strong> Versioning</a></li><li class="chapter-item expanded "><a href="../protocol.html"><strong aria-hidden="true">9.</strong> Protocol schema</a></li><li class="chapter-item expanded "><a href="../benchmarks.html"><strong aria-hidden="true">10.</strong> Benchmarks</a></li><li class="chapter-item expanded "><a href="../architecture/index.html"><strong aria-hidden="true">11.</strong> Architecture</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/management.html"><strong aria-hidden="true">11.1.</strong> Management Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/cli.html"><strong aria-hidden="true">11.1.1.</strong> CLI</a></li><li class="chapter-item expanded "><a href="../architecture/web_admin.html"><strong aria-hidden="true">11.1.2.</strong> Admin Web Panel</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/api.html"><strong aria-hidden="true">11.2.</strong> GraphQL API</a></li><li class="chapter-item expanded "><a href="../architecture/configuration.html"><strong aria-hidden="true">11.3.</strong> Configuration Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/schema_registry.html"><strong aria-hidden="true">11.3.1.</strong> Schema Registry</a></li><li class="chapter-item expanded "><a href="../architecture/leader_elector.html"><strong aria-hidden="true">11.3.2.</strong> Leader Elector</a></li><li class="chapter-item expanded "><a href="../architecture/edge_registry.html"><strong aria-hidden="true">11.3.3.</strong> Edge Registry</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/ingestion.html"><strong aria-hidden="true">11.4.</strong> Ingestion Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/data_router.html"><strong aria-hidden="true">11.4.1.</strong> Data Router</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/storage.html"><strong aria-hidden="true">11.5.</strong> Storage Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/command_service.html"><strong aria-hidden="true">11.5.1.</strong> Command Service</a></li><li class="chapter-item expanded "><a href="../architecture/db_shrinker_storage.html"><strong aria-hidden="true">11.5.2.</strong> Db Shrinker Storage</a></li><li class="chapter-item expanded "><a href="../architecture/query_service.html"><strong aria-hidden="true">11.5.3.</strong> Query Service</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">11.6.</strong> Materialization Layer</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/object_builder.html"><strong aria-hidden="true">11.6.1.</strong> Object Builder</a></li><li class="chapter-item expanded "><a href="../architecture/partial_update_engine.html"><strong aria-hidden="true">11.6.2.</strong> Partial Update Engine</a></li><li class="chapter-item expanded "><a href="../architecture/materializer_general.html"><strong aria-hidden="true">11.6.3.</strong> General Materializer</a></li><li class="chapter-item expanded "><a href="../architecture/materializer_ondemand.html"><strong aria-hidden="true">11.6.4.</strong> On Demand Materializer</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/retrieval.html"><strong aria-hidden="true">11.7.</strong> Retrieval Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/query_router.html"><strong aria-hidden="true">11.7.1.</strong> Query Router</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/utils.html"><strong aria-hidden="true">11.8.</strong> Utils</a></li></ol></li><li class="chapter-item expanded "><a href="../configuration/index.html"><strong aria-hidden="true">12.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../configuration/api.html"><strong aria-hidden="true">12.1.</strong> api</a></li><li class="chapter-item expanded "><a href="../configuration/command-service.html"><strong aria-hidden="true">12.2.</strong> command-service</a></li><li class="chapter-item expanded "><a href="../configuration/data-router.html"><strong aria-hidden="true">12.3.</strong> data-router</a></li><li class="chapter-item expanded "><a href="../configuration/edge-registry.html"><strong aria-hidden="true">12.4.</strong> edge-registry</a></li><li class="chapter-item expanded "><a href="../configuration/materializer-general.html"><strong aria-hidden="true">12.5.</strong> materializer-general</a></li><li class="chapter-item expanded "><a href="../configuration/materializer-ondemand.html"><strong aria-hidden="true">12.6.</strong> materializer-ondemand</a></li><li class="chapter-item expanded "><a href="../configuration/object-builder.html"><strong aria-hidden="true">12.7.</strong> object-builder</a></li><li class="chapter-item expanded "><a href="../configuration/partial-update-engine.html"><strong aria-hidden="true">12.8.</strong> partial-update-engine</a></li><li class="chapter-item expanded "><a href="../configuration/query-router.html"><strong aria-hidden="true">12.9.</strong> query-router</a></li><li class="chapter-item expanded "><a href="../configuration/query-service.html"><strong aria-hidden="true">12.10.</strong> query-service</a></li><li class="chapter-item expanded "><a href="../configuration/query-service-ts.html"><strong aria-hidden="true">12.11.</strong> query-service-ts</a></li><li class="chapter-item expanded "><a href="../configuration/schema-registry.html"><strong aria-hidden="true">12.12.</strong> schema-registry</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">13.</strong> RFCs</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../rfc/NAF-Commit_message_formalization_and_enforcement.html"><strong aria-hidden="true">13.1.</strong> Commit message formalization</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-0000C-00-rfc-01.html"><strong aria-hidden="true">13.2.</strong> 0000C - Alternative communication method</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-0000E-00-rfc-01.html"><strong aria-hidden="true">13.3.</strong> 0000E - MessagePack support</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00010-00-rfc-01.html"><strong aria-hidden="true">13.4.</strong> 00010 - CdlIM Versioning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../rfc/CDLF-00010-00-rfc-02.html"><strong aria-hidden="true">13.4.1.</strong> 00010 - CdlIM Versioning 2.0</a></li></ol></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00011-00-rfc-01.html"><strong aria-hidden="true">13.5.</strong> 00011 - Materialization - Overview</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00012-00-rfc-01.html"><strong aria-hidden="true">13.6.</strong> 00012 - Edge Registry</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00013-00-rfc-01.html"><strong aria-hidden="true">13.7.</strong> 00013 - Materialized Views</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00015-00-rfc-01.html"><strong aria-hidden="true">13.8.</strong> 00015 - CDL publishing deployment configurations</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00016-00-rfc-01.html" class="active"><strong aria-hidden="true">13.9.</strong> 00016 - Schema-Registry-less CDL deployment</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">The Common Data Layer</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/epiphany-platform/CommonDataLayer" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#front-matter" id="front-matter">Front Matter</a></h1>
+<pre><code>Title           : Schema-Registry-less CDL deployment
+Author(s)       : Wojciech Polak
+Team            : CommonDataLayer
+Reviewer        : CommonDataLayer
+Created         : 2021-06-24
+Last updated    : 2021-06-24
+Version         : 1.0.0
+CDL feature ID  : CDLF-00016-00
+</code></pre>
+<h2><a class="header" href="#glossary" id="glossary">Glossary</a></h2>
+<h3><a class="header" href="#terminology" id="terminology">Terminology</a></h3>
+<ul>
+<li>CDL - Common Data Layer</li>
+<li>DR - Data Router, a CDL component responsible for routing ingested messages.</li>
+<li>SR - Schema Registry, a CDL component responsible for keeping information about the type of object conveyed inside the message.</li>
+<li>QR - Query Router, a CDL component responsible for routing queries to the proper repository.</li>
+<li>CS - Command Service, a CDL component, ingestion part of the repository.</li>
+<li>QS - Query Service, a CDL component, query part of the repository.</li>
+<li>CIM - CDL Ingestion Message</li>
+<li>User - user of the CDL.</li>
+<li>Message - message sent to CDL for processing.</li>
+<li>Breaking Change - behavior change, or API of the CDL, may result in system breakage on release update.</li>
+<li>Routing information - information necessary for DR and QR to successfully deliver the provided message and querying the repository's data.</li>
+</ul>
+<h2><a class="header" href="#formats" id="formats">Formats</a></h2>
+<p>v1.0 input message format up to this point:</p>
+<pre><code>{
+    object_id: UUID,
+    schema_id: UUID,
+    data: { any valid JSON }
+}
+</code></pre>
+<p>v1.0 input message format to accommodate schema-registry-less routing:</p>
+<pre><code>{
+    options: {
+        repository: String?, // Optional field
+    }, // If empty, can be ommited for backwards compability
+    schema_id: UUID,
+    object_id: UUID,
+    data: { any valid JSON }
+}
+</code></pre>
+<p>Static configuration format:</p>
+<pre><code>[repositories]
+repository_name = { insert_destination: String, query_address: String, schema_type: SchemaType }
+</code></pre>
+<p>SchemaType</p>
+<pre><code>&quot;documentstorage&quot; | &quot;timeseries&quot;
+</code></pre>
+<h2><a class="header" href="#introduction" id="introduction">Introduction</a></h2>
+<h3><a class="header" href="#background" id="background">Background</a></h3>
+<p>It was requested from the CDL stack to route messages in an environment where SR is not deployed.</p>
+<p>Currently, CDL is using SR to decide which insert destination and query address is used during data and query routing.
+This information is tightly tied to the Schema (and schema id).
+Each Schema stored in the PostgreSQL table contains these fields:</p>
+<table><thead><tr><th>id</th><th>name</th><th>schema type</th><th>insert destination</th><th>query address</th></tr></thead><tbody>
+<tr><td>UUID</td><td>String</td><td>SchemaType</td><td>String</td><td>String</td></tr>
+</tbody></table>
+<p>Also worth noting is that the user can use one CS to store more than one Schema. Therefore one Schema is not equivalent to one service stack.</p>
+<p>The second purpose (which in many cases can be omitted) is that each Schema is linked to its definition, which might be used for validation purposes.</p>
+<p>After implementing this feature, CDL will insert and query data from proper repositories without using SR. It is intended for limited environments and therefore has a limited number of supported features.</p>
+<h3><a class="header" href="#assumptions" id="assumptions">Assumptions</a></h3>
+<ul>
+<li>CDL should allow to omit Schema Registry deployment and provide an alternative way of routing data.</li>
+<li>Considering CIM format, any new fields or configuration must not be a breaking change.</li>
+</ul>
+<h3><a class="header" href="#limitations" id="limitations">Limitations</a></h3>
+<ul>
+<li>In this alternative, state routing would become a static table, which requires restarting the services after each change.</li>
+<li>Data validation would be unavailable as we would not keep track of schema definitions.</li>
+<li>Materialization would be unavailable, as Views also are handled by SR and are coupled with Schemas.</li>
+</ul>
+<h2><a class="header" href="#proposed-solution" id="proposed-solution">Proposed solution</a></h2>
+<h3><a class="header" href="#static-routing" id="static-routing">Static routing</a></h3>
+<p>Like reverse proxies allow the user to set up static routing, CDL should allow it via configuration files.
+Schema definitions would be separated from routing information.
+This routing would take precedence over querying SR (in case both of them are available).</p>
+<p>Each routing service (DR and QR) would load the same static configuration file, and then whenever the field
+<code>repository</code> would be present in the new CIM input message. It would use static routing information to send the request further.</p>
+<ul>
+<li>Data Router would use the <code>insert_destination</code> field.</li>
+<li>Query Router would use <code>query_address</code> and <code>schema_type</code> fields.</li>
+</ul>
+<p><code>schema_id</code>, while is not associated with any Schema definition, is still used as an element of the object identification pair:
+(<code>schema_id</code>, <code>object_id</code>) and required by both QR and DR. As mentioned in the Background section, one repository stack might be used to store more than one Schema. Also, CDL does not guarantee the uniqueness of <code>object_id</code> outside of its Schema.</p>
+<p>Because there is no SR responsible for registering Schema and assigning it <code>schema_id</code>, it means that the user must prepare their predefined UUIDs.</p>
+<h3><a class="header" href="#possible-extension" id="possible-extension">Possible extension</a></h3>
+<p>In the future, whenever Configuration Service would be introduced, one might think about moving this Static routing into a dynamic environment.</p>
+<h3><a class="header" href="#major-concerns" id="major-concerns">Major concerns</a></h3>
+<p>The static routing allows new kinds of errors and bugs in the CDL system. The CDL user must consider the possibility of service configuration sync issues because there is no single source of truth or consensus algorithm.</p>
+<p>It is crucial to use the same configuration for both ingesting and querying data.</p>
+<h2><a class="header" href="#further-considerations" id="further-considerations">Further Considerations</a></h2>
+<h3><a class="header" href="#impact-on-other-teams" id="impact-on-other-teams">Impact on other teams</a></h3>
+<p>This feature does not provide any breaking change. Therefore all other teams can use CDL with Schema Registry without problems.</p>
+<h3><a class="header" href="#scalability" id="scalability">Scalability</a></h3>
+<p>No impact. Because static routing is Read-Only, one can scale all services without any extra cost or configuration.</p>
+<h3><a class="header" href="#testing" id="testing">Testing</a></h3>
+<p>This feature MUST undergo thorough testing (in the best scenario, automatic E2E tests). Test cases MUST include:</p>
+<ul>
+<li>Failure scenarios:
+<ul>
+<li>Message is corrupted</li>
+<li>Message contains repository which is not defined in static routing</li>
+<li>Corrupted configuration</li>
+</ul>
+</li>
+<li>Green path test</li>
+<li>Performance tests</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../rfc/CDLF-00015-00-rfc-01.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../rfc/CDLF-00015-00-rfc-01.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
