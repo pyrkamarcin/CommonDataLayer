@@ -1,8 +1,7 @@
+use crate::models::ObjectIdPair;
 use anyhow::{Context, Result};
 use cdl_dto::edges::TreeObject;
 use serde_json::Value;
-
-use crate::ObjectIdPair;
 
 pub fn get_sub_object(value: &Value, mut path: std::str::Split<char>) -> Result<Value> {
     match path.next() {

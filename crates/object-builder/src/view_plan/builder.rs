@@ -1,4 +1,9 @@
+use super::{UnfinishedRow, UnfinishedRowVariant};
+use crate::models::ObjectIdPair;
+use crate::sources::{ComputationSource, FieldDefinitionSource, FilterSource, FilterValueSource};
+use crate::utils::get_base_object;
 use anyhow::{Context, Result};
+use cdl_dto::materialization::Relation;
 use cdl_dto::{
     edges::{TreeObject, TreeResponse},
     materialization::{
@@ -9,13 +14,7 @@ use cdl_dto::{
 };
 use std::collections::{HashMap, HashSet};
 use std::num::NonZeroU8;
-
-use cdl_dto::materialization::Relation;
 use uuid::Uuid;
-
-use super::{UnfinishedRow, UnfinishedRowVariant};
-use crate::sources::{ComputationSource, FieldDefinitionSource, FilterSource, FilterValueSource};
-use crate::{utils::get_base_object, ObjectIdPair};
 
 #[derive(Debug)]
 pub struct ViewPlanBuilder<'a> {

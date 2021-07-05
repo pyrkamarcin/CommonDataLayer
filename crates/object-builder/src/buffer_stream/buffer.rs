@@ -1,8 +1,9 @@
 use anyhow::Result;
 use serde_json::Value;
 
+use crate::models::ObjectIdPair;
+use crate::sources::RowSource;
 use crate::view_plan::ViewPlan;
-use crate::{sources::RowSource, ObjectIdPair};
 
 /// Because objects are received on the go, and object builder needs to create joins,
 /// these objects need to be tempoirairly stored in some kind of buffer until the last part

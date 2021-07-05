@@ -1,32 +1,32 @@
-use async_trait::async_trait;
-use bb8::Pool;
-use cdl_dto::{edges::TreeResponse, materialization};
-use communication_utils::{consumer::ConsumerHandler, message::CommunicationMessage};
-use futures::{future::ready, Stream, StreamExt, TryStreamExt};
-use metrics_utils::{self as metrics, counter};
-use row_builder::RowBuilder;
-use rpc::common::RowDefinition as RpcRowDefinition;
-use rpc::materializer_general::{MaterializedView as RpcMaterializedView, Options};
-use rpc::object_builder::{object_builder_server::ObjectBuilder, Empty, View};
-use rpc::schema_registry::types::SchemaType;
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use std::collections::HashSet;
 use std::{collections::HashMap, convert::TryInto, pin::Pin};
+
+use async_trait::async_trait;
+use bb8::Pool;
+use futures::{future::ready, Stream, StreamExt, TryStreamExt};
+use serde_json::Value;
 use uuid::Uuid;
+
+use cdl_dto::{edges::TreeResponse, materialization};
+use communication_utils::{consumer::ConsumerHandler, message::CommunicationMessage};
+use metrics_utils::{self as metrics, counter};
+use models::{MaterializedView, ObjectIdPair, RowDefinition};
+use row_builder::RowBuilder;
+use rpc::common::RowDefinition as RpcRowDefinition;
+use rpc::materializer_general::MaterializedView as RpcMaterializedView;
+use rpc::object_builder::{object_builder_server::ObjectBuilder, Empty, View};
+use rpc::schema_registry::types::SchemaType;
 
 use crate::{buffer_stream::ObjectBufferedStream, view_plan::ViewPlan};
 
-pub mod settings;
-
-mod pool;
-mod utils;
-
 mod buffer_stream;
-mod view_plan;
-
+mod models;
+mod pool;
 mod row_builder;
+pub mod settings;
 mod sources;
+mod utils;
+mod view_plan;
 
 #[derive(Clone)]
 pub struct ObjectBuilderImpl {
@@ -43,85 +43,6 @@ type SchemaObjectStream = DynStream<(ObjectIdPair, Value)>;
 type RowStream = DynStream<RowDefinition>;
 type MaterializedChunksStream = DynStream<MaterializedView>;
 type MaterializeStream = DynStream<RpcRowDefinition, tonic::Status>;
-
-#[derive(Serialize, Debug)]
-#[serde(rename_all = "snake_case")]
-struct MaterializedView {
-    view_id: Uuid,
-    options: Value,
-    rows: Vec<RowDefinition>,
-}
-
-#[derive(Serialize, Debug)]
-#[serde(rename_all = "snake_case")]
-pub struct RowDefinition {
-    object_ids: HashSet<Uuid>,
-    fields: HashMap<String, Value>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
-pub struct ObjectIdPair {
-    pub schema_id: Uuid,
-    pub object_id: Uuid,
-}
-
-mod object_id_pair {
-    use super::*;
-    use serde::{
-        de::{Error, Visitor},
-        Deserializer, Serializer,
-    };
-
-    impl Serialize for ObjectIdPair {
-        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: Serializer,
-        {
-            serializer.serialize_str(&format!("{},{}", self.schema_id, self.object_id))
-        }
-    }
-
-    impl<'de> Deserialize<'de> for ObjectIdPair {
-        fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where
-            D: Deserializer<'de>,
-        {
-            struct Helper;
-
-            impl<'de> Visitor<'de> for Helper {
-                type Value = ObjectIdPair;
-
-                fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-                    write!(formatter, "two UUID separated by single comma")
-                }
-
-                fn visit_str<E: Error>(self, value: &str) -> Result<ObjectIdPair, E> {
-                    let mut split = value.split(',');
-                    let schema_id = split.next();
-                    let object_id = split.next();
-                    let rest = split.next();
-
-                    match (schema_id, object_id, rest) {
-                        (Some(schema_id), Some(object_id), None) => {
-                            let schema_id = Uuid::parse_str(schema_id)
-                                .map_err(|e| E::custom(format!("{}", e)))?;
-                            let object_id = Uuid::parse_str(object_id)
-                                .map_err(|e| E::custom(format!("{}", e)))?;
-
-                            Ok(ObjectIdPair {
-                                schema_id,
-                                object_id,
-                            })
-                        }
-                        _ => Err(E::custom("Expected two UUID separated by single comma")),
-                    }
-                }
-            }
-
-            deserializer.deserialize_str(Helper)
-        }
-    }
-}
 
 impl ObjectBuilderImpl {
     pub async fn new(settings: &settings::Settings) -> anyhow::Result<Self> {
@@ -142,46 +63,6 @@ impl ObjectBuilderImpl {
             sr_pool,
             er_pool,
             chunk_capacity: settings.chunk_capacity,
-        })
-    }
-}
-
-impl TryInto<RpcRowDefinition> for RowDefinition {
-    type Error = serde_json::Error;
-
-    fn try_into(self) -> Result<RpcRowDefinition, Self::Error> {
-        let fields = self
-            .fields
-            .into_iter()
-            .map(|(key, value)| Ok((key, serde_json::to_string(&value)?)))
-            .collect::<serde_json::Result<_>>()?;
-        Ok(RpcRowDefinition {
-            object_ids: self
-                .object_ids
-                .into_iter()
-                .map(|id| id.to_string())
-                .collect(),
-            fields,
-        })
-    }
-}
-
-impl TryInto<RpcMaterializedView> for MaterializedView {
-    type Error = serde_json::Error;
-
-    fn try_into(self) -> Result<RpcMaterializedView, Self::Error> {
-        let rows = self
-            .rows
-            .into_iter()
-            .map(|row| row.try_into())
-            .collect::<serde_json::Result<_>>()?;
-
-        Ok(RpcMaterializedView {
-            view_id: self.view_id.to_string(),
-            options: Options {
-                options: serde_json::to_string(&self.options)?,
-            },
-            rows,
         })
     }
 }

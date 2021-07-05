@@ -1,3 +1,5 @@
+use crate::models::ObjectIdPair;
+use crate::sources::{FieldDefinitionSource, FilterSource, RowSource};
 use anyhow::Result;
 use cdl_dto::{
     edges::TreeResponse,
@@ -8,9 +10,6 @@ use serde::Serialize;
 use serde_json::Value;
 use std::{collections::HashMap, num::NonZeroU8};
 use uuid::Uuid;
-
-use crate::sources::{FieldDefinitionSource, FilterSource, RowSource};
-use crate::ObjectIdPair;
 
 use self::builder::ViewPlanBuilder;
 

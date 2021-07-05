@@ -1,20 +1,17 @@
-use std::collections::{HashMap, HashSet};
-
-use anyhow::{Context, Result};
-use maplit::hashmap;
-use serde_json::Value;
-
+use crate::models::ObjectIdPair;
+use crate::models::RowDefinition;
 use crate::{
     row_builder::field_builder::ComputationEngine,
     sources::{FieldDefinitionSource, FilterSource, RowSource},
-    ObjectIdPair, RowDefinition,
 };
+use anyhow::{Context, Result};
+use field_builder::FieldBuilder;
+use maplit::hashmap;
+use row_filter::RowFilter;
+use serde_json::Value;
+use std::collections::{HashMap, HashSet};
 
 mod field_builder;
-
-use field_builder::FieldBuilder;
-use row_filter::RowFilter;
-
 mod row_filter;
 
 pub struct RowBuilder {}
@@ -118,10 +115,12 @@ mod tests {
     use std::collections::BTreeMap;
 
     use anyhow::Result;
+
     use misc_utils::serde_json::{to_string_sorted, SortSettings};
 
-    use super::*;
     use crate::{buffer_stream::ObjectBuffer, view_plan::ViewPlan};
+
+    use super::*;
 
     #[test]
     fn test_row_builder() -> Result<()> {
