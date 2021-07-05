@@ -50,15 +50,14 @@ impl ObjectBuilderImpl {
             .build(pool::SchemaRegistryConnectionManager {
                 address: settings.services.schema_registry_url.to_string(),
             })
-            .await
-            .unwrap();
+            .await?;
 
         let er_pool = Pool::builder()
             .build(pool::EdgeRegistryConnectionManager {
                 address: settings.services.edge_registry_url.to_string(),
             })
-            .await
-            .unwrap();
+            .await?;
+
         Ok(Self {
             sr_pool,
             er_pool,
