@@ -17,7 +17,7 @@ use row_filter::RowFilter;
 
 mod row_filter;
 
-pub struct RowBuilder {}
+pub struct RowBuilder;
 
 impl RowBuilder {
     pub fn new() -> Self {
@@ -97,9 +97,9 @@ impl RowBuilder {
                         Computed { computation, .. } => {
                             ComputationEngine::new(&objects).compute(computation)?
                         }
-                        Array { .. } => {
+                        SubObject { .. } => {
                             anyhow::bail!(
-                                "Array field definition is not supported in relation-less view"
+                                "SubObject field definition is not supported in relation-less view"
                             )
                         }
                     },

@@ -5,7 +5,7 @@ use crate::types::schema::{NewSchema, SchemaDefinition, SchemaUpdate};
 use crate::types::view::{FullView, NewView, ViewUpdate};
 use crate::types::{DbExport, VersionedUuid};
 use bb8::Pool;
-use cdl_dto::materialization::Relation;
+use cdl_dto::materialization::{FieldDefinition, Relation};
 use cdl_dto::{TryFromRpc, TryIntoRpc};
 use communication_utils::metadata_fetcher::MetadataFetcher;
 use communication_utils::Result;
@@ -23,6 +23,7 @@ use std::convert::TryInto;
 use std::pin::Pin;
 use tokio_stream::{Stream, StreamExt};
 use tonic::{Request, Response, Status};
+use tracing::warn;
 use uuid::Uuid;
 
 pub struct SchemaRegistryImpl {
@@ -180,6 +181,23 @@ impl SchemaRegistry for SchemaRegistryImpl {
 
         tracing::debug!(options = ?materializer_options, "Materializer options");
 
+        let fields = request
+            .fields
+            .into_iter()
+            .map(|(key, value)| {
+                let definition =
+                    serde_json::from_str(&value).map_err(RegistryError::MalformedViewFields)?;
+                let definition = if let FieldDefinition::Array { base, fields } = definition {
+                    warn!("The `Array` variant name is deprecated, please rename to `SubObject`");
+                    FieldDefinition::SubObject { base, fields }
+                } else {
+                    definition
+                };
+
+                Ok((key, definition))
+            })
+            .collect::<RegistryResult<HashMap<_, _>>>()?;
+
         let new_view = NewView {
             view_id: request
                 .view_id
@@ -190,19 +208,7 @@ impl SchemaRegistry for SchemaRegistryImpl {
             name: request.name,
             materializer_address: request.materializer_address,
             materializer_options,
-            fields: Json(
-                request
-                    .fields
-                    .into_iter()
-                    .map(|(key, value)| {
-                        Ok((
-                            key,
-                            serde_json::from_str(&value)
-                                .map_err(RegistryError::MalformedViewFields)?,
-                        ))
-                    })
-                    .collect::<RegistryResult<HashMap<_, _>>>()?,
-            ),
+            fields: Json(fields),
             filters: Json(request.filters.map(TryFromRpc::try_from_rpc).transpose()?),
             relations: Json(relations),
         };
@@ -229,11 +235,13 @@ impl SchemaRegistry for SchemaRegistryImpl {
                     .fields
                     .into_iter()
                     .map(|(key, value)| {
-                        Ok((
-                            key,
-                            serde_json::from_str(&value)
-                                .map_err(RegistryError::MalformedViewFields)?,
-                        ))
+                        let definition = serde_json::from_str(&value)
+                            .map_err(RegistryError::MalformedViewFields)?;
+                        let definition = if let FieldDefinition::Array { base, fields } = definition {
+                            warn!("The `Array` variant name is deprecated, please rename to `SubObject`");
+                            FieldDefinition::SubObject { base, fields }
+                        } else { definition };
+                        Ok((key, definition))
                     })
                     .collect::<RegistryResult<HashMap<_, _>>>()?,
             ))

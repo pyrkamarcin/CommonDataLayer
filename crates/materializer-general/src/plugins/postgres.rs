@@ -16,6 +16,7 @@ use metrics_utils::{self as metrics, counter};
 use rpc::materializer_general::MaterializedView;
 use serde_json::Value;
 use settings_utils::PostgresSettings;
+use tracing::warn;
 use uuid::Uuid;
 
 // TODO: Move some of those structs to dto crate
@@ -255,20 +256,34 @@ fn get_field_list(definition: &FullView) -> Vec<Field> {
                 });
             }
             FieldDefinition::Array { fields, .. } => {
-                fields_to_process = fields
-                    .iter()
-                    .map(|x| PartialFieldDefinition {
-                        definition: x.1,
-                        sql_name: format!("{}_{}", field.sql_name, x.0),
+                warn!("The `Array` variant name is deprecated, please rename to `SubObject`");
+
+                for sub_field in fields {
+                    fields_to_process.push_front(PartialFieldDefinition {
+                        definition: sub_field.1,
+                        sql_name: format!("{}_{}", field.sql_name, sub_field.0),
                         field_name: field.field_name.clone(),
                         json_path: {
                             let mut vec = field.json_path.clone();
-                            vec.push(x.0.clone());
+                            vec.push(sub_field.0.clone());
                             vec
                         },
-                    })
-                    .chain(fields_to_process.into_iter())
-                    .collect()
+                    });
+                }
+            }
+            FieldDefinition::SubObject { fields, .. } => {
+                for sub_field in fields {
+                    fields_to_process.push_front(PartialFieldDefinition {
+                        definition: sub_field.1,
+                        sql_name: format!("{}_{}", field.sql_name, sub_field.0),
+                        field_name: field.field_name.clone(),
+                        json_path: {
+                            let mut vec = field.json_path.clone();
+                            vec.push(sub_field.0.clone());
+                            vec
+                        },
+                    });
+                }
             }
         }
     }

@@ -11,6 +11,7 @@ use std::collections::{HashMap, HashSet};
 use std::num::NonZeroU8;
 
 use cdl_dto::materialization::Relation;
+use tracing::warn;
 use uuid::Uuid;
 
 use super::{UnfinishedRow, UnfinishedRowVariant};
@@ -267,8 +268,27 @@ impl<'a> ViewPlanBuilder<'a> {
                 }
             }
             FieldDefinition::Array { base, fields } => {
-                let relation_id = NonZeroU8::new(*base)
-                    .context("Array field type needs a reference to relation in view definition")?;
+                warn!("The `Array` variant name is deprecated, please rename to `SubObject`");
+
+                let relation_id = NonZeroU8::new(*base).context(
+                    "SubObject field type needs a reference to relation in view definition",
+                )?;
+                let object = *variant.objects.get(&relation_id).with_context(|| {
+                    format!(
+                        "Could not find a relation {} in view definition",
+                        relation_id
+                    )
+                })?;
+                let mut variant = variant.clone();
+                variant.root_object = object;
+                FieldDefinitionSource::SubObject {
+                    fields: self.build_fields(&variant, fields)?,
+                }
+            }
+            FieldDefinition::SubObject { base, fields } => {
+                let relation_id = NonZeroU8::new(*base).context(
+                    "SubObject field type needs a reference to relation in view definition",
+                )?;
 
                 let object = *variant.objects.get(&relation_id).with_context(|| {
                     format!(
@@ -280,7 +300,7 @@ impl<'a> ViewPlanBuilder<'a> {
                 let mut variant = variant.clone();
                 variant.root_object = object;
 
-                FieldDefinitionSource::Array {
+                FieldDefinitionSource::SubObject {
                     fields: self.build_fields(&variant, fields)?,
                 }
             }

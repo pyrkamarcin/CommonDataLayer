@@ -313,6 +313,10 @@ pub enum FieldDefinition {
         base: LocalId,
         fields: HashMap<String, FieldDefinition>,
     },
+    SubObject {
+        base: LocalId,
+        fields: HashMap<String, FieldDefinition>,
+    },
 }
 
 #[derive(Clone, Debug, Serialize, PartialEq)]
