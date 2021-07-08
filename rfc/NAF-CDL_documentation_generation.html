@@ -1,0 +1,322 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>CDL Documentation Generation - The Common Data Layer</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="../favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="../favicon.png">
+        
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        
+        <link rel="stylesheet" href="../css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="../fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> Common Data Layer</a></li><li class="chapter-item expanded "><a href="../how_it_works.html"><strong aria-hidden="true">2.</strong> How does it work</a></li><li class="chapter-item expanded "><a href="../getting_started.html"><strong aria-hidden="true">3.</strong> Getting Started</a></li><li class="chapter-item expanded "><a href="../deployment/index.html"><strong aria-hidden="true">4.</strong> Deployment</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../deployment/local/index.html"><strong aria-hidden="true">4.1.</strong> Local deployment</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../deployment/local/docker-compose.html"><strong aria-hidden="true">4.1.1.</strong> docker-compose</a></li><li class="chapter-item expanded "><a href="../deployment/local/helm.html"><strong aria-hidden="true">4.1.2.</strong> Helm</a></li></ol></li><li class="chapter-item expanded "><a href="../deployment/production/index.html"><strong aria-hidden="true">4.2.</strong> Production-grade deployment</a></li></ol></li><li class="chapter-item expanded "><a href="../schemas_and_views.html"><strong aria-hidden="true">5.</strong> Schemas and Views</a></li><li class="chapter-item expanded "><a href="../examples/index.html"><strong aria-hidden="true">6.</strong> Examples</a></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">6.1.</strong> TODO</div></li></ol></li><li class="chapter-item expanded "><a href="../features/index.html"><strong aria-hidden="true">7.</strong> Features</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../features/ordering.html"><strong aria-hidden="true">7.1.</strong> Message ordering</a></li><li class="chapter-item expanded "><a href="../features/materialization.html"><strong aria-hidden="true">7.2.</strong> Materialization</a></li><li class="chapter-item expanded "><a href="../features/client_routing.html"><strong aria-hidden="true">7.3.</strong> Client routing</a></li></ol></li><li class="chapter-item expanded "><a href="../versioning.html"><strong aria-hidden="true">8.</strong> Versioning</a></li><li class="chapter-item expanded "><a href="../protocol.html"><strong aria-hidden="true">9.</strong> Protocol schema</a></li><li class="chapter-item expanded "><a href="../benchmarks.html"><strong aria-hidden="true">10.</strong> Benchmarks</a></li><li class="chapter-item expanded "><a href="../architecture/index.html"><strong aria-hidden="true">11.</strong> Architecture</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/management.html"><strong aria-hidden="true">11.1.</strong> Management Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/cli.html"><strong aria-hidden="true">11.1.1.</strong> CLI</a></li><li class="chapter-item expanded "><a href="../architecture/web_admin.html"><strong aria-hidden="true">11.1.2.</strong> Admin Web Panel</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/api.html"><strong aria-hidden="true">11.2.</strong> GraphQL API</a></li><li class="chapter-item expanded "><a href="../architecture/configuration.html"><strong aria-hidden="true">11.3.</strong> Configuration Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/schema_registry.html"><strong aria-hidden="true">11.3.1.</strong> Schema Registry</a></li><li class="chapter-item expanded "><a href="../architecture/leader_elector.html"><strong aria-hidden="true">11.3.2.</strong> Leader Elector</a></li><li class="chapter-item expanded "><a href="../architecture/edge_registry.html"><strong aria-hidden="true">11.3.3.</strong> Edge Registry</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/ingestion.html"><strong aria-hidden="true">11.4.</strong> Ingestion Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/data_router.html"><strong aria-hidden="true">11.4.1.</strong> Data Router</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/storage.html"><strong aria-hidden="true">11.5.</strong> Storage Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/command_service.html"><strong aria-hidden="true">11.5.1.</strong> Command Service</a></li><li class="chapter-item expanded "><a href="../architecture/db_shrinker_storage.html"><strong aria-hidden="true">11.5.2.</strong> Db Shrinker Storage</a></li><li class="chapter-item expanded "><a href="../architecture/query_service.html"><strong aria-hidden="true">11.5.3.</strong> Query Service</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">11.6.</strong> Materialization Layer</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/object_builder.html"><strong aria-hidden="true">11.6.1.</strong> Object Builder</a></li><li class="chapter-item expanded "><a href="../architecture/partial_update_engine.html"><strong aria-hidden="true">11.6.2.</strong> Partial Update Engine</a></li><li class="chapter-item expanded "><a href="../architecture/materializer_general.html"><strong aria-hidden="true">11.6.3.</strong> General Materializer</a></li><li class="chapter-item expanded "><a href="../architecture/materializer_ondemand.html"><strong aria-hidden="true">11.6.4.</strong> On Demand Materializer</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/retrieval.html"><strong aria-hidden="true">11.7.</strong> Retrieval Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/query_router.html"><strong aria-hidden="true">11.7.1.</strong> Query Router</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/utils.html"><strong aria-hidden="true">11.8.</strong> Utils</a></li></ol></li><li class="chapter-item expanded "><a href="../configuration/index.html"><strong aria-hidden="true">12.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../configuration/api.html"><strong aria-hidden="true">12.1.</strong> api</a></li><li class="chapter-item expanded "><a href="../configuration/command-service.html"><strong aria-hidden="true">12.2.</strong> command-service</a></li><li class="chapter-item expanded "><a href="../configuration/data-router.html"><strong aria-hidden="true">12.3.</strong> data-router</a></li><li class="chapter-item expanded "><a href="../configuration/edge-registry.html"><strong aria-hidden="true">12.4.</strong> edge-registry</a></li><li class="chapter-item expanded "><a href="../configuration/materializer-general.html"><strong aria-hidden="true">12.5.</strong> materializer-general</a></li><li class="chapter-item expanded "><a href="../configuration/materializer-ondemand.html"><strong aria-hidden="true">12.6.</strong> materializer-ondemand</a></li><li class="chapter-item expanded "><a href="../configuration/object-builder.html"><strong aria-hidden="true">12.7.</strong> object-builder</a></li><li class="chapter-item expanded "><a href="../configuration/partial-update-engine.html"><strong aria-hidden="true">12.8.</strong> partial-update-engine</a></li><li class="chapter-item expanded "><a href="../configuration/query-router.html"><strong aria-hidden="true">12.9.</strong> query-router</a></li><li class="chapter-item expanded "><a href="../configuration/query-service.html"><strong aria-hidden="true">12.10.</strong> query-service</a></li><li class="chapter-item expanded "><a href="../configuration/query-service-ts.html"><strong aria-hidden="true">12.11.</strong> query-service-ts</a></li><li class="chapter-item expanded "><a href="../configuration/schema-registry.html"><strong aria-hidden="true">12.12.</strong> schema-registry</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">13.</strong> RFCs</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../rfc/NAF-Commit_message_formalization_and_enforcement.html"><strong aria-hidden="true">13.1.</strong> Commit message formalization</a></li><li class="chapter-item expanded "><a href="../rfc/NAF-CDL_documentation_generation.html" class="active"><strong aria-hidden="true">13.2.</strong> CDL Documentation Generation</a></li><li class="chapter-item expanded "><a href="../rfc/NAF-Branching_strategy.html"><strong aria-hidden="true">13.3.</strong> Branching strategy</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-0000C-00-rfc-01.html"><strong aria-hidden="true">13.4.</strong> 0000C - Alternative communication method</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-0000E-00-rfc-01.html"><strong aria-hidden="true">13.5.</strong> 0000E - MessagePack support</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00010-00-rfc-01.html"><strong aria-hidden="true">13.6.</strong> 00010 - CdlIM Versioning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../rfc/CDLF-00010-00-rfc-02.html"><strong aria-hidden="true">13.6.1.</strong> 00010 - CdlIM Versioning 2.0</a></li></ol></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00011-00-rfc-01.html"><strong aria-hidden="true">13.7.</strong> 00011 - Materialization - Overview</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00012-00-rfc-01.html"><strong aria-hidden="true">13.8.</strong> 00012 - Edge Registry</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00013-00-rfc-01.html"><strong aria-hidden="true">13.9.</strong> 00013 - Materialized Views</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00015-00-rfc-01.html"><strong aria-hidden="true">13.10.</strong> 00015 - CDL publishing deployment configurations</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00016-00-rfc-01.html"><strong aria-hidden="true">13.11.</strong> 00016 - Schema-Registry-less CDL deployment</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00017-00-rfc-01.html"><strong aria-hidden="true">13.12.</strong> 00017 - Query raw routes</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">The Common Data Layer</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/epiphany-platform/CommonDataLayer" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#front-matter" id="front-matter">Front Matter</a></h1>
+<pre><code>Title           : CDL documentation generation
+Author(s)       : Łukasz Biel
+Team            : CommonDataLayer
+Last updated    : 2021-07-01
+Version         : 1.0.0
+</code></pre>
+<h1><a class="header" href="#glossary" id="glossary">Glossary</a></h1>
+<ul>
+<li><code>CDL</code> - Common Data Layer</li>
+<li><code>QR</code> - Query Router</li>
+<li><code>xtask</code> - cargo job; similar to how you may define run targets in npm, rake, etc.</li>
+<li><code>PoC</code> - proof of concept</li>
+<li><code>Swagger</code> - Swagger is a tool for generating client and server code from OpenAPI specification. It supports most major languages.</li>
+</ul>
+<h1><a class="header" href="#preface" id="preface">Preface</a></h1>
+<p>The necessity of creating this RFC was sparked by amount of manual work needed when documenting API in <code>QR</code>.
+Some topics I'm exploring here can be stretched to other parts of CDL documentation, and I'm taking my liberty to include
+these parts as well. Thus, reader should mind, that result of this document may span across larger group of components than
+<code>QR</code> alone.</p>
+<h1><a class="header" href="#current-state" id="current-state">Current state</a></h1>
+<p><code>QR</code> API is documented manually via <a href="https://swagger.io/specification/">OpenApi</a> spec file. At the moment of writing this rfc it's outdated.<br />
+<code>Configuration</code> is documented manually via <a href="../configuration/index.html">toml</a> files compliant with <a href="https://github.com/mehcode/config-rs">rust config crate</a>.
+Later, it's possible that we'll replace these configs with configuration service.<br />
+<code>gRPC</code> configuration is hand-written and <a href="https://github.com/hyperium/tonic">tonic</a> generates rust files with code needed for client and server implementation; 
+proto files are located in <a href="https://github.com/epiphany-platform/CommonDataLayer/tree/develop/crates/rpc/proto">rpc crate</a>.<br />
+<code>CDL Input Message</code> format is documented by hand in <a href="../architecture/data_router.html">docs</a>. At the moment of writing this rfc it's outdated.<br />
+<code>Notification Message</code> format is not documented to my knowing.<br />
+<code>graphQL</code> provides documentation via its endpoint and it's built into library we use. It may be wort considering to provide static graphQL spec in repository.</p>
+<h1><a class="header" href="#problem-to-solve" id="problem-to-solve">Problem to solve</a></h1>
+<p>Maintaining documentation for formats used in communication within or with CDL is cumbersome.
+We need to research options of automating the process and validating its results.</p>
+<h1><a class="header" href="#possible-solutions" id="possible-solutions">Possible solutions</a></h1>
+<h2><a class="header" href="#generate-rust-code-from-specification-files" id="generate-rust-code-from-specification-files">Generate rust code from specification files:</a></h2>
+<p>There are options for generating rust code from proto (already in place) and OpenAPI.</p>
+<p>For generating structures needed for our internal and external communication, via Kafka and RabbitMQ, we could use <a href="https://docs.rs/schemafy/0.5.2/schemafy/">schemafy crate</a>.
+It most likely needs to be done via <code>xtask</code>, similar to how we are generating things using <a href="https://github.com/hyperium/tonic">tonic</a>.</p>
+<p>As for OpenAPI, it would require us to switch away from using <a href="https://github.com/seanmonstar/warp">warp</a> in favour of <a href="https://github.com/hyperium/hyper">hyper</a>. Swagger can generate new crate in our repo, 
+that <code>QR</code> would use as a base.</p>
+<p>For graphQL api - we would need to provide a <code>xtask</code> which pulls spec from running api instance. There's no easy way to generate rust code from existing api spec. If we were to stick with this approach - we'd have to write something in-house.</p>
+<p>TOML configuration is a bit problematic. There are no known crates that can easily generate rust structs out from Toml config, and our structs
+are usually reused. What I mean is that generating code would introduce duplication. It's not necessarily bad, but that's confusing.
+We probably would need to produce an in-house solution for that problem. 
+There's also issue that at some point toml configuration may be phased out in favour of Config Service, so let's not get attached.</p>
+<p>In general - it requires some significant work from team to switch fully to configs generating rust code and it can't be done easily in all of the places.</p>
+<h2><a class="header" href="#generate-configs-from-rust" id="generate-configs-from-rust">Generate configs from rust</a></h2>
+<h3><a class="header" href="#compiler-pass-way" id="compiler-pass-way">Compiler pass way:</a></h3>
+<p>We can create a binary that walks through our codebase and based on some criteria generates specs based on rust AST. It's doable, although not an easy task.
+More can be read searching for feature <code>rustc_private</code>, it allows users to use rustc as a library.</p>
+<h3><a class="header" href="#xtask--lib-way" id="xtask--lib-way">XTask + Lib way:</a></h3>
+<p>We can create special traits/methods and use them within custom binaries used only in <code>xtask</code> targets. This way compiler should remove unused instances of code in official binaries,
+no extra handling would be visible on production side, but <code>xtask</code> target would be able to perform actions based on these traits.</p>
+<p>We would do nothing for <code>graphQL</code>, yet create task that starts an instance and fetches spec.</p>
+<p>We would have to work hard on <code>QR</code> as warp doesn't necessarily play with such code generation - 
+I don't think it's wise to decorate function expressions with macros, and methods themselves don't provide all info out of the box.
+We would have to mark arguments of these methods with where does it come from. Some are provided by header, some are caches, some are bodies or query params. 
+If we wouldn't compromise speed and latency, I'd propose to review other options for servers in rust,
+as I believe they may be easier to integrate with <code>xtask</code> approach. Alas, there's a lot of uncertainty, and some of the research definitely requires a PoC.</p>
+<p>For configuration, it should be really easy to write these traits from scratch. It's ever possible to use <code>serde</code> own traits within our own (for defaults and whatnot).
+For JSONs, in form of <code>CDL Input Message</code> and <code>Notification Message</code>, goes the same. Just, we can use existing solution.</p>
+<p><code>gRPC</code> may prove a challenge, more research is to be done, probably PoC. Tonic supports generation one way, 
+and I'm not sure how much of an effort would it be to replace generated files with something we'd be able to write manually and generate protos from it.
+<a href="https://github.com/google/tarpc">tarpc</a> may be worth looking at, as it's purely macro based. We've put some work into it, however I cannot recall any PoC using protobuf format. 
+Some context may be found in <a href="https://github.com/google/tarpc/issues/161">this issue</a>, it appears it's possible. For <code>xtask</code> this still would mean custom <code>.protobuf</code> gen.</p>
+<h2><a class="header" href="#mixed-solution" id="mixed-solution">Mixed solution</a></h2>
+<p>It's not a problem to have mixed solution in some places. Important part is nothing has to be done manually in more than one place.</p>
+<h1><a class="header" href="#authors-comment" id="authors-comment">Author's comment</a></h1>
+<p>As generating rust code may be tempting and is quite popular in rest of the industry, I think it may be beneficial to generate specs from rust.
+Rust macro system is quite easy to use and this differentiates it from most of other languages. We will avoid compiling / and possibly reviewing / specs.
+Some initial discussion happened on this topic, and it seems that team, in majority, agrees with that. Next step would be to PoC this.</p>
+<h1><a class="header" href="#conclusion" id="conclusion">Conclusion</a></h1>
+<p>We've discussed this topic on 07.07.2021.
+Conclusion:</p>
+<ul>
+<li>gRPC isn't our priority, and we are happy with current state; with <code>ar_pe_ce</code> being worked on, it's possible to revive this topic once it gets plugged into cdl.</li>
+<li>graphql needs no work; specification in web service is sufficient for now.</li>
+<li>configs, public json APIs and QR got their own tasks with preparing PoCs with homegrown solution:
+<ul>
+<li>https://github.com/epiphany-platform/CommonDataLayer/issues/628</li>
+<li>https://github.com/epiphany-platform/CommonDataLayer/issues/629</li>
+<li>https://github.com/epiphany-platform/CommonDataLayer/issues/630</li>
+</ul>
+</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../rfc/NAF-Commit_message_formalization_and_enforcement.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../rfc/NAF-Branching_strategy.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../rfc/NAF-Commit_message_formalization_and_enforcement.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="../rfc/NAF-Branching_strategy.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
