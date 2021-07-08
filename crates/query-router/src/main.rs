@@ -44,9 +44,7 @@ struct FeatureSettings {
 
 impl Default for FeatureSettings {
     fn default() -> Self {
-        Self {
-            raw_endpoint: true,
-        }
+        Self { raw_endpoint: true }
     }
 }
 
