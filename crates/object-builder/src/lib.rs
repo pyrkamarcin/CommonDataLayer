@@ -17,10 +17,11 @@ use tracing_futures::Instrument;
 use uuid::Uuid;
 
 use crate::{buffer_stream::ObjectBufferedStream, view_plan::ViewPlan};
+use rpc::edge_registry::{EdgeRegistryConnectionManager, EdgeRegistryPool};
+use rpc::schema_registry::{SchemaRegistryConnectionManager, SchemaRegistryPool};
 
 pub mod settings;
 
-mod pool;
 mod utils;
 
 mod buffer_stream;
@@ -31,8 +32,8 @@ mod sources;
 
 #[derive(Clone)]
 pub struct ObjectBuilderImpl {
-    sr_pool: pool::SchemaRegistryPool,
-    er_pool: pool::EdgeRegistryPool,
+    sr_pool: SchemaRegistryPool,
+    er_pool: EdgeRegistryPool,
     chunk_capacity: usize,
 }
 
@@ -127,14 +128,14 @@ mod object_id_pair {
 impl ObjectBuilderImpl {
     pub async fn new(settings: &settings::Settings) -> anyhow::Result<Self> {
         let sr_pool = Pool::builder()
-            .build(pool::SchemaRegistryConnectionManager {
+            .build(SchemaRegistryConnectionManager {
                 address: settings.services.schema_registry_url.to_string(),
             })
             .await
             .unwrap();
 
         let er_pool = Pool::builder()
-            .build(pool::EdgeRegistryConnectionManager {
+            .build(EdgeRegistryConnectionManager {
                 address: settings.services.edge_registry_url.to_string(),
             })
             .await
@@ -194,7 +195,7 @@ impl ConsumerHandler for ObjectBuilderImpl {
         let payload = msg.payload()?;
         tracing::debug!(?payload, "Handle MQ message");
         counter!("cdl.object-builder.build-object.mq", 1);
-        let request: materialization::Request = serde_json::from_str(&payload)?;
+        let request: materialization::Request = serde_json::from_str(payload)?;
         let view_id = request.view_id;
 
         let view = self.get_view(view_id);

@@ -9,7 +9,7 @@ use super::schema_type;
 use super::search_for;
 
 macro_rules! rpc_enum {
-	(
+    (
         $name: ident,
         $inner: path,
         $inner_field: ident,
@@ -71,7 +71,7 @@ macro_rules! rpc_enum {
                 else {  Err(anyhow::anyhow!(concat!("Invalid ", $display))) }
             }
         }
-	};
+    };
 }
 
 rpc_enum! {

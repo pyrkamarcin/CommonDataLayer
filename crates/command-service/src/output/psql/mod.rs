@@ -60,7 +60,7 @@ impl OutputPlugin for PostgresOutputPlugin {
 
         trace!("Storing message {:?}", msg);
 
-        let payload: Value = match serde_json::from_str(&msg.data.get()) {
+        let payload: Value = match serde_json::from_str(msg.data.get()) {
             Ok(json) => json,
             Err(_err) => return Resolution::CommandServiceFailure,
         };

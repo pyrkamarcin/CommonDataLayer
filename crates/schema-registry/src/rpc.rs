@@ -137,7 +137,7 @@ impl SchemaRegistry for SchemaRegistryImpl {
         if let Some(destination) = request.patch.insert_destination.as_ref() {
             if !self
                 .mq_metadata
-                .destination_exists(&destination)
+                .destination_exists(destination)
                 .await
                 .map_err(RegistryError::from)?
             {
@@ -184,7 +184,7 @@ impl SchemaRegistry for SchemaRegistryImpl {
             view_id: request
                 .view_id
                 .as_ref()
-                .map(|view_id| parse_uuid(&view_id))
+                .map(|view_id| parse_uuid(view_id))
                 .transpose()?,
             base_schema_id: parse_uuid(&request.base_schema_id)?,
             name: request.name,
@@ -594,7 +594,7 @@ impl SchemaRegistry for SchemaRegistryImpl {
 
         let (_version, definition) = self.db.get_schema_definition(&versioned_id).await?;
         let schema = jsonschema::JSONSchema::compile(&definition)
-            .map_err(RegistryError::InvalidJsonSchema)?;
+            .map_err(|err| RegistryError::InvalidJsonSchema(err.to_string()))?;
         let errors = match schema.validate(&json) {
             Ok(()) => vec![],
             Err(errors) => errors.map(|err| err.to_string()).collect(),

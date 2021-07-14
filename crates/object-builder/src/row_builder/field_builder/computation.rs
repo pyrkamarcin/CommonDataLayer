@@ -24,7 +24,7 @@ impl<'a> ComputationEngine<'a> {
                 let field_path_parts = field_path.split('.');
                 let object = self
                     .objects
-                    .get(&object)
+                    .get(object)
                     .with_context(|| format!("Could not find object: {:?}", object))?;
                 get_sub_object(object, field_path_parts)?
             }

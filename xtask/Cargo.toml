@@ -8,8 +8,8 @@ license = "Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow      = "1.0.40"
-itertools   = "0.10.0"
+anyhow      = "1.0.42"
+itertools   = "0.10.1"
 pico-args   = "0.4.2"
-tonic-build = { version = "0.4.2", default-features = false, features = ["prost", "transport"] }
+tonic-build = { version = "0.5.0", default-features = false, features = ["prost", "transport"] }
 xshell      = "0.1.14"

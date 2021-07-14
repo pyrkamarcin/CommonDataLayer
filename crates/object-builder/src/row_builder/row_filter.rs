@@ -66,7 +66,7 @@ impl<'a> RowFilter<'a> {
             FilterValueSource::SchemaField { object, field_path } => {
                 let object = self
                     .objects
-                    .get(&object)
+                    .get(object)
                     .with_context(|| format!("Could not find object: {:?}", object))?;
                 let field_path_parts = field_path.split('.');
                 get_sub_object(object, field_path_parts)?

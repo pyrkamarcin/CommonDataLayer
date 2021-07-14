@@ -462,7 +462,7 @@ impl EdgeRegistry for EdgeRegistryImpl {
             .relation_id
             .as_ref()
             .map(|relation_id| {
-                Uuid::from_str(&relation_id).map_err(|_| Status::invalid_argument("relation_id"))
+                Uuid::from_str(relation_id).map_err(|_| Status::invalid_argument("relation_id"))
             })
             .transpose()?;
         let parent_schema_id = Uuid::from_str(&request.parent_schema_id)

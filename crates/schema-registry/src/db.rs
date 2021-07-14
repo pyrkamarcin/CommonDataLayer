@@ -476,9 +476,9 @@ impl SchemaRegistryDb {
     ) -> RegistryResult<()> {
         let (_version, definition) = self.get_schema_definition(&schema_id).await?;
         let schema = jsonschema::JSONSchema::compile(&definition)
-            .map_err(RegistryError::InvalidJsonSchema)?;
+            .map_err(|err| RegistryError::InvalidJsonSchema(err.to_string()))?;
 
-        let result = match schema.validate(&json) {
+        let result = match schema.validate(json) {
             Ok(()) => Ok(()),
             Err(errors) => Err(RegistryError::InvalidData(
                 errors.map(|err| err.to_string()).collect(),

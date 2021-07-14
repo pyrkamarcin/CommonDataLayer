@@ -1,10 +1,16 @@
+pub use crate::codegen::query_service_ts::*;
 use crate::error::ClientError;
 use query_service_ts_client::QueryServiceTsClient;
-use tonic::transport::Channel;
+use tonic::service::interceptor::InterceptedService;
+use tonic::transport::{Channel, Endpoint, Error};
+use tracing_utils::grpc::InterceptorType;
 
-pub use crate::codegen::query_service_ts::*;
-
-pub async fn connect(addr: String) -> Result<QueryServiceTsClient<Channel>, ClientError> {
+pub async fn connect(
+    addr: String,
+) -> Result<
+    QueryServiceTsClient<InterceptedService<Channel, &'static dyn InterceptorType>>,
+    ClientError,
+> {
     connect_inner(addr)
         .await
         .map_err(|err| ClientError::ConnectionError { source: err })
@@ -12,12 +18,13 @@ pub async fn connect(addr: String) -> Result<QueryServiceTsClient<Channel>, Clie
 
 async fn connect_inner(
     addr: String,
-) -> Result<QueryServiceTsClient<Channel>, tonic::transport::Error> {
-    let conn = tonic::transport::Endpoint::new(addr)?.connect().await?;
+) -> Result<QueryServiceTsClient<InterceptedService<Channel, &'static dyn InterceptorType>>, Error>
+{
+    let conn = Endpoint::new(addr)?.connect().await?;
 
     Ok(QueryServiceTsClient::with_interceptor(
         conn,
-        tracing_utils::grpc::interceptor(),
+        &tracing_utils::grpc::interceptor,
     ))
 }
 

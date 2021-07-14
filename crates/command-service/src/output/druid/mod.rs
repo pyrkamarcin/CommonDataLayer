@@ -88,7 +88,7 @@ impl OutputPlugin for DruidOutputPlugin {
 
 fn deserialize_payloads(msg: &BorrowedInsertMessage<'_>) -> Result<Vec<Vec<u8>>, Resolution> {
     let result: Result<Vec<TimeseriesInputMessage>, serde_json::Error> =
-        serde_json::from_str(&msg.data.get());
+        serde_json::from_str(msg.data.get());
     match result {
         Ok(values) => Ok(values
             .into_iter()

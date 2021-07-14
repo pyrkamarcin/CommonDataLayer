@@ -77,7 +77,7 @@ impl MaterializerImpl {
 
 impl MaterializerImpl {
     fn validate_options_inner(&self, options: &str) -> anyhow::Result<()> {
-        let options: serde_json::Value = serde_json::from_str(&options)?;
+        let options: serde_json::Value = serde_json::from_str(options)?;
         self.materializer.validate_options(options)?;
         Ok(())
     }

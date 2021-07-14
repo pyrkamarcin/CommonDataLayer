@@ -1,3 +1,5 @@
+#![feature(exact_size_is_empty)]
+
 use crate::schema::SchemaMetadataSupplier;
 use crate::{config::Settings, handler::Handler};
 use cache::DynamicCache;

@@ -146,8 +146,8 @@ fn check_inbound_version(string: &str) -> anyhow::Result<()> {
 
     let (version, pre, build) = version.disassociate_metadata();
 
-    let pre: Vec<String> = pre.into_iter().map(ToOwned::to_owned).collect();
-    let build: Vec<String> = build.into_iter().map(ToOwned::to_owned).collect();
+    let pre = pre.into_iter().map(ToOwned::to_owned);
+    let build = build.into_iter().map(ToOwned::to_owned);
 
     if !pre.is_empty() {
         anyhow::bail!("Malformed message, version can not contain prerelease part");
@@ -169,7 +169,7 @@ async fn route_static(
     publisher: &CommonPublisher,
     repository_path: &str,
 ) -> anyhow::Result<()> {
-    check_inbound_version(&event.version)?;
+    check_inbound_version(event.version)?;
     let payload = BorrowedInsertMessage {
         object_id: event.object_id,
         schema_id: event.schema_id,
@@ -197,7 +197,7 @@ async fn route(
 ) -> anyhow::Result<()> {
     let insert_destination = cache.get(event.schema_id).await?;
 
-    route_static(event, &key, publisher, &insert_destination).await
+    route_static(event, key, publisher, &insert_destination).await
 }
 
 #[tracing::instrument(skip(producer))]
@@ -209,7 +209,7 @@ async fn send_message(
 ) {
     let payload_len = payload.len();
     let delivery_status = producer
-        .publish_message(&insert_destination, key, payload)
+        .publish_message(insert_destination, key, payload)
         .await;
 
     if delivery_status.is_err() {

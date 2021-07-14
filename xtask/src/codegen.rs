@@ -17,7 +17,7 @@ pub fn codegen(protos: &[&str]) -> Result<()> {
     println!("build protos");
     tonic_build::configure()
         .out_dir("src/codegen")
-        .compile(&protos, &["proto/"])?;
+        .compile(protos, &["proto/"])?;
 
     let files = xshell::read_dir("src/codegen")?;
 

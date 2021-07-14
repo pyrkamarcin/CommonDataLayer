@@ -34,7 +34,7 @@ pub enum RegistryError {
     #[error("Input data does not match schema: {}", join_with_commas(.0))]
     InvalidData(Vec<String>),
     #[error("Invalid JSON schema: {0}")]
-    InvalidJsonSchema(jsonschema::CompilationError),
+    InvalidJsonSchema(String),
     #[error("Error receiving notification from database: {0}")]
     NotificationError(sqlx::Error),
     #[error("Malformed notification payload: {0}")]

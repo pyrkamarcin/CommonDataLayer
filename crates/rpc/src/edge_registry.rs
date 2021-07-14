@@ -1,31 +1,31 @@
-use crate::error::ClientError;
-use edge_registry_client::EdgeRegistryClient;
-use tonic::transport::Channel;
-
 pub use crate::codegen::edge_registry::*;
+use crate::error::ClientError;
 use bb8::{Pool, PooledConnection};
+use edge_registry_client::EdgeRegistryClient;
+use tonic::service::interceptor::InterceptedService;
+use tonic::transport::{Channel, Endpoint, Error};
+use tracing_utils::grpc::InterceptorType;
 
 pub type EdgeRegistryPool = Pool<EdgeRegistryConnectionManager>;
-pub type EdgeRegistryConn = EdgeRegistryClient<Channel>;
+pub type EdgeRegistryConn =
+    EdgeRegistryClient<InterceptedService<Channel, &'static dyn InterceptorType>>;
 
 pub struct EdgeRegistryConnectionManager {
     pub address: String,
 }
 
-pub async fn connect(addr: String) -> Result<EdgeRegistryClient<Channel>, ClientError> {
+pub async fn connect(addr: String) -> Result<EdgeRegistryConn, ClientError> {
     connect_inner(addr)
         .await
         .map_err(|err| ClientError::ConnectionError { source: err })
 }
 
-async fn connect_inner(
-    addr: String,
-) -> Result<EdgeRegistryClient<Channel>, tonic::transport::Error> {
-    let conn = tonic::transport::Endpoint::new(addr)?.connect().await?;
+async fn connect_inner(addr: String) -> Result<EdgeRegistryConn, Error> {
+    let conn = Endpoint::new(addr)?.connect().await?;
 
     Ok(EdgeRegistryClient::with_interceptor(
         conn,
-        tracing_utils::grpc::interceptor(),
+        &tracing_utils::grpc::interceptor,
     ))
 }
 

@@ -41,8 +41,8 @@ impl CommunicationConfig {
                     ordered_topics
                         .iter()
                         .map(move |topic| ParallelCommonConsumerConfig::Kafka {
-                            brokers: &brokers,
-                            group_id: &group_id,
+                            brokers,
+                            group_id,
                             task_limiter: TaskLimiter::new(*task_limit),
                             topic,
                         });
@@ -61,8 +61,8 @@ impl CommunicationConfig {
                 });
                 let iter = ordered_queue_names.iter().map(move |queue_name| {
                     ParallelCommonConsumerConfig::Amqp {
-                        connection_string: &connection_string,
-                        consumer_tag: &consumer_tag,
+                        connection_string,
+                        consumer_tag,
                         queue_name,
                         options,
                         task_limiter: TaskLimiter::new(*task_limit),
@@ -89,8 +89,8 @@ impl CommunicationConfig {
                     unordered_topics
                         .iter()
                         .map(move |topic| ParallelCommonConsumerConfig::Kafka {
-                            brokers: &brokers,
-                            group_id: &group_id,
+                            brokers,
+                            group_id,
                             topic,
                             task_limiter: TaskLimiter::new(*task_limit),
                         });
@@ -109,8 +109,8 @@ impl CommunicationConfig {
                 });
                 let iter = unordered_queue_names.iter().map(move |queue_name| {
                     ParallelCommonConsumerConfig::Amqp {
-                        connection_string: &connection_string,
-                        consumer_tag: &consumer_tag,
+                        connection_string,
+                        consumer_tag,
                         queue_name,
                         options,
                         task_limiter: TaskLimiter::new(*task_limit),

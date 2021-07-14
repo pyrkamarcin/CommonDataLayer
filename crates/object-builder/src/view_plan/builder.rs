@@ -160,7 +160,7 @@ impl<'a> ViewPlanBuilder<'a> {
         fields
             .iter()
             .map(|(field_name, field)| {
-                self.build_field(&variant, field)
+                self.build_field(variant, field)
                     .map(|field| (field_name.clone(), field))
             })
             .collect::<Result<HashMap<_, _>>>()

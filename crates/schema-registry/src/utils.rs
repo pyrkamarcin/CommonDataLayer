@@ -26,7 +26,7 @@ pub async fn build_full_schema(schema: &mut Value, conn: &SchemaRegistryDb) -> R
         }
     }
 
-    JSONSchema::compile(&schema).map_err(RegistryError::InvalidJsonSchema)?;
+    JSONSchema::compile(schema).map_err(|err| RegistryError::InvalidJsonSchema(err.to_string()))?;
 
     Ok(())
 }

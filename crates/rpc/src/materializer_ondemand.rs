@@ -1,31 +1,31 @@
-use crate::error::ClientError;
-use on_demand_materializer_client::OnDemandMaterializerClient;
-use tonic::transport::Channel;
-
 pub use crate::codegen::materializer_ondemand::*;
+use crate::error::ClientError;
 use bb8::{Pool, PooledConnection};
+use on_demand_materializer_client::OnDemandMaterializerClient;
+use tonic::service::interceptor::InterceptedService;
+use tonic::transport::Channel;
+use tracing_utils::grpc::InterceptorType;
 
-pub type OnDemandMaterializerConn = OnDemandMaterializerClient<Channel>;
+pub type OnDemandMaterializerConn =
+    OnDemandMaterializerClient<InterceptedService<Channel, &'static dyn InterceptorType>>;
 pub type OnDemandMaterializerPool = Pool<OnDemandMaterializerConnectionManager>;
 
 pub struct OnDemandMaterializerConnectionManager {
     pub address: String,
 }
 
-pub async fn connect(addr: String) -> Result<OnDemandMaterializerClient<Channel>, ClientError> {
+pub async fn connect(addr: String) -> Result<OnDemandMaterializerConn, ClientError> {
     connect_inner(addr)
         .await
         .map_err(|err| ClientError::ConnectionError { source: err })
 }
 
-async fn connect_inner(
-    addr: String,
-) -> Result<OnDemandMaterializerClient<Channel>, tonic::transport::Error> {
+async fn connect_inner(addr: String) -> Result<OnDemandMaterializerConn, tonic::transport::Error> {
     let conn = tonic::transport::Endpoint::new(addr)?.connect().await?;
 
     Ok(OnDemandMaterializerClient::with_interceptor(
         conn,
-        tracing_utils::grpc::interceptor(),
+        &tracing_utils::grpc::interceptor,
     ))
 }
 

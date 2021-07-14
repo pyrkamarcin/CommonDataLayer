@@ -29,7 +29,7 @@ pub fn load_samples() -> anyhow::Result<Vec<Value>> {
 
     sample_data
         .into_iter()
-        .map(|data| serde_json::from_str(&data).context("invalid sample"))
+        .map(|data| serde_json::from_str(data).context("invalid sample"))
         .collect()
 }
 

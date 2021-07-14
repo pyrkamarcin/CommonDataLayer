@@ -25,7 +25,7 @@ impl MQEvents {
             None => {
                 let kafka_events = self.events.clone();
                 let (subscriber, stream) =
-                    EventSubscriber::new(&settings, topic, move |topic| async move {
+                    EventSubscriber::new(settings, topic, move |topic| async move {
                         tracing::warn!("Message queue stream has closed");
                         // Remove topic from hashmap so next time someone ask about this stream,
                         // it will be recreated

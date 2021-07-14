@@ -1,3 +1,5 @@
+#![feature(trait_alias)]
+
 use opentelemetry::global;
 use opentelemetry::sdk::propagation::TraceContextPropagator;
 use tokio::runtime::Handle;
