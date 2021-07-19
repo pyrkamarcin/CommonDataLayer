@@ -8,10 +8,6 @@ spec:
     image: cdl-tests
     imagePullPolicy: IfNotPresent
     env:
-    # - name: CDL_COMMAND_SERVICE_ADDRESS
-    #   value: "1"
-    # - name: CDL_DATA_ROUTER_ADDRESS
-    #   value: "1"
     - name: CDL_EDGE_REGISTRY_ADDRESS
       value: "http://cdl-edge-registry:6400"
     - name: CDL_MATERIALIZER_GENERAL_ADDRESS

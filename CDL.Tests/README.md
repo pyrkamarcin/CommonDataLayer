@@ -6,10 +6,11 @@ Testing framework for [Common Data Layer][cdl] , implemented in the [.Net5][net5
 
 CDL and infrastructure have to be deployed somewhere. Please see our docs - [deployment][deployment]. 
 
+Below are listed environment variables that are required to successfully launch the tests.
+
+
 | Env variable name | Value |
 |---|---|
-| CDL_COMMAND_SERVICE_ADDRESS | http://localhost:50202 |
-| CDL_DATA_ROUTER_ADDRESS | http://localhost:50102 |
 | CDL_EDGE_REGISTRY_ADDRESS | http://localhost:50110 |
 | CDL_MATERIALIZER_GENERAL_ADDRESS | http://localhost:50203 |
 | CDL_MATERIALIZER_ONDEMAND_ADDRESS | http://localhost:50108 |
@@ -21,17 +22,19 @@ CDL and infrastructure have to be deployed somewhere. Please see our docs - [dep
 | CDL_KAFKA_EDGE_INPUT_TOPIC | cdl.edge.input |
 | CDL_SCHEMA_REGISTRY_DESTINATION | cdl.document.1.data |
 
-Before you start, you have to have the latest proto files. Test solution requires proto files in the 'proto' folder. To do that you can create a symlink 
+Before you start, you have to have the latest proto files. Tests solution requires proto files placed in the solution folder. 
 
-'ln -s ../crates/rpc/proto .'
 
+To do it you can run build.sh script to copy and patch proto files, and also docker image with tests will be created.
 
 ## Launch tests
 If you use sources 'dotnet test'
 
 If you use build artifacts. 'dotnet vstest CDL.Tests.dll'
 
-Also you can use 'build.sh', to build app and create docker image. Then you have to run container to lunch the tests.
+Run docker container with tests image. 
+
+'docker run --network host --env-file cdl.env cdl-tests:latest'
 
 [net5]: https://docs.microsoft.com/en-us/aspnet/core/?view=aspnetcore-5.0
 [cdl]: https://epiphany-platform.github.io/CommonDataLayer/
