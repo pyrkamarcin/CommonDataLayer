@@ -1,0 +1,420 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Documentation restructure and RFC process - The Common Data Layer</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="../favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="../favicon.png">
+        
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        
+        <link rel="stylesheet" href="../css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="../fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> Common Data Layer</a></li><li class="chapter-item expanded "><a href="../how_it_works.html"><strong aria-hidden="true">2.</strong> How does it work</a></li><li class="chapter-item expanded "><a href="../getting_started.html"><strong aria-hidden="true">3.</strong> Getting Started</a></li><li class="chapter-item expanded "><a href="../deployment/index.html"><strong aria-hidden="true">4.</strong> Deployment</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../deployment/local/index.html"><strong aria-hidden="true">4.1.</strong> Local deployment</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../deployment/local/docker-compose.html"><strong aria-hidden="true">4.1.1.</strong> docker-compose</a></li><li class="chapter-item expanded "><a href="../deployment/local/helm.html"><strong aria-hidden="true">4.1.2.</strong> Helm</a></li></ol></li><li class="chapter-item expanded "><a href="../deployment/production/index.html"><strong aria-hidden="true">4.2.</strong> Production-grade deployment</a></li></ol></li><li class="chapter-item expanded "><a href="../schemas_and_views.html"><strong aria-hidden="true">5.</strong> Schemas and Views</a></li><li class="chapter-item expanded "><a href="../examples/index.html"><strong aria-hidden="true">6.</strong> Examples</a></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">6.1.</strong> TODO</div></li></ol></li><li class="chapter-item expanded "><a href="../features/index.html"><strong aria-hidden="true">7.</strong> Features</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../features/ordering.html"><strong aria-hidden="true">7.1.</strong> Message ordering</a></li><li class="chapter-item expanded "><a href="../features/materialization.html"><strong aria-hidden="true">7.2.</strong> Materialization</a></li><li class="chapter-item expanded "><a href="../features/client_routing.html"><strong aria-hidden="true">7.3.</strong> Client routing</a></li></ol></li><li class="chapter-item expanded "><a href="../versioning.html"><strong aria-hidden="true">8.</strong> Versioning</a></li><li class="chapter-item expanded "><a href="../protocol.html"><strong aria-hidden="true">9.</strong> Protocol schema</a></li><li class="chapter-item expanded "><a href="../benchmarks.html"><strong aria-hidden="true">10.</strong> Benchmarks</a></li><li class="chapter-item expanded "><a href="../architecture/index.html"><strong aria-hidden="true">11.</strong> Architecture</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/management.html"><strong aria-hidden="true">11.1.</strong> Management Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/cli.html"><strong aria-hidden="true">11.1.1.</strong> CLI</a></li><li class="chapter-item expanded "><a href="../architecture/web_admin.html"><strong aria-hidden="true">11.1.2.</strong> Admin Web Panel</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/api.html"><strong aria-hidden="true">11.2.</strong> GraphQL API</a></li><li class="chapter-item expanded "><a href="../architecture/configuration.html"><strong aria-hidden="true">11.3.</strong> Configuration Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/schema_registry.html"><strong aria-hidden="true">11.3.1.</strong> Schema Registry</a></li><li class="chapter-item expanded "><a href="../architecture/leader_elector.html"><strong aria-hidden="true">11.3.2.</strong> Leader Elector</a></li><li class="chapter-item expanded "><a href="../architecture/edge_registry.html"><strong aria-hidden="true">11.3.3.</strong> Edge Registry</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/ingestion.html"><strong aria-hidden="true">11.4.</strong> Ingestion Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/data_router.html"><strong aria-hidden="true">11.4.1.</strong> Data Router</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/storage.html"><strong aria-hidden="true">11.5.</strong> Storage Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/command_service.html"><strong aria-hidden="true">11.5.1.</strong> Command Service</a></li><li class="chapter-item expanded "><a href="../architecture/db_shrinker_storage.html"><strong aria-hidden="true">11.5.2.</strong> Db Shrinker Storage</a></li><li class="chapter-item expanded "><a href="../architecture/query_service.html"><strong aria-hidden="true">11.5.3.</strong> Query Service</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">11.6.</strong> Materialization Layer</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/object_builder.html"><strong aria-hidden="true">11.6.1.</strong> Object Builder</a></li><li class="chapter-item expanded "><a href="../architecture/partial_update_engine.html"><strong aria-hidden="true">11.6.2.</strong> Partial Update Engine</a></li><li class="chapter-item expanded "><a href="../architecture/materializer_general.html"><strong aria-hidden="true">11.6.3.</strong> General Materializer</a></li><li class="chapter-item expanded "><a href="../architecture/materializer_ondemand.html"><strong aria-hidden="true">11.6.4.</strong> On Demand Materializer</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/retrieval.html"><strong aria-hidden="true">11.7.</strong> Retrieval Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/query_router.html"><strong aria-hidden="true">11.7.1.</strong> Query Router</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/utils.html"><strong aria-hidden="true">11.8.</strong> Utils</a></li></ol></li><li class="chapter-item expanded "><a href="../configuration/index.html"><strong aria-hidden="true">12.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../configuration/api.html"><strong aria-hidden="true">12.1.</strong> api</a></li><li class="chapter-item expanded "><a href="../configuration/command-service.html"><strong aria-hidden="true">12.2.</strong> command-service</a></li><li class="chapter-item expanded "><a href="../configuration/data-router.html"><strong aria-hidden="true">12.3.</strong> data-router</a></li><li class="chapter-item expanded "><a href="../configuration/edge-registry.html"><strong aria-hidden="true">12.4.</strong> edge-registry</a></li><li class="chapter-item expanded "><a href="../configuration/materializer-general.html"><strong aria-hidden="true">12.5.</strong> materializer-general</a></li><li class="chapter-item expanded "><a href="../configuration/materializer-ondemand.html"><strong aria-hidden="true">12.6.</strong> materializer-ondemand</a></li><li class="chapter-item expanded "><a href="../configuration/object-builder.html"><strong aria-hidden="true">12.7.</strong> object-builder</a></li><li class="chapter-item expanded "><a href="../configuration/partial-update-engine.html"><strong aria-hidden="true">12.8.</strong> partial-update-engine</a></li><li class="chapter-item expanded "><a href="../configuration/query-router.html"><strong aria-hidden="true">12.9.</strong> query-router</a></li><li class="chapter-item expanded "><a href="../configuration/query-service.html"><strong aria-hidden="true">12.10.</strong> query-service</a></li><li class="chapter-item expanded "><a href="../configuration/query-service-ts.html"><strong aria-hidden="true">12.11.</strong> query-service-ts</a></li><li class="chapter-item expanded "><a href="../configuration/schema-registry.html"><strong aria-hidden="true">12.12.</strong> schema-registry</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">13.</strong> RFCs</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../rfc/NAF-Commit_message_formalization_and_enforcement.html"><strong aria-hidden="true">13.1.</strong> Commit message formalization</a></li><li class="chapter-item expanded "><a href="../rfc/NAF-CDL_documentation_generation.html"><strong aria-hidden="true">13.2.</strong> CDL Documentation Generation</a></li><li class="chapter-item expanded "><a href="../rfc/NAF-Branching_strategy.html"><strong aria-hidden="true">13.3.</strong> Branching strategy</a></li><li class="chapter-item expanded "><a href="../rfc/NAF-Documentation_and_RFC_process.html" class="active"><strong aria-hidden="true">13.4.</strong> Documentation restructure and RFC process</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-0000C-00-rfc-01.html"><strong aria-hidden="true">13.5.</strong> 0000C - Alternative communication method</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-0000E-00-rfc-01.html"><strong aria-hidden="true">13.6.</strong> 0000E - MessagePack support</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00010-00-rfc-01.html"><strong aria-hidden="true">13.7.</strong> 00010 - CdlIM Versioning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../rfc/CDLF-00010-00-rfc-02.html"><strong aria-hidden="true">13.7.1.</strong> 00010 - CdlIM Versioning 2.0</a></li></ol></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00011-00-rfc-01.html"><strong aria-hidden="true">13.8.</strong> 00011 - Materialization - Overview</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00012-00-rfc-01.html"><strong aria-hidden="true">13.9.</strong> 00012 - Edge Registry</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00013-00-rfc-01.html"><strong aria-hidden="true">13.10.</strong> 00013 - Materialized Views</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00015-00-rfc-01.html"><strong aria-hidden="true">13.11.</strong> 00015 - CDL publishing deployment configurations</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00016-00-rfc-01.html"><strong aria-hidden="true">13.12.</strong> 00016 - Schema-Registry-less CDL deployment</a></li><li class="chapter-item expanded "><a href="../rfc/CDLF-00017-00-rfc-01.html"><strong aria-hidden="true">13.13.</strong> 00017 - Query raw routes</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">The Common Data Layer</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/epiphany-platform/CommonDataLayer" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#front-matter" id="front-matter">Front Matter</a></h1>
+<pre><code>Title           : Documentation restructure and RFC process
+Category        : Process
+Author(s)       : Wojciech Polak
+Created         : 2021-07-02
+</code></pre>
+<h1><a class="header" href="#glossary" id="glossary">Glossary</a></h1>
+<p>RFC - Request for Comments</p>
+<h1><a class="header" href="#preface" id="preface">Preface</a></h1>
+<p>This RFC introduces a new process to keep our documentation clean and up-to-date. Both subjects - documentation restructure, and RFC process are married and cannot be discussed separately.</p>
+<h1><a class="header" href="#documentation-restructure" id="documentation-restructure">Documentation restructure</a></h1>
+<h2><a class="header" href="#goal" id="goal">Goal</a></h2>
+<p>To simplify, clarify documentation structure. What documents should be grouped in what categories. Also, to define what the categories are and what these purposes are.</p>
+<h2><a class="header" href="#what-we-have-now" id="what-we-have-now">What we have now</a></h2>
+<pre><code>architecture - information about each component - very brief. Almost 70% of the architecture documentation takes information about configuration and environment variables. This information is outdated.
+
+configuration - newest created directory, description of all ENV variables, and configuration files. It is up to date.
+
+deployment - documentation how to deploy CDL
+
+examples - empty
+
+features - brief information about main features like client routing, materialization, and ordering. materialization.md is only an outdated tutorial without further explanation of the goal and overall design.
+
+rfc - directory where we keep all RFC, mixed processes, abandoned RFCs, implemented features, and WIP features.
+
+SUMMARY.md - the main index must be updated whenever we add a new document—often forgotten and outdated. It is used to generate a sidebar with navigation. Very important.
+
+benchmarks.md - empty, TODO
+
+getting_started.md - simple, outdated tutorial on how to play with CDL
+
+how_it_works.md - Simple, probably also outdated, three paragraphs on how CDL works internally. Very brief.
+
+index.md - First file seen when someone visits docs.commondatalayer.org
+
+protocol.md - empty, TODO
+
+schemas_and_views.md - few paragraphs explaining what schema and view is. It is very much outdated before we started materialization.
+
+versioning.md - brief information about CDL and SemVer. It also describes our branching or tagging strategy and releases schedule. I will be outdated very quickly.
+</code></pre>
+<h2><a class="header" href="#what-should-we-have" id="what-should-we-have">What should we have</a></h2>
+<p>Please, keep in mind that an explanation for these changes is written in the next section describing the RFC process.</p>
+<pre><code>architecture
+Purpose: information about each component, schema registry, object builder, and other applications. It should only contain our internal architecture description, the current state of each element. Information what it does, why and how, what algorithms (from a broad perspective without many implementation details) were used, the protocol between the systems, etc. It should be enough information to adapt a new developer to CDL quickly. 
+Change: remove ENV variables as these are duplicated in the following directory.
+Used by: CDL team
+
+configuration
+Purpose: Description of all ENV variables and configuration files
+Change: No changes needed
+Used by: CDL user
+
+deployment
+Purpose: Documentation of how to deploy CDL
+Change: No changes needed
+Used by: CDL user
+
+examples
+Purpose: a place for tutorials (for example, the one living right now in features/materialization.md, although it needs an update) and guides.
+Change: Move features/materialization.md, also maybe getting_started.md
+Used by: CDL user
+
+features
+Purpose: a place for feature (behavior) description. Each feature should have at least one document describing it. Example: ordering.md, materialization.md, routing.md, CDLIM_versioning.md
+Change: Rewrite materialization.md by precisely describing what this feature is. Rest should be kept as it is, especially index.md with table linking feature with RFC and documentation.
+Used by: CDL user
+
+processes
+Purpose: a place for all our processes. For example: Commit message formalization or this RFC when it's going to be accepted.
+Change: New directory. Keep index.md similar to the one in features
+Used by: CDL team
+
+rfc
+Purpose: a place for all RFCs.
+Change: Tag all RFCs with their status. Create features/processes based on RFCs that are closed. There is no need for index.md because of SUMMARY.md.
+Used by: CDL team
+
+...
+The rest is not that important for now. CDL team should create an issue to clean and update these, but there is no point in discussing these now.
+</code></pre>
+<h1><a class="header" href="#rfc-process" id="rfc-process">RFC process</a></h1>
+<h2><a class="header" href="#goal-1" id="goal-1">Goal</a></h2>
+<p>To simplify, clarify our methodology. To explain what should be included in RFC and what steps should be included in the RFC process.</p>
+<h2><a class="header" href="#what-we-have-now-1" id="what-we-have-now-1">What we have now</a></h2>
+<h3><a class="header" href="#rfc-definition" id="rfc-definition">RFC definition</a></h3>
+<p>RFC is describing either the change or current state of the CDL. It might refer to other RFC and the current state of CDL. 
+There is no definition of what RFC is and what it should include.</p>
+<h3><a class="header" href="#structure" id="structure">Structure</a></h3>
+<p>We keep all RFCs in the <code>rfc</code> directory; however, there is little to no resolution after we close it.
+Description of the components is mixed with RFCs describing features and processes, resulting in a strange mess where NAF-Commit_message...md lives next to <code>CDLF-000XX-rfc-XX.md</code>. </p>
+<h2><a class="header" href="#what-should-we-have-1" id="what-should-we-have-1">What should we have</a></h2>
+<p>RFC should only describe <strong>change</strong> to CDL. The change might be:</p>
+<ul>
+<li>New feature</li>
+<li>Modification of existing feature</li>
+<li>New process</li>
+<li>Modification of existing process</li>
+</ul>
+<p>It should not contain information about a single component (its current state, as this is the purpose of <code>architecture</code>).</p>
+<h3><a class="header" href="#rfc-category" id="rfc-category">RFC Category</a></h3>
+<p>Each RFC must contain a category informing whether it describes the feature or the process.
+Accepted values: <code>Feature</code>/<code>Process</code>.</p>
+<h3><a class="header" href="#rfc-deadline" id="rfc-deadline">RFC Deadline</a></h3>
+<p>Each RFC must contain a deadline to speed up the process.
+Before the deadline is met, the author should remind all interested parties about it.</p>
+<p>If the deadline is met without conclusion, the author of the RFC should create a meeting and invite all interested in these RFC parties. Then during this meeting resolution has to be made.</p>
+<p>The deadline must be set at least 3 days from the announcement. RFC author should schedule the meeting on the nearest possible date that is acceptable for all parties.</p>
+<p>Until the deadline, everyone is allowed to comment on the RFC. Participants should use the scheduled meeting only to decide when there is more than one strong opinion about the subject. All issues should be defined and discussed via GitHub comments. The deadline meeting should be relatively short if everyone agrees on the subject.</p>
+<p>There may be exceptions to this rule - for example, when during a deadline meeting, everyone agrees to wait for new information from superiors, etc.</p>
+<h3><a class="header" href="#rfc-ordering-number" id="rfc-ordering-number">RFC ordering number</a></h3>
+<p>Each RFC has an assigned ordering number that is an always-increasing integer. In rare situations, there might be gaps between two integers.
+RFC ordering number has to be unique.</p>
+<p>RFC ordering number and feature ID are not the same concepts.</p>
+<h3><a class="header" href="#the-process" id="the-process">The process</a></h3>
+<h4><a class="header" href="#draft" id="draft">Draft</a></h4>
+<p>The author of the RFC should create a new document in the <code>rfc</code> directory. This directory has a flat structure, and each RFC should have a filename in human-readable format with RFC ordering prefix number and version postfix number. For example: <code>1234_schema_registry_less_CDL_deployment_01.md</code>.</p>
+<p>Version postfix number is increased when RFC describes changes for existing RFC; for example, when there is <code>xxx_feature_01.md</code>, the author wants to describe the modification or new approach to the feature (which isn't a new feature itself), they should write <code>yyy_feature_02.md</code>. In that case, however, the ordering number is always different - <code>xxx</code> &lt; <code>yyy</code>.</p>
+<p>Format:
+<code>&lt;RFC ordering number&gt;_&lt;Human readable name&gt;_&lt;Version postfix number&gt;.md</code></p>
+<p>Each RFC has to contain Front Matter in the format:</p>
+<pre><code># Front Matter
+
+```
+Title           : Schema-Registry-less CDL deployment
+Category        : Feature
+Author(s)       : Wojciech Polak
+Team            : CommonDataLayer
+Created         : 2021-06-24
+Deadline        : 2021-06-26
+CDL feature ID  : CDLF-00016-00
+```
+</code></pre>
+<p>CDL feature ID is required only for the feature description. If RFC describes the process, this field should be omitted.</p>
+<p>Team field is optional. If missing, its implied that CDL Team has created it.</p>
+<p>RFC format allows other custom fields to be included if necessary, such as why RFC has been abandoned.</p>
+<p>For example, the author should commit the draft to a separate branch, for example, <code>rfc/&lt;filename&gt;</code>.</p>
+<h4><a class="header" href="#pull-request" id="pull-request">Pull Request</a></h4>
+<p>When the draft is ready for review, an author should create PR and inform reviewers.</p>
+<h4><a class="header" href="#resolution" id="resolution">Resolution</a></h4>
+<p>Each RFC must result in:</p>
+<ul>
+<li>When accepted:
+<ul>
+<li>If the team decide to implement feature described in the RFC:
+<ul>
+<li>Implementator should create tracking issue - he should include its id in <code>features/index.md</code> table.</li>
+<li>Update in <code>architecture</code> - all components that were changed should be updated, so this RFC won't be needed to understand how for example, Object Builder works. It should be done as a part of PR that has been merged.</li>
+<li>Update in <code>features</code> - if RFCs category is <code>Feature</code> - Update existing or create new feature.md and write a new description of what this feature does. In some cases, the author can selectively copy-paste it from RFC; however, the author must be careful. It should be done as a part of PR that has been merged.</li>
+</ul>
+</li>
+<li>If RFC describes the process: 
+<ul>
+<li><code>processes/index.md</code> needs to be updated</li>
+<li>Update in <code>processes</code> - if RFCs category is <code>Process</code> - Update existing or create a new process.md and write a further description of how the process looks. In some cases, the author can selectively copy-paste it from RFC; however, the author must be careful. Implementator should do it in PR that has been merged.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>If the deadline has been met, but no conclusion has been reached - RFC should be updated with the new deadline
+(sub-issues).</li>
+<li>When abandoned - RFC should be updated with <code>Abandon reason</code>.</li>
+</ul>
+<p>It also means PRs with implementations should not be accepted and merged before merging documentation.
+Exception: It is allowed to split PR into smaller, by merging the first and then separate PR documentation. However, until the last PR implementation is merged, <strong>tracking issue has to be kept open</strong>.</p>
+<h4><a class="header" href="#further-changes" id="further-changes">Further changes</a></h4>
+<p>Apart from minor typo fixes, and formatting RFC should be immutable.
+Whenever there is a need to change the feature or the process, one should create another RFC describing new goals and changes.</p>
+<h3><a class="header" href="#summary" id="summary">Summary</a></h3>
+<p>RFC should describe <strong>changes</strong> while <code>features</code>/<code>processes</code>/<code>architecture</code> should keep up-to-date information about the current state of CDL.</p>
+<h1><a class="header" href="#decisions" id="decisions">Decisions</a></h1>
+<blockquote>
+<p>Actions are from meeting about RFC that happened on 13.07.2021</p>
+</blockquote>
+<ul>
+<li>Included default minimal deadline period.</li>
+<li>Decided to change filenames to something more human-readable</li>
+<li>Added ordering number for RFC</li>
+<li>Removed boilerplate fields like &quot;Reviewer&quot;, &quot;Last updated&quot;, or &quot;Version&quot;</li>
+<li>Decided to remove RFC status from RFC document and keep the information in <code>features/index.md</code> instead</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../rfc/NAF-Branching_strategy.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../rfc/CDLF-0000C-00-rfc-01.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../rfc/NAF-Branching_strategy.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="../rfc/CDLF-0000C-00-rfc-01.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
