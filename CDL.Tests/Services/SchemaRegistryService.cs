@@ -60,7 +60,7 @@ namespace CDL.Tests.Services
                 Id = schemaId,
                 Patch = new SchemaMetadataPatch()
                 {
-                    InsertDestination = _options.CDL_COMMAND_SERVICE_ADDRESS,
+                    InsertDestination = _options.CDL_SCHEMA_REGISTRY_DESTINATION,
                     QueryAddress = _options.CDL_QUERY_SERVICE_ADDRESS,
                     Name = name,
                     SchemaType = type

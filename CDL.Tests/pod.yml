@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cdl-tests
+spec:
+  containers:
+  - name: tests
+    image: cdl-tests
+    imagePullPolicy: IfNotPresent
+    env:
+    # - name: CDL_COMMAND_SERVICE_ADDRESS
+    #   value: "1"
+    # - name: CDL_DATA_ROUTER_ADDRESS
+    #   value: "1"
+    - name: CDL_EDGE_REGISTRY_ADDRESS
+      value: "http://cdl-edge-registry:6400"
+    - name: CDL_MATERIALIZER_GENERAL_ADDRESS
+      value: "http://cdl-postgres-materializer-general:6400"
+    - name: CDL_MATERIALIZER_ONDEMAND_ADDRESS
+      value: "http://cdl-materializer-ondemand:6400"
+    - name: CDL_QUERY_ROUTER_ADDRESS
+      value: "http://cdl-query-router:6401"
+    - name: CDL_QUERY_SERVICE_ADDRESS
+      value: "http://cdl-postgres-query-service:6400"
+    - name: CDL_SCHEMA_REGISTRY_ADDRESS
+      value: "http://cdl-schema-registry:6400"
+    - name: CDL_KAFKA_BROKER
+      value: "infrastructure-kafka-headless"
+    - name: CDL_KAFKA_DATA_INPUT_TOPIC
+      value: "cdl.data.input"
+    - name: CDL_KAFKA_EDGE_INPUT_TOPIC
+      value: "cdl.edge.input"
+    - name: CDL_SCHEMA_REGISTRY_DESTINATION
+      value: "cdl.document.data"
+  restartPolicy: Never
