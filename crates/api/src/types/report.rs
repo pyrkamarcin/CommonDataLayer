@@ -11,7 +11,9 @@ pub struct Report {
     /// Success/Failure
     pub description: String,
     /// Object id
-    pub object_id: Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub object_id: Option<Uuid>,
     /// JSON encoded payload
-    pub payload: Json<Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub payload: Option<Json<Value>>,
 }

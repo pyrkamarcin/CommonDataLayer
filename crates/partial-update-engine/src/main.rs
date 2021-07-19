@@ -48,10 +48,12 @@ struct ServicesSettings {
 }
 
 #[derive(Deserialize, Debug, PartialEq, Eq, Hash)]
+#[allow(clippy::enum_variant_names)]
 #[serde(untagged)]
 enum PartialNotification {
     CommandServiceNotification(CommandServiceNotification),
     EdgeRegistryNotification(EdgeRegistryNotification),
+    OtherNotification(OtherNotification),
 }
 
 #[derive(Deserialize, Debug, PartialEq, Eq, Hash)]
@@ -67,6 +69,10 @@ struct EdgeRegistryNotification {
     pub relation_id: Uuid,
     pub parent_object_id: Uuid,
 }
+
+#[derive(Deserialize, Debug, PartialEq, Eq, Hash)]
+#[serde(rename_all = "snake_case")]
+struct OtherNotification {}
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -160,7 +166,7 @@ fn new_notification(
         .ok_or_else(|| anyhow::anyhow!("Message has no payload"))??;
 
     let notification: PartialNotification = serde_json::from_str(payload)?;
-    trace!("new notification {:#?}", notification);
+    trace!(?notification, "new notification");
     changes.insert(notification);
     let partition = message.partition();
     let offset = message.offset();
@@ -240,6 +246,7 @@ async fn process_changes(
                         .insert(notification.parent_object_id);
                 }
             }
+            PartialNotification::OtherNotification(_) => {}
         }
     }
 

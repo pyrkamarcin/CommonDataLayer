@@ -6,6 +6,7 @@ use communication_utils::publisher::CommonPublisher;
 use serde::{Deserialize, Serialize};
 use std::future::Future;
 use std::marker::PhantomData;
+use std::sync::Arc;
 
 pub mod full_notification_sender;
 
@@ -36,27 +37,27 @@ where
 
 #[async_trait::async_trait]
 pub trait NotificationService: Send + Sync + 'static {
-    async fn notify(self: Box<Self>, description: &str) -> anyhow::Result<()>;
+    async fn notify(self: Arc<Self>, description: &str) -> anyhow::Result<()>;
 }
 
 #[async_trait::async_trait]
 impl NotificationService for () {
-    async fn notify(self: Box<Self>, _: &str) -> anyhow::Result<()> {
+    async fn notify(self: Arc<Self>, _: &str) -> anyhow::Result<()> {
         Ok(())
     }
 }
 
 impl<T, S> NotificationPublisher<T, S>
 where
-    T: IntoSerialize<S> + Send + Sync + 'static,
+    T: IntoSerialize<S> + Send + Sync + 'static + Clone,
     S: Serialize + Send + Sync + 'static,
 {
-    pub fn and_message_body<U>(&self, msg: &U) -> Box<dyn NotificationService>
+    pub fn and_message_body<U>(&self, msg: &U) -> Arc<dyn NotificationService>
     where
         U: OwnMessage<Owned = T>,
     {
         match self {
-            NotificationPublisher::Full(config) => Box::new(FullNotificationSender {
+            NotificationPublisher::Full(config) => Arc::new(FullNotificationSender {
                 application: config.application,
                 producer: config.publisher.clone(),
                 destination: config.destination.clone(),
@@ -64,7 +65,7 @@ where
                 msg: msg.to_owned_message(),
                 _phantom: PhantomData,
             }),
-            NotificationPublisher::Disabled => Box::new(()),
+            NotificationPublisher::Disabled => Arc::new(()),
         }
     }
 }

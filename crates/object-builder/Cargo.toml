@@ -26,6 +26,7 @@ metrics_utils           = { path = "../utils/crates/metrics" }
 anyhow      = "1.0.42"
 async-trait = "0.1.50"
 bb8         = "0.7.0"
+derive_more = "0.99.16"
 futures     = "0.3.15"
 itertools   = "0.10.1"
 maplit      = "1.0.2"

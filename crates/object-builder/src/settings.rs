@@ -1,6 +1,11 @@
-use communication_utils::consumer::{CommonConsumer, CommonConsumerConfig};
+use communication_utils::{
+    consumer::{CommonConsumer, CommonConsumerConfig},
+    publisher::CommonPublisher,
+};
+use derive_more::Display;
 use serde::Deserialize;
 use settings_utils::*;
+use utils::notification::NotificationSettings;
 
 #[derive(Debug, Deserialize)]
 pub struct Settings {
@@ -17,6 +22,9 @@ pub struct Settings {
 
     #[serde(default)]
     pub log: LogSettings,
+
+    #[serde(default)]
+    pub notifications: NotificationSettings,
 }
 
 impl Settings {
@@ -42,6 +50,15 @@ impl Settings {
             _ => anyhow::bail!("Unsupported consumer specification"),
         }
     }
+
+    pub async fn publisher(&self) -> anyhow::Result<CommonPublisher> {
+        publisher(
+            self.kafka.as_ref().map(|kafka| kafka.brokers.as_str()),
+            self.amqp.as_ref().map(|amqp| amqp.exchange_url.as_str()),
+            None,
+        )
+        .await
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -50,7 +67,7 @@ pub struct ServicesSettings {
     pub edge_registry_url: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Display)]
 #[serde(rename_all = "snake_case")]
 pub enum CommunicationMethod {
     Kafka,
