@@ -97,6 +97,7 @@ impl ViewPlan {
     pub fn objects_filter(&self) -> HashMap<Uuid, materialization::Schema> {
         self.missing
             .keys()
+            .sorted_by_key(|o| o.schema_id)
             .group_by(|ObjectIdPair { schema_id, .. }| schema_id)
             .into_iter()
             .map(|(schema_id, objects)| {

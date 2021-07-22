@@ -409,6 +409,7 @@ impl SchemaRegistry for SchemaRegistryImpl {
         let id = parse_uuid(&request.id)?;
 
         let view = self.db.get_view(id).await?;
+        let filters = view.filters.0.map(|f| f.try_into_rpc()).transpose()?;
 
         Ok(Response::new(rpc::schema_registry::FullView {
             id: request.id,
@@ -430,7 +431,7 @@ impl SchemaRegistry for SchemaRegistryImpl {
                 })
                 .collect::<RegistryResult<_>>()?,
             relations: view.relations.0.into_iter().map(|r| r.into_rpc()).collect(),
-            filters: None, //TODO:
+            filters,
         }))
     }
 

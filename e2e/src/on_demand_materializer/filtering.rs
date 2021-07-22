@@ -15,7 +15,6 @@ mod on_standard_field {
     use uuid::Uuid;
 
     #[tokio::test]
-    #[ignore = "todo"]
     async fn should_apply_simple_filter_for_request_with_empty_relations() -> Result<()> {
         let schema_a = add_schema("test", POSTGRES_QUERY_ADDR, POSTGRES_INSERT_DESTINATION).await?;
 
@@ -65,16 +64,17 @@ mod on_standard_field {
     }
 
     #[tokio::test]
-    #[ignore = "todo"]
     async fn should_properly_merge_multiple_filters_using_and_operator() -> Result<()> {
         let schema_a = add_schema("test", POSTGRES_QUERY_ADDR, POSTGRES_INSERT_DESTINATION).await?;
 
         let object_id_a = Uuid::new_v4();
         let object_id_b = Uuid::new_v4();
         let object_id_c = Uuid::new_v4();
+        let object_id_d = Uuid::new_v4();
         insert_message(object_id_a, schema_a, r#"{"FieldA":1,"FieldB":1}"#).await?;
-        insert_message(object_id_b, schema_a, r#"{"FieldA":2,"FieldB":1}"#).await?;
-        insert_message(object_id_c, schema_a, r#"{"FieldA":2,"FieldB":2}"#).await?;
+        insert_message(object_id_b, schema_a, r#"{"FieldA":1,"FieldB":2}"#).await?;
+        insert_message(object_id_c, schema_a, r#"{"FieldA":2,"FieldB":1}"#).await?;
+        insert_message(object_id_d, schema_a, r#"{"FieldA":2,"FieldB":2}"#).await?;
 
         let mut fields = HashMap::new();
         fields.insert(
@@ -142,7 +142,6 @@ mod on_standard_field {
     }
 
     #[tokio::test]
-    #[ignore = "todo"]
     async fn should_properly_merge_multiple_filters_using_or_operator() -> Result<()> {
         let schema_a = add_schema("test", POSTGRES_QUERY_ADDR, POSTGRES_INSERT_DESTINATION).await?;
 
@@ -216,7 +215,6 @@ mod on_standard_field {
     }
 
     #[tokio::test]
-    #[ignore = "todo"]
     async fn should_properly_merge_multiple_filters_complex() -> Result<()> {
         let schema_a = add_schema("test", POSTGRES_QUERY_ADDR, POSTGRES_INSERT_DESTINATION).await?;
 
@@ -339,7 +337,6 @@ mod on_standard_field {
     }
 
     #[tokio::test]
-    #[ignore = "todo"]
     async fn should_apply_filters_to_subrelations() -> Result<()> {
         let schema_a = add_schema("test", POSTGRES_QUERY_ADDR, POSTGRES_INSERT_DESTINATION).await?;
         let schema_b = add_schema("test", POSTGRES_QUERY_ADDR, POSTGRES_INSERT_DESTINATION).await?;
@@ -381,7 +378,7 @@ mod on_standard_field {
             schema_a,
             "test",
             "",
-            Default::default(),
+            fields,
             None,
             &[NewRelation {
                 global_id: relation_id,
@@ -417,7 +414,6 @@ mod on_standard_field {
     }
 
     #[tokio::test]
-    #[ignore = "todo"]
     async fn should_allow_filtering_using_field_not_materialized_in_view() -> Result<()> {
         let schema_a = add_schema("test", POSTGRES_QUERY_ADDR, POSTGRES_INSERT_DESTINATION).await?;
 
@@ -467,7 +463,6 @@ mod on_standard_field {
     }
 
     #[tokio::test]
-    #[ignore = "todo"]
     async fn should_allow_filtering_using_field_from_schema_not_materialized_in_view() -> Result<()>
     {
         let schema_a = add_schema("test", POSTGRES_QUERY_ADDR, POSTGRES_INSERT_DESTINATION).await?;
@@ -498,7 +493,7 @@ mod on_standard_field {
             schema_a,
             "test",
             "",
-            Default::default(),
+            fields,
             None,
             &[NewRelation {
                 global_id: relation_id,
@@ -533,7 +528,6 @@ mod on_standard_field {
     }
 
     #[tokio::test]
-    #[ignore = "todo"]
     async fn should_allow_filtering_using_fields_from_view() -> Result<()> {
         let schema_a = add_schema("test", POSTGRES_QUERY_ADDR, POSTGRES_INSERT_DESTINATION).await?;
 
@@ -591,7 +585,6 @@ mod on_standard_field {
     }
 
     #[tokio::test]
-    #[ignore = "todo"]
     async fn should_allow_filtering_using_raw_value() -> Result<()> {
         let schema_a = add_schema("test", POSTGRES_QUERY_ADDR, POSTGRES_INSERT_DESTINATION).await?;
 
@@ -656,7 +649,6 @@ mod on_standard_field {
     }
 
     #[tokio::test]
-    #[ignore = "todo"]
     async fn should_allow_filtering_using_computed_field() -> Result<()> {
         let schema_a = add_schema("test", POSTGRES_QUERY_ADDR, POSTGRES_INSERT_DESTINATION).await?;
 

@@ -13,7 +13,6 @@ use tokio::time::sleep;
 use uuid::Uuid;
 
 #[tokio::test]
-#[ignore = "todo"]
 async fn should_compute_field_from_another_value_in_relationless_view() -> Result<()> {
     let schema_a = add_schema("test", POSTGRES_QUERY_ADDR, POSTGRES_INSERT_DESTINATION).await?;
 
@@ -55,10 +54,10 @@ async fn should_compute_field_from_another_value_in_relationless_view() -> Resul
             field_type: FieldType::Json, // TODO: Boolean
         },
     );
-    let object_id_a = Uuid::new_v4();
-
     let view = add_view(schema_a, "test", "", fields, None, &[], None).await?;
-    insert_message(object_id_a, schema_a, r#"{"FieldA":1}"#).await?;
+
+    let object_id_a = Uuid::new_v4();
+    insert_message(object_id_a, schema_a, r#"{"FieldA":"1"}"#).await?;
 
     sleep(Duration::from_secs(1)).await; // async insert
 
