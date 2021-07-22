@@ -3167,7 +3167,6 @@ dependencies = [
  "bb8",
  "cdl_dto",
  "communication_utils",
- "either",
  "futures",
  "futures-util",
  "jsonschema",
