@@ -1,5 +1,3 @@
-use crate::communication::resolution::Resolution;
-use crate::output::OutputPlugin;
 use cdl_dto::ingestion::BorrowedInsertMessage;
 use fnv::FnvHashMap;
 use metrics_utils::{self as metrics, counter};
@@ -13,6 +11,9 @@ use thiserror::Error as DeriveError;
 use tracing::error;
 use url::ParseError;
 use uuid::Uuid;
+
+use crate::communication::resolution::Resolution;
+use crate::output::OutputPlugin;
 
 pub struct VictoriaMetricsOutputPlugin {
     client: Client,
@@ -148,9 +149,10 @@ mod tests {
     use super::*;
 
     mod describe_build_line_protocol {
-        use super::*;
         use test_case::test_case;
         use uuid::Uuid;
+
+        use super::*;
 
         #[test_case(r#"[{"fields":{}, "ts": 15},
                        {"fields":{"a01": 10}, "ts": 15}]"#                => matches Err(Error::EmptyFields))]

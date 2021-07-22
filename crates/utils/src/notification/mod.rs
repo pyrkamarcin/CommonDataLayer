@@ -1,11 +1,13 @@
-use crate::notification::full_notification_sender::{
-    FullNotificationSender, FullNotificationSenderBase,
-};
+use std::future::Future;
+use std::marker::PhantomData;
+
 use cdl_dto::ingestion::OwnMessage;
 use communication_utils::publisher::CommonPublisher;
 use serde::{Deserialize, Serialize};
-use std::future::Future;
-use std::marker::PhantomData;
+
+use crate::notification::full_notification_sender::{
+    FullNotificationSender, FullNotificationSenderBase,
+};
 
 pub mod full_notification_sender;
 

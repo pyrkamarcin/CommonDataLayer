@@ -1,8 +1,9 @@
+use std::collections::HashMap;
+
 use cdl_dto::materialization::FieldType;
 use rpc::schema_registry::types::LogicOperator;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::HashMap;
 
 use crate::ObjectIdPair;
 

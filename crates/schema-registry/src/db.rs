@@ -1,5 +1,9 @@
 use std::collections::HashMap;
 
+use cdl_dto::materialization::{FieldDefinition, Filter, Relation};
+use either::Either;
+use futures::future;
+use futures_util::stream::{StreamExt, TryStreamExt};
 use semver::Version;
 use serde_json::Value;
 use sqlx::pool::PoolConnection;
@@ -17,10 +21,6 @@ use crate::types::DbExport;
 use crate::types::VersionedUuid;
 use crate::utils::build_full_schema;
 use crate::{settings::Settings, types::view::FullView};
-use cdl_dto::materialization::{FieldDefinition, Filter, Relation};
-use either::Either;
-use futures::future;
-use futures_util::stream::{StreamExt, TryStreamExt};
 
 const SCHEMAS_LISTEN_CHANNEL: &str = "schemas";
 const VIEWS_LISTEN_CHANNEL: &str = "views";

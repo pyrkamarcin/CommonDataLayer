@@ -1,4 +1,7 @@
-use crate::{api::*, *};
+use std::collections::HashMap;
+use std::num::NonZeroU8;
+use std::time::Duration;
+
 use anyhow::Result;
 use cdl_api::types::view::NewRelation;
 use cdl_dto::materialization::{
@@ -6,11 +9,10 @@ use cdl_dto::materialization::{
 };
 use cdl_dto::materialization::{FieldDefinition, FieldType};
 use cdl_rpc::schema_registry::types::SearchFor;
-use std::collections::HashMap;
-use std::num::NonZeroU8;
-use std::time::Duration;
 use tokio::time::sleep;
 use uuid::Uuid;
+
+use crate::{api::*, *};
 
 #[tokio::test]
 #[ignore = "todo"]

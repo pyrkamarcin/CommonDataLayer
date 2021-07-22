@@ -4,14 +4,13 @@ use std::{
     sync::Mutex,
 };
 
+use misc_utils::abort_on_poison;
 use rdkafka::{
     consumer::{DefaultConsumerContext, StreamConsumer},
     message::BorrowedMessage,
     Message, Offset, TopicPartitionList,
 };
 use tracing::trace;
-
-use misc_utils::abort_on_poison;
 
 #[derive(Default)]
 pub struct KafkaAckQueue {

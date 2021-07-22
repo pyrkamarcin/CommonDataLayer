@@ -1,5 +1,5 @@
-use crate::output::OutputPlugin;
-use crate::{communication::MessageRouter, input::Error};
+use std::sync::Arc;
+
 use async_trait::async_trait;
 use cdl_dto::ingestion::BorrowedInsertMessage;
 use communication_utils::get_order_group_id;
@@ -9,9 +9,11 @@ use communication_utils::{
 use communication_utils::{parallel_consumer::ParallelCommonConsumer, Result};
 use futures::future::try_join_all;
 use metrics_utils::{self as metrics, counter};
-use std::sync::Arc;
 use tracing::{error, trace};
 use utils::parallel_task_queue::ParallelTaskQueue;
+
+use crate::output::OutputPlugin;
+use crate::{communication::MessageRouter, input::Error};
 
 pub struct Service<P: OutputPlugin> {
     consumers: Vec<ParallelCommonConsumer>,

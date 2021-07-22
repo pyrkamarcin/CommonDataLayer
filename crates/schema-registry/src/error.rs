@@ -1,8 +1,9 @@
-use crate::types::VersionedUuid;
 use semver::Version;
 use thiserror::Error;
 use tonic::Status;
 use uuid::Uuid;
+
+use crate::types::VersionedUuid;
 
 #[derive(Debug, Error)]
 pub enum RegistryError {

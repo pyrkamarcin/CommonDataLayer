@@ -1,11 +1,11 @@
-use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 use communication_utils::{parallel_consumer::ParallelCommonConsumer, publisher::CommonPublisher};
+use serde::{Deserialize, Serialize};
 use settings_utils::{
     AmqpSettings, ConsumerKafkaSettings, GRpcSettings, LogSettings, MonitoringSettings,
     RepositoryStaticRouting,
 };
-use std::collections::HashMap;
 use task_utils::task_limiter::TaskLimiter;
 
 #[derive(Deserialize, Debug, Serialize)]

@@ -1,3 +1,9 @@
+use std::collections::hash_map::Entry;
+use std::{
+    collections::{HashMap, HashSet},
+    time::Duration,
+};
+
 use anyhow::{Context, Result};
 use cdl_dto::materialization::Request;
 use misc_utils::set_aborting_panic_hook;
@@ -11,11 +17,6 @@ use rdkafka::{
 use rpc::schema_registry::{FullView, Id};
 use serde::{Deserialize, Serialize};
 use settings_utils::*;
-use std::collections::hash_map::Entry;
-use std::{
-    collections::{HashMap, HashSet},
-    time::Duration,
-};
 use tokio::time::sleep;
 use tokio_stream::StreamExt;
 use tracing::{trace, Instrument};

@@ -1,3 +1,9 @@
+use std::cmp::min;
+use std::convert::TryInto;
+use std::str::FromStr;
+use std::sync::Arc;
+use std::{fmt, time};
+
 use anyhow::{Context, Error};
 use bb8_postgres::bb8::{Pool, PooledConnection};
 use bb8_postgres::tokio_postgres::{Config, NoTls};
@@ -16,11 +22,6 @@ use rpc::edge_registry::{
 };
 use serde::{Deserialize, Serialize};
 use settings_utils::PostgresSettings;
-use std::cmp::min;
-use std::convert::TryInto;
-use std::str::FromStr;
-use std::sync::Arc;
-use std::{fmt, time};
 use thiserror::Error;
 use tokio::sync::Mutex;
 use tonic::{Request, Response, Status};

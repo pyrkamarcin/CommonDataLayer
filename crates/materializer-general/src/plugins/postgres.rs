@@ -1,7 +1,6 @@
 use std::collections::VecDeque;
 use std::{collections::HashMap, convert::TryFrom, convert::TryInto};
 
-use super::MaterializerPlugin;
 use anyhow::Context;
 use bb8_postgres::tokio_postgres::{types::Type, Config, NoTls};
 use bb8_postgres::{bb8, PostgresConnectionManager};
@@ -17,6 +16,8 @@ use rpc::materializer_general::MaterializedView;
 use serde_json::Value;
 use settings_utils::PostgresSettings;
 use uuid::Uuid;
+
+use super::MaterializerPlugin;
 
 // TODO: Move some of those structs to dto crate
 

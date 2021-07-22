@@ -1,9 +1,10 @@
+use std::convert::Infallible;
+
 use futures_util::TryFuture;
 use hyper::{Body, Request};
 use opentelemetry::global;
 use opentelemetry_http::{HeaderExtractor, HeaderInjector};
 use reqwest::RequestBuilder;
-use std::convert::Infallible;
 use tower_service::Service;
 use tracing::Instrument;
 use tracing_opentelemetry::OpenTelemetrySpanExt;

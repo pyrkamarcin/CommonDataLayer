@@ -1,3 +1,7 @@
+use std::io::Stdout;
+use std::sync::Arc;
+use std::time::Duration;
+
 use anyhow::Context;
 use clap::Clap;
 use pbr::ProgressBar;
@@ -5,9 +9,6 @@ use rdkafka::{
     producer::{FutureProducer, FutureRecord},
     ClientConfig,
 };
-use std::io::Stdout;
-use std::sync::Arc;
-use std::time::Duration;
 use tokio::sync::mpsc::{channel, Sender};
 use tokio::sync::Mutex;
 use tokio::time::sleep;

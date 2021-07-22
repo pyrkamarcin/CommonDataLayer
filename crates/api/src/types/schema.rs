@@ -1,12 +1,12 @@
 use std::convert::TryInto;
 
 use async_graphql::{FieldResult, InputObject, Json, SimpleObject};
+use rpc::schema_registry::types::SchemaType;
 use semver::{Version, VersionReq};
 use serde_json::Value;
 use uuid::Uuid;
 
 use crate::types::view::View;
-use rpc::schema_registry::types::SchemaType;
 
 pub struct FullSchema {
     pub id: Uuid,

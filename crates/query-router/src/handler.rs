@@ -1,15 +1,16 @@
+use std::{collections::HashMap, sync::Arc};
+
+use futures_util::TryStreamExt;
+use rpc::schema_registry::types::SchemaType;
+use rpc::{query_service, query_service_ts};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{collections::HashMap, sync::Arc};
+use settings_utils::RepositoryStaticRouting;
 use uuid::Uuid;
 use warp::hyper::header::CONTENT_TYPE;
 
 use crate::error::Error;
 use crate::schema::{SchemaCache, SchemaMetadata};
-use futures_util::TryStreamExt;
-use rpc::schema_registry::types::SchemaType;
-use rpc::{query_service, query_service_ts};
-use settings_utils::RepositoryStaticRouting;
 
 const APPLICATION_JSON: &str = "application/json";
 

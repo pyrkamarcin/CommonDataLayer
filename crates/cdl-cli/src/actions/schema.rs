@@ -1,15 +1,15 @@
 use std::convert::TryInto;
 use std::path::PathBuf;
 
+use rpc::schema_registry::{
+    types::SchemaType, Empty, Id, NewSchema, NewSchemaVersion, SchemaDefinition, SchemaMetadata,
+    SchemaMetadataPatch, SchemaMetadataUpdate, ValueToValidate, VersionedId,
+};
 use semver::{Version, VersionReq};
 use serde_json::Value;
 use uuid::Uuid;
 
 use crate::utils::*;
-use rpc::schema_registry::{
-    types::SchemaType, Empty, Id, NewSchema, NewSchemaVersion, SchemaDefinition, SchemaMetadata,
-    SchemaMetadataPatch, SchemaMetadataUpdate, ValueToValidate, VersionedId,
-};
 
 pub async fn get_schema_definition(
     schema_id: Uuid,

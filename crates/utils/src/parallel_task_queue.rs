@@ -3,9 +3,8 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use tokio::sync::oneshot::{channel, Receiver, Sender};
-
 use misc_utils::abort_on_poison;
+use tokio::sync::oneshot::{channel, Receiver, Sender};
 
 type LocksDB = Arc<Mutex<HashMap<String, LockQueue>>>;
 

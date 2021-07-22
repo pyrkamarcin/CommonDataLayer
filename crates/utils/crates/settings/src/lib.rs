@@ -1,3 +1,7 @@
+use std::env;
+use std::fmt::Debug;
+use std::net::SocketAddrV4;
+
 use anyhow::bail;
 use communication_utils::consumer::{CommonConsumer, CommonConsumerConfig};
 use communication_utils::parallel_consumer::{
@@ -8,9 +12,6 @@ use config::{Config, Environment, File};
 use derive_more::Display;
 use lapin::options::BasicConsumeOptions;
 use serde::{Deserialize, Serialize};
-use std::env;
-use std::fmt::Debug;
-use std::net::SocketAddrV4;
 use task_utils::task_limiter::TaskLimiter;
 use url::Url;
 

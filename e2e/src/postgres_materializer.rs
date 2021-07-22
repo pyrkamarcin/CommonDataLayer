@@ -1,4 +1,6 @@
-use crate::{api::*, *};
+use std::collections::HashMap;
+use std::time::Duration;
+
 use anyhow::Result;
 use bb8_postgres::{
     bb8::{Pool, PooledConnection},
@@ -7,10 +9,10 @@ use bb8_postgres::{
 };
 use cdl_dto::materialization::{FieldDefinition, FieldType, PostgresMaterializerOptions};
 use serde_json::Value;
-use std::collections::HashMap;
-use std::time::Duration;
 use tokio::time::sleep;
 use uuid::Uuid;
+
+use crate::{api::*, *};
 
 const PG_SCHEMA: &str = "public";
 const PG_USER: &str = "postgres";

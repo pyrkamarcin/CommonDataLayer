@@ -1,3 +1,6 @@
+use std::collections::HashSet;
+use std::{collections::HashMap, convert::TryInto, pin::Pin};
+
 use async_trait::async_trait;
 use bb8::Pool;
 use cdl_dto::{edges::RelationTree, materialization};
@@ -6,19 +9,17 @@ use futures::{future::ready, Stream, StreamExt, TryStreamExt};
 use metrics_utils::{self as metrics, counter};
 use row_builder::RowBuilder;
 use rpc::common::RowDefinition as RpcRowDefinition;
+use rpc::edge_registry::{EdgeRegistryConnectionManager, EdgeRegistryPool};
 use rpc::materializer_general::{MaterializedView as RpcMaterializedView, Options};
 use rpc::object_builder::{object_builder_server::ObjectBuilder, Empty, View};
 use rpc::schema_registry::types::SchemaType;
+use rpc::schema_registry::{SchemaRegistryConnectionManager, SchemaRegistryPool};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::HashSet;
-use std::{collections::HashMap, convert::TryInto, pin::Pin};
 use tracing_futures::Instrument;
 use uuid::Uuid;
 
 use crate::{buffer_stream::ObjectBufferedStream, view_plan::ViewPlan};
-use rpc::edge_registry::{EdgeRegistryConnectionManager, EdgeRegistryPool};
-use rpc::schema_registry::{SchemaRegistryConnectionManager, SchemaRegistryPool};
 
 pub mod settings;
 
@@ -68,11 +69,12 @@ pub struct ObjectIdPair {
 }
 
 mod object_id_pair {
-    use super::*;
     use serde::{
         de::{Error, Visitor},
         Deserializer, Serializer,
     };
+
+    use super::*;
 
     impl Serialize for ObjectIdPair {
         fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>

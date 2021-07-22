@@ -1,4 +1,8 @@
+use std::collections::{HashMap, HashSet};
+use std::num::NonZeroU8;
+
 use anyhow::{Context, Result};
+use cdl_dto::materialization::Relation;
 use cdl_dto::{
     edges::{RelationTree, TreeObject},
     materialization::{
@@ -7,10 +11,6 @@ use cdl_dto::{
         RawValueFilter, SchemaFieldFilter, SimpleFilter, SimpleFilterKind, ViewPathFilter,
     },
 };
-use std::collections::{HashMap, HashSet};
-use std::num::NonZeroU8;
-
-use cdl_dto::materialization::Relation;
 use uuid::Uuid;
 
 use super::{UnfinishedRow, UnfinishedRowVariant};

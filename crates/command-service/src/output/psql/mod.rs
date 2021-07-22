@@ -1,5 +1,5 @@
-use crate::communication::resolution::Resolution;
-use crate::output::OutputPlugin;
+use std::time;
+
 use bb8::Pool;
 use bb8_postgres::tokio_postgres::types::Json;
 use bb8_postgres::tokio_postgres::{Config, NoTls};
@@ -9,9 +9,11 @@ pub use error::Error;
 use metrics_utils::{self as metrics, counter};
 use serde_json::Value;
 use settings_utils::PostgresSettings;
-use std::time;
 use tracing::{error, trace};
 use utils::psql::validate_schema;
+
+use crate::communication::resolution::Resolution;
+use crate::output::OutputPlugin;
 
 pub mod error;
 

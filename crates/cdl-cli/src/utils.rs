@@ -1,6 +1,7 @@
+use std::path::PathBuf;
+
 use anyhow::Context;
 use serde_json::Value;
-use std::path::PathBuf;
 
 pub fn read_json(file: Option<PathBuf>) -> anyhow::Result<Value> {
     if let Some(file_name) = file {

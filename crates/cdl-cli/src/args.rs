@@ -1,10 +1,9 @@
 use std::path::PathBuf;
 
 use clap::Clap;
+use rpc::schema_registry::types::SchemaType;
 use semver::{Version, VersionReq};
 use uuid::Uuid;
-
-use rpc::schema_registry::types::SchemaType;
 
 /// A tool to interact with services in the Common Data Layer.
 #[derive(Clap)]

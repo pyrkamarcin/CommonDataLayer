@@ -1,10 +1,11 @@
-pub use crate::codegen::schema_registry::*;
-use crate::error::ClientError;
 use bb8::{Pool, PooledConnection};
 use schema_registry_client::SchemaRegistryClient;
 use tonic::service::interceptor::InterceptedService;
 use tonic::transport::Channel;
 use tracing_utils::grpc::InterceptorType;
+
+pub use crate::codegen::schema_registry::*;
+use crate::error::ClientError;
 
 pub mod types;
 

@@ -1,7 +1,9 @@
-use crate::{events::EventStream, events::EventSubscriber, settings::Settings};
 use std::collections::HashMap;
 use std::sync::Arc;
+
 use tokio::sync::Mutex;
+
+use crate::{events::EventStream, events::EventSubscriber, settings::Settings};
 
 #[derive(Clone)]
 pub struct MQEvents {

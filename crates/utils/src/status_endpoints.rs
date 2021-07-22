@@ -1,9 +1,10 @@
+use std::convert::Infallible;
+use std::sync::RwLock;
+
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Method, Request, Response, Server, StatusCode};
 use lazy_static::lazy_static;
 use settings_utils::MonitoringSettings;
-use std::convert::Infallible;
-use std::sync::RwLock;
 use tracing::trace;
 
 lazy_static! {

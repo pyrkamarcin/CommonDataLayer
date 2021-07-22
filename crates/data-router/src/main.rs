@@ -1,12 +1,14 @@
 #![feature(exact_size_is_empty)]
 
-use crate::schema::SchemaMetadataSupplier;
-use crate::{config::Settings, handler::Handler};
+use std::sync::Arc;
+
 use cache::DynamicCache;
 use metrics_utils as metrics;
 use settings_utils::load_settings;
-use std::sync::Arc;
 use utils::parallel_task_queue::ParallelTaskQueue;
+
+use crate::schema::SchemaMetadataSupplier;
+use crate::{config::Settings, handler::Handler};
 
 mod config;
 mod handler;

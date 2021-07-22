@@ -78,9 +78,10 @@ pub mod serde_json {
 
     #[cfg(test)]
     mod tests {
-        use super::*;
         use serde_json::json;
         use test_case::test_case;
+
+        use super::*;
 
         #[test_case(json!({"b": 1, "c": 2, "a": 3,}), SortSettings::default() => r#"{"a":3,"b":1,"c":2}"# ; "simple")]
         #[test_case(json!([{"b": 1, "c": 2, "a": 3,}]), SortSettings::default() => r#"[{"a":3,"b":1,"c":2}]"# ; "in array")]

@@ -1,14 +1,13 @@
 use std::{collections::HashMap, num::NonZeroU8};
 
 use async_graphql::{FieldResult, InputObject, Json};
+use cdl_dto::materialization::{Filter, Relation};
+use cdl_dto::TryIntoRpc;
 use rpc::schema_registry::types::SearchFor;
 use serde_json::Value;
 use uuid::Uuid;
 
 use crate::types::IntoQueried;
-
-use cdl_dto::materialization::{Filter, Relation};
-use cdl_dto::TryIntoRpc;
 
 /// A new view under a schema.
 #[derive(Clone, Debug, InputObject)]

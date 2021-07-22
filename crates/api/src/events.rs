@@ -7,16 +7,16 @@ use std::pin::Pin;
 
 use async_graphql::FieldResult;
 use async_trait::async_trait;
-use futures::task::{Context as FutCtx, Poll};
-use futures::{Future, Stream};
-use tokio::sync::broadcast::{self, Sender};
-
-use crate::settings::Settings;
 use communication_utils::{
     consumer::{CommonConsumer, CommonConsumerConfig, ConsumerHandler},
     message::CommunicationMessage,
 };
+use futures::task::{Context as FutCtx, Poll};
+use futures::{Future, Stream};
 use settings_utils::CommunicationMethod;
+use tokio::sync::broadcast::{self, Sender};
+
+use crate::settings::Settings;
 
 /// Owned generic message received from message queue.
 #[derive(Clone, Debug)]

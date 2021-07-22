@@ -1,5 +1,8 @@
 mod on_standard_field {
-    use crate::{api::*, *};
+    use std::collections::HashMap;
+    use std::num::NonZeroU8;
+    use std::time::Duration;
+
     use anyhow::Result;
     use cdl_api::types::view::NewRelation;
     use cdl_dto::materialization::{
@@ -8,11 +11,10 @@ mod on_standard_field {
     };
     use cdl_dto::materialization::{ComputedFilter, FieldDefinition, FieldType, ViewPathFilter};
     use cdl_rpc::schema_registry::types::{LogicOperator, SearchFor};
-    use std::collections::HashMap;
-    use std::num::NonZeroU8;
-    use std::time::Duration;
     use tokio::time::sleep;
     use uuid::Uuid;
+
+    use crate::{api::*, *};
 
     #[tokio::test]
     #[ignore = "todo"]

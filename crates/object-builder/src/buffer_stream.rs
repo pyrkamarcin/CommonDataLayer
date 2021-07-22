@@ -1,13 +1,15 @@
+use std::task::Poll;
+
 use anyhow::Result;
 use futures::{ready, Stream};
 use pin_project_lite::pin_project;
 use serde_json::Value;
-use std::task::Poll;
 
 mod buffer;
 
-use crate::{sources::RowSource, view_plan::ViewPlan, ObjectIdPair};
 pub use buffer::ObjectBuffer;
+
+use crate::{sources::RowSource, view_plan::ViewPlan, ObjectIdPair};
 
 pin_project! {
     pub struct ObjectBufferedStream<S> {
@@ -70,12 +72,6 @@ where
 
 #[cfg(all(test, not(miri)))]
 mod tests {
-    use crate::{
-        sources::FieldDefinitionSource,
-        view_plan::{UnfinishedRow, ViewPlan},
-    };
-
-    use super::*;
     use cdl_dto::materialization::{FieldDefinition, FieldType, FullView};
     use futures::{pin_mut, FutureExt, StreamExt, TryStreamExt};
     use maplit::*;
@@ -83,6 +79,12 @@ mod tests {
     use tokio::sync::mpsc::{channel, Sender};
     use tokio_stream::wrappers::ReceiverStream;
     use uuid::Uuid;
+
+    use super::*;
+    use crate::{
+        sources::FieldDefinitionSource,
+        view_plan::{UnfinishedRow, ViewPlan},
+    };
 
     impl<S> ObjectBufferedStream<S>
     where

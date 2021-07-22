@@ -2,9 +2,8 @@ use anyhow::Context;
 use clap::Clap;
 use postgres::{Client, Config, NoTls, Row};
 use serde_json::Value as JsonValue;
-use uuid::Uuid;
-
 use tracing::{debug, info, trace};
+use uuid::Uuid;
 
 #[derive(Debug, Clone, Clap)]
 struct Opts {
@@ -135,9 +134,10 @@ fn merge(a: &mut JsonValue, b: JsonValue) {
 #[cfg(test)]
 mod tests {
     mod describe_merge {
-        use crate::merge;
         use serde_json::{json, Value};
         use test_case::test_case;
+
+        use crate::merge;
 
         #[test_case("{}", "{}" => json!({}))]
         #[test_case(r#"{"success": true}"#, "{}" => json!({"success": true}))]

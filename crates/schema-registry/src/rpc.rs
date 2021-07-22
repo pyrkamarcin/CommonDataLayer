@@ -1,9 +1,7 @@
-use crate::db::SchemaRegistryDb;
-use crate::error::{RegistryError, RegistryResult};
-use crate::settings::Settings;
-use crate::types::schema::{NewSchema, SchemaDefinition, SchemaUpdate};
-use crate::types::view::{FullView, NewView, ViewUpdate};
-use crate::types::{DbExport, VersionedUuid};
+use std::collections::HashMap;
+use std::convert::TryInto;
+use std::pin::Pin;
+
 use bb8::Pool;
 use cdl_dto::materialization::Relation;
 use cdl_dto::{TryFromRpc, TryIntoRpc};
@@ -18,12 +16,16 @@ use rpc::schema_registry::{
 use semver::Version;
 use semver::VersionReq;
 use sqlx::types::Json;
-use std::collections::HashMap;
-use std::convert::TryInto;
-use std::pin::Pin;
 use tokio_stream::{Stream, StreamExt};
 use tonic::{Request, Response, Status};
 use uuid::Uuid;
+
+use crate::db::SchemaRegistryDb;
+use crate::error::{RegistryError, RegistryResult};
+use crate::settings::Settings;
+use crate::types::schema::{NewSchema, SchemaDefinition, SchemaUpdate};
+use crate::types::view::{FullView, NewView, ViewUpdate};
+use crate::types::{DbExport, VersionedUuid};
 
 pub struct SchemaRegistryImpl {
     pub edge_registry: EdgeRegistryPool,

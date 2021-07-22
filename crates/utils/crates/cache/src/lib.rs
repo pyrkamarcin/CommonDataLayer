@@ -1,7 +1,8 @@
-use lru::LruCache;
 use std::fmt;
 use std::future::Future;
 use std::hash::Hash;
+
+use lru::LruCache;
 use tokio::sync::Mutex;
 
 #[async_trait::async_trait]

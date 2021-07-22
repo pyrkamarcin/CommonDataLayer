@@ -1,12 +1,13 @@
+use std::fs::File;
+use std::net::{Ipv4Addr, SocketAddrV4};
+use std::path::PathBuf;
+
 use anyhow::Context;
 use metrics_utils as metrics;
 use rpc::schema_registry::schema_registry_server::SchemaRegistryServer;
 use schema_registry::rpc::SchemaRegistryImpl;
 use schema_registry::settings::Settings;
 use settings_utils::load_settings;
-use std::fs::File;
-use std::net::{Ipv4Addr, SocketAddrV4};
-use std::path::PathBuf;
 use tokio::time::sleep;
 use tokio::time::Duration;
 use tonic::transport::Server;

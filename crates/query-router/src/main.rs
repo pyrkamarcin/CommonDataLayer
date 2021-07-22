@@ -1,10 +1,11 @@
+use std::collections::HashMap;
+use std::sync::Arc;
+
 use cache::DynamicCache;
 use metrics_utils as metrics;
 use schema::SchemaMetadataSupplier;
 use serde::Deserialize;
 use settings_utils::{load_settings, LogSettings, MonitoringSettings, RepositoryStaticRouting};
-use std::collections::HashMap;
-use std::sync::Arc;
 use uuid::Uuid;
 use warp::Filter;
 

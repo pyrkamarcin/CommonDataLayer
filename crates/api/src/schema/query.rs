@@ -2,7 +2,12 @@ use std::collections::HashMap;
 
 use async_graphql::{Context, FieldResult, Json, Object};
 use itertools::Itertools;
+use rpc::edge_registry::EdgeRegistryPool;
+use rpc::materializer_ondemand::{OnDemandMaterializerPool, OnDemandRequest};
+use rpc::schema_registry::types::SchemaType;
+use rpc::schema_registry::SchemaRegistryPool;
 use semver::VersionReq;
+use tracing_utils::http::RequestBuilderTracingExt;
 use uuid::Uuid;
 
 use crate::schema::utils::{get_schema, get_view};
@@ -12,11 +17,6 @@ use crate::types::view::View;
 use crate::types::view::{MaterializedView, RowDefinition};
 use crate::{error::Result, types::view::FullView};
 use crate::{settings::Settings, types::view::OnDemandViewRequest};
-use rpc::edge_registry::EdgeRegistryPool;
-use rpc::materializer_ondemand::{OnDemandMaterializerPool, OnDemandRequest};
-use rpc::schema_registry::types::SchemaType;
-use rpc::schema_registry::SchemaRegistryPool;
-use tracing_utils::http::RequestBuilderTracingExt;
 
 #[Object]
 /// Schema is the format in which data is to be sent to the Common Data Layer.
