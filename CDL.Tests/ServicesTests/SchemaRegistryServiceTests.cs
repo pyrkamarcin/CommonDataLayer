@@ -19,12 +19,21 @@ namespace CDL.Tests.ServicesTests
         private ITopicProducer<InsertObject> _kafkaProducer;
         private Fixture _fixture;
 
-        public SchemaRegistryServiceTests(SchemaRegistryService schemaRegistryService, QueryRouterService queryService, ITopicProducer<InsertObject> kafkaProducer, Fixture fixture)
+        private EdgeRegistryService _edgeRegistryService;
+
+        public SchemaRegistryServiceTests(
+            SchemaRegistryService schemaRegistryService, 
+            QueryRouterService queryService, 
+            ITopicProducer<InsertObject> kafkaProducer, 
+            Fixture fixture,
+            EdgeRegistryService edgeRegistryService
+        )
         {
             _schemaRegistryService = schemaRegistryService;
             _queryService = queryService;
             _kafkaProducer = kafkaProducer;
             _fixture = fixture;
+            _edgeRegistryService = edgeRegistryService;
         }
 
         [Fact]
@@ -171,5 +180,64 @@ namespace CDL.Tests.ServicesTests
             Assert.Equal(System.Net.HttpStatusCode.OK, schemaObjectsAfter.StatusCode);
             Assert.Contains(objectId, schemaObjectsAfter.Content);
         }
+
+        
+        [Fact]
+        public void GetViewsByRelation()
+        {
+            var schema_a = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<GeneralObject>().ToJSONString(), 
+                new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage 
+            }).Result;
+            var schema_b = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<GeneralObject>().ToJSONString(), 
+                new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage 
+            }).Result;
+            var relation = _edgeRegistryService.AddRelation(schema_a.Id_, schema_b.Id_).Result;
+            var relationForView = new List<Relation>();
+            
+            relationForView.Add(new Relation(){
+                GlobalId = relation.RelationId_,
+                LocalId = _fixture.Create<UInt32>(),
+                SearchFor = new SearchFor(){
+                    SearchFor_ = SearchFor.Types.Direction.Children,
+                }
+            });
+
+            var view = _schemaRegistryService.AddViewToSchema(schema_a.Id_, _fixture.Create<string>(), new List<Simple>(), relationForView);
+            var allViewByRelations = _schemaRegistryService.GetAllViewsByRelation(relation.RelationId_).Result;
+
+            Assert.True(allViewByRelations.Views.Count == 1);
+            Assert.True(allViewByRelations.Views[0].BaseSchemaId.Equals(schema_a.Id_));
+        } 
+
+        [Fact]
+        public void GetAllViewsOfSchema()
+        {
+            var schema_a = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<GeneralObject>().ToJSONString(), 
+                new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage 
+            }).Result;
+           
+            var relation = _edgeRegistryService.AddRelation(schema_a.Id_, schema_a.Id_).Result;
+            var relationForView = new List<Relation>();
+            
+            relationForView.Add(new Relation(){
+                GlobalId = relation.RelationId_,
+                LocalId = _fixture.Create<UInt32>(),
+                SearchFor = new SearchFor(){
+                    SearchFor_ = SearchFor.Types.Direction.Children,
+                }
+            });
+
+            var view = _schemaRegistryService.AddViewToSchema(schema_a.Id_, _fixture.Create<string>(), new List<Simple>(), relationForView);
+            var allViewByRelations = _schemaRegistryService.GetAllViewsOfSchema(schema_a.Id_).Result;
+
+            Assert.True(allViewByRelations.Views.Count == 1);
+            Assert.True(allViewByRelations.Views[0].BaseSchemaId.Equals(schema_a.Id_));
+        } 
     }
 }

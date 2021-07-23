@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using AutoFixture;
 using CDL.Tests.MessageBroker.Kafka;
 using CDL.Tests.Services;

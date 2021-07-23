@@ -34,8 +34,26 @@ namespace CDL.Tests.Services
                 },
                 Definition = ByteString.CopyFromUtf8(definition)
             };
-            
+
             return Task.FromResult(_client.AddSchema(schema));
+        }
+
+        public Task<SchemaViews> GetAllViewsByRelation(string relationId)
+        {
+            var id = new Id(){
+                Id_ = relationId
+            };
+            
+            return Task.FromResult(_client.GetAllViewsByRelation(id));
+        }
+
+        public Task<SchemaViews> GetAllViewsOfSchema(string schemaId)
+        {
+            var id = new Id(){
+                Id_ = schemaId
+            };
+
+            return Task.FromResult(_client.GetAllViewsOfSchema(id));
         }
 
         public Task<Empty> AddSchemaVersion(string schemaId, string data, string definition, string version)
@@ -83,6 +101,29 @@ namespace CDL.Tests.Services
             foreach (var field in materializerFields)
             {
                 view.Fields.Add(field.simple.field_name, JsonSerializer.Serialize(field));
+            }            
+            
+            return Task.FromResult(_client.AddViewToSchema(view));
+        }
+
+        public Task<Id> AddViewToSchema(string schemaId, string name, IList<Simple> materializerFields, IList<Relation> relations, bool materializerOnDemand = false, string materializerOptions = "{}")
+        {
+            var view = new NewView()
+            {
+                BaseSchemaId = schemaId,
+                Name = name,
+                MaterializerAddress = materializerOnDemand ? string.Empty : _options.CDL_MATERIALIZER_GENERAL_ADDRESS,
+                MaterializerOptions = materializerOptions,
+            };
+
+            foreach (var field in materializerFields)
+            {
+                view.Fields.Add(field.simple.field_name, JsonSerializer.Serialize(field));
+            }
+
+            foreach (var item in relations)
+            {
+                view.Relations.Add(item);
             }            
             
             return Task.FromResult(_client.AddViewToSchema(view));
