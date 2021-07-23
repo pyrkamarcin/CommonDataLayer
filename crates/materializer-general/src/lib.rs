@@ -7,7 +7,6 @@ use serde::Serialize;
 use settings_utils::PostgresSettings;
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::Mutex;
 use utils::notification::{IntoSerialize, NotificationPublisher};
 use view::ViewSupplier;
 
@@ -52,7 +51,7 @@ impl IntoSerialize<MaterializationNotification> for MaterializedView {
 }
 
 type MaterializerNotificationPublisher =
-    Arc<Mutex<NotificationPublisher<MaterializedView, MaterializationNotification>>>;
+    Arc<NotificationPublisher<MaterializedView, MaterializationNotification>>;
 
 pub struct MaterializerImpl {
     materializer: Arc<dyn MaterializerPlugin>,
@@ -119,10 +118,8 @@ impl GeneralMaterializer for MaterializerImpl {
             .map_err(error_handler)?;
         let view_definition = self.view_cache.get(view_id).await.map_err(error_handler)?;
 
-        let publisher = self.notification_publisher.clone();
-        let publisher = publisher.lock().await; // TODO: Should we have lock active for the whole time?
         let instance =
-            NotificationPublisher::clone(&publisher).with_message_body(&materialized_view);
+            Arc::clone(&self.notification_publisher).and_message_body(&materialized_view);
 
         self.materializer
             .upsert_view(materialized_view, view_definition.clone())

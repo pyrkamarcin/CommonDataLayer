@@ -22,7 +22,6 @@ use std::str::FromStr;
 use std::sync::Arc;
 use std::{fmt, time};
 use thiserror::Error;
-use tokio::sync::Mutex;
 use tonic::{Request, Response, Status};
 use tracing::{debug, error, trace};
 use utils::notification::NotificationPublisher;
@@ -50,13 +49,13 @@ pub struct AddEdgesMessage {
 pub struct EdgeRegistryImpl {
     pool: Pool<PostgresConnectionManager<NoTls>>,
     schema: String,
-    notification_sender: Arc<Mutex<NotificationPublisher<AddEdgesMessage>>>,
+    notification_sender: Arc<NotificationPublisher<AddEdgesMessage>>,
 }
 
 impl EdgeRegistryImpl {
     pub async fn new(
         settings: &PostgresSettings,
-        notification_sender: Arc<Mutex<NotificationPublisher<AddEdgesMessage>>>,
+        notification_sender: Arc<NotificationPublisher<AddEdgesMessage>>,
     ) -> anyhow::Result<Self> {
         let mut pg_config = Config::new();
         pg_config
@@ -240,8 +239,6 @@ impl EdgeRegistryImpl {
     ) -> anyhow::Result<()> {
         counter!("cdl.edge-registry.add-edges", 1);
         let conn = self.connect().await?;
-        let notification_sender = self.notification_sender.clone();
-        let instance = notification_sender.lock().await;
 
         for relation in relations {
             trace!(
@@ -249,9 +246,8 @@ impl EdgeRegistryImpl {
                 relation.child_object_ids.len(),
                 relation.relation_id
             );
-            instance
-                .clone()
-                .with_message_body(&relation)
+            Arc::clone(&self.notification_sender)
+                .and_message_body(&relation)
                 .notify("success")
                 .await?;
             for child_object_id in relation.child_object_ids {

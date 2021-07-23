@@ -51,16 +51,16 @@ where
     T: IntoSerialize<S> + Send + Sync + 'static,
     S: Serialize + Send + Sync + 'static,
 {
-    pub fn with_message_body<U>(self, msg: &U) -> Box<dyn NotificationService>
+    pub fn and_message_body<U>(&self, msg: &U) -> Box<dyn NotificationService>
     where
         U: OwnMessage<Owned = T>,
     {
         match self {
             NotificationPublisher::Full(config) => Box::new(FullNotificationSender {
                 application: config.application,
-                producer: config.publisher,
-                destination: config.destination,
-                context: config.context,
+                producer: config.publisher.clone(),
+                destination: config.destination.clone(),
+                context: config.context.clone(),
                 msg: msg.to_owned_message(),
                 _phantom: PhantomData,
             }),

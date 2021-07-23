@@ -10,7 +10,7 @@ pub mod config;
 pub mod resolution;
 
 pub struct MessageRouter<P: OutputPlugin> {
-    notification_sender: NotificationPublisher<OwnedInsertMessage>,
+    notification_sender: Arc<NotificationPublisher<OwnedInsertMessage>>,
     output_plugin: Arc<P>,
 }
 
@@ -26,14 +26,14 @@ impl<P: OutputPlugin> Clone for MessageRouter<P> {
 impl<P: OutputPlugin> MessageRouter<P> {
     pub fn new(report_sender: NotificationPublisher<OwnedInsertMessage>, output_plugin: P) -> Self {
         Self {
-            notification_sender: report_sender,
+            notification_sender: Arc::new(report_sender),
             output_plugin: Arc::new(output_plugin),
         }
     }
 
     #[tracing::instrument(skip(self, msg))]
     pub async fn handle_message(&self, msg: BorrowedInsertMessage<'_>) -> anyhow::Result<()> {
-        let instance = self.notification_sender.clone().with_message_body(&msg);
+        let instance = Arc::clone(&self.notification_sender).and_message_body(&msg);
 
         let status = self.output_plugin.handle_message(msg).await;
 

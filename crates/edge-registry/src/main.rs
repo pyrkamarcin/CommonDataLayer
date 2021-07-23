@@ -7,7 +7,6 @@ use rpc::edge_registry::edge_registry_server::EdgeRegistryServer;
 use settings_utils::{load_settings, CommunicationMethod};
 use std::process;
 use std::sync::Arc;
-use tokio::sync::Mutex;
 use tonic::transport::Server;
 use tracing::{error, info};
 use utils::status_endpoints;
@@ -36,11 +35,8 @@ async fn main() -> anyhow::Result<()> {
         )
         .await?;
 
-    let registry = EdgeRegistryImpl::new(
-        &settings.postgres,
-        Arc::new(Mutex::new(notification_publisher)),
-    )
-    .await?;
+    let registry =
+        EdgeRegistryImpl::new(&settings.postgres, Arc::new(notification_publisher)).await?;
     let consumer = match (settings.kafka, settings.amqp) {
         (Some(kafka), _) if settings.communication_method == CommunicationMethod::Kafka => {
             Some(kafka.consumer().await?)
