@@ -56,9 +56,9 @@ impl TryFrom<MaterializedView> for PsqlView {
             .into_iter()
             .map(|row| {
                 let object_ids = row
-                    .object_ids
+                    .objects
                     .into_iter()
-                    .map(|oid| oid.parse())
+                    .map(|o| o.object_id.parse())
                     .collect::<Result<_, _>>()?;
                 let fields = row
                     .fields

@@ -295,20 +295,24 @@ impl EdgeRegistryImpl {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn get_edges_impl(
-        &self,
-        object_id: Uuid,
-    ) -> anyhow::Result<impl Iterator<Item = (Uuid, Uuid)>> {
+    async fn get_edges_impl(&self, object_id: Uuid) -> anyhow::Result<Vec<Edge>> {
         counter!("cdl.edge-registry.get-edges", 1);
         let conn = self.connect().await?;
         Ok(conn
             .query(
-                "SELECT relation_id, child_object_id FROM edges WHERE parent_object_id = $1",
+                "SELECT relation_id, child_object_id FROM edges WHERE parent_object_id = $1 ORDER BY relation_id",
                 &[&object_id],
             )
             .await?
             .into_iter()
-            .map(|row| (row.get(0), row.get(1))))
+            .map(|row| (row.get::<_,Uuid>(0), row.get::<_,Uuid>(1)))
+            .group_by(|(relation_id, _child_object_id)| *relation_id)
+            .into_iter()
+            .map(move |(relation_id, children)| Edge {
+                relation_id: relation_id.to_string(),
+                parent_object_id: object_id.to_string(),
+                child_object_ids: children.map(|child| child.1.to_string()).collect(),
+            }).collect())
     }
 
     fn resolve_tree_recursive<'a, F, S, R>(
@@ -697,17 +701,7 @@ impl EdgeRegistry for EdgeRegistryImpl {
             .await
             .map_err(|err| db_communication_error("get_edges", err))?;
 
-        Ok(Response::new(ObjectRelations {
-            relations: rows
-                .group_by(|(relation_id, _)| *relation_id)
-                .into_iter()
-                .map(|(relation_id, children)| Edge {
-                    relation_id: relation_id.to_string(),
-                    parent_object_id: request.object_id.to_string(),
-                    child_object_ids: children.map(|child| child.1.to_string()).collect(),
-                })
-                .collect(),
-        }))
+        Ok(Response::new(ObjectRelations { relations: rows }))
     }
 
     #[tracing::instrument(skip(self))]

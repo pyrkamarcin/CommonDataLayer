@@ -7,7 +7,7 @@ patch --ignore-whitespace < *.new
 
 or use interactive script:
 
-dependencies: `colordiff`
+dependencies: `colordiff`, `bash >= 4.0`
 
 ``` sh
 ./review.sh
