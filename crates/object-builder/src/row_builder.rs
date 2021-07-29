@@ -54,12 +54,15 @@ impl RowBuilder {
             .iter()
             .map(|field| field_builder.build(field))
             .collect::<anyhow::Result<_>>()?;
-        let object_ids = objects
-            .keys()
-            .map(|object_pair| object_pair.object_id)
-            .collect();
+        let object_ids = objects.keys().cloned().collect();
 
-        RowFilter::new(&objects).filter(RowDefinition { object_ids, fields }, filters)
+        RowFilter::new(&objects).filter(
+            RowDefinition {
+                objects: object_ids,
+                fields,
+            },
+            filters,
+        )
     }
 
     fn build_single(
@@ -106,10 +109,16 @@ impl RowBuilder {
                 ))
             })
             .collect::<anyhow::Result<_>>()?;
-        let mut object_ids = HashSet::new();
-        object_ids.insert(pair.object_id);
+        let mut object_pairs = HashSet::new();
+        object_pairs.insert(pair);
 
-        RowFilter::new(&objects).filter(RowDefinition { object_ids, fields }, filters)
+        RowFilter::new(&objects).filter(
+            RowDefinition {
+                objects: object_pairs,
+                fields,
+            },
+            filters,
+        )
     }
 }
 
@@ -125,7 +134,7 @@ mod tests {
 
     #[test]
     fn test_row_builder() -> Result<()> {
-        snapshot_runner::test_snapshots("builded_rows", |input| {
+        snapshot_runner::test_snapshots("built_rows", |input| {
             let view = input.get_json("view").expect("view");
             let edges: Vec<_> = input.get_json("edges").expect("edges");
             let objects: BTreeMap<ObjectIdPair, Value> =
@@ -144,7 +153,7 @@ mod tests {
                 .flatten()
                 .flat_map(|row| row_builder.build(row).transpose())
                 .collect::<Result<Vec<_>>>()
-                .expect("builded rows");
+                .expect("built rows");
 
             to_string_sorted(
                 &rows,

@@ -5,7 +5,7 @@ use communication_utils::{consumer::ConsumerHandler, message::CommunicationMessa
 use futures::{future::ready, Stream, StreamExt, TryStreamExt};
 use metrics_utils::{self as metrics, counter};
 use row_builder::RowBuilder;
-use rpc::common::RowDefinition as RpcRowDefinition;
+use rpc::common::{Object, RowDefinition as RpcRowDefinition};
 use rpc::materializer_general::{MaterializedView as RpcMaterializedView, Options};
 use rpc::object_builder::{object_builder_server::ObjectBuilder, Empty, View};
 use rpc::schema_registry::types::SchemaType;
@@ -57,7 +57,7 @@ struct MaterializedView {
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "snake_case")]
 pub struct RowDefinition {
-    object_ids: HashSet<Uuid>,
+    objects: HashSet<ObjectIdPair>,
     fields: HashMap<String, Value>,
 }
 
@@ -158,10 +158,13 @@ impl TryInto<RpcRowDefinition> for RowDefinition {
             .map(|(key, value)| Ok((key, serde_json::to_string(&value)?)))
             .collect::<serde_json::Result<_>>()?;
         Ok(RpcRowDefinition {
-            object_ids: self
-                .object_ids
+            objects: self
+                .objects
                 .into_iter()
-                .map(|id| id.to_string())
+                .map(|object| Object {
+                    object_id: object.object_id.to_string(),
+                    schema_id: object.schema_id.to_string(),
+                })
                 .collect(),
             fields,
         })
