@@ -355,9 +355,9 @@ impl QueryRoot {
                     .collect::<Result<_, async_graphql::Error>>()?;
 
                 let object_ids = row
-                    .object_ids
+                    .objects
                     .into_iter()
-                    .map(|oid| oid.parse())
+                    .map(|o| o.object_id.parse())
                     .collect::<Result<_, _>>()?;
                 Ok(RowDefinition { object_ids, fields })
             })

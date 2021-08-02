@@ -23,14 +23,27 @@ pub struct MaterializationNotification {
 
 #[derive(Serialize, Clone)]
 struct MaterializationRow {
-    object_ids: Vec<String>,
+    objects: Vec<Object>,
     fields: HashMap<String, String>,
+}
+
+#[derive(Serialize, Clone)]
+struct Object {
+    object_id: String,
+    schema_id: String,
 }
 
 impl From<RowDefinition> for MaterializationRow {
     fn from(row: RowDefinition) -> Self {
         Self {
-            object_ids: row.object_ids,
+            objects: row
+                .objects
+                .into_iter()
+                .map(|o| Object {
+                    object_id: o.object_id,
+                    schema_id: o.schema_id,
+                })
+                .collect(),
             fields: row.fields,
         }
     }
