@@ -53,7 +53,6 @@ struct ServicesSettings {
 enum PartialNotification {
     CommandServiceNotification(CommandServiceNotification),
     EdgeRegistryNotification(EdgeRegistryNotification),
-    OtherNotification(OtherNotification),
 }
 
 #[derive(Deserialize, Debug, PartialEq, Eq, Hash)]
@@ -69,10 +68,6 @@ struct EdgeRegistryNotification {
     pub relation_id: Uuid,
     pub parent_object_id: Uuid,
 }
-
-#[derive(Deserialize, Debug, PartialEq, Eq, Hash)]
-#[serde(rename_all = "snake_case")]
-struct OtherNotification {}
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -116,10 +111,14 @@ async fn main() -> anyhow::Result<()> {
         // TODO: configure max items per batch(?) - otherwise we won't start view recalculation if messages are sent more often then timeout
         match message_stream.try_next().await {
             Ok(opt_message) => match opt_message {
-                Some(message) => {
-                    let (partition, offset) = new_notification(&mut changes, message?)?;
-                    offsets.insert(partition, offset);
-                }
+                Some(message) => match new_notification(&mut changes, message?) {
+                    Ok((partition, offset)) => {
+                        offsets.insert(partition, offset);
+                    }
+                    Err(error) => {
+                        tracing::error!(?error, "Could not deserialize notification");
+                    }
+                },
                 None => {
                     process_changes(&producer, &settings, &mut changes).await?;
                     acknowledge_messages(
@@ -246,7 +245,6 @@ async fn process_changes(
                         .insert(notification.parent_object_id);
                 }
             }
-            PartialNotification::OtherNotification(_) => {}
         }
     }
 
