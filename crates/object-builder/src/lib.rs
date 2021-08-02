@@ -255,6 +255,10 @@ impl ObjectBuilderImpl {
 
                     for error in errors.into_iter() {
                         tracing::error!("Could not materialize row: {}", error);
+                        /*
+                        If we cannot send notification about an error,
+                        it is critical failure and we cannot continue processing materialization.
+                        */
                         report_sender.clone().notify(error.as_str()).await?;
                     }
 
