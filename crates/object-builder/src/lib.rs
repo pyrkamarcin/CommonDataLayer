@@ -19,6 +19,7 @@ use tracing_futures::Instrument;
 use uuid::Uuid;
 
 use crate::{buffer_stream::ObjectBufferedStream, view_plan::ViewPlan};
+use object_id_pair::ObjectIdPair;
 use rpc::edge_registry::{EdgeRegistryConnectionManager, EdgeRegistryPool};
 use rpc::schema_registry::{SchemaRegistryConnectionManager, SchemaRegistryPool};
 
@@ -29,6 +30,7 @@ mod utils;
 mod buffer_stream;
 mod view_plan;
 
+mod object_id_pair;
 mod row_builder;
 mod sources;
 
@@ -46,8 +48,10 @@ type DynStream<T, E = anyhow::Error> =
 type ObjectStream = DynStream<(Uuid, Value)>;
 type SchemaObjectStream = DynStream<(ObjectIdPair, Value)>;
 type RowStream = DynStream<RowDefinition>;
+/// This type is not Sync because async_trait futures are not Sync.
+/// We require Sync in DynStream because it is requirement of tonic.
 type MaterializedChunksStream =
-    Pin<Box<dyn Stream<Item = anyhow::Result<MaterializedView>> + Send + 'static>>; // Why this cannot be Sync?
+    Pin<Box<dyn Stream<Item = anyhow::Result<MaterializedView>> + Send + 'static>>;
 type MaterializeStream = DynStream<RpcRowDefinition, tonic::Status>;
 
 #[derive(Serialize, Debug)]
@@ -64,14 +68,6 @@ pub struct RowDefinition {
     objects: HashSet<ObjectIdPair>,
     fields: HashMap<String, Value>,
 }
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
-pub struct ObjectIdPair {
-    pub schema_id: Uuid,
-    pub object_id: Uuid,
-}
-
-mod object_id_pair;
 
 impl ObjectBuilderImpl {
     pub async fn new(settings: &settings::Settings) -> anyhow::Result<Self> {

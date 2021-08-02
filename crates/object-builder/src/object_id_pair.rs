@@ -3,6 +3,13 @@ use serde::{
     de::{Error, Visitor},
     Deserializer, Serializer,
 };
+use uuid::Uuid;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
+pub struct ObjectIdPair {
+    pub schema_id: Uuid,
+    pub object_id: Uuid,
+}
 
 impl Serialize for ObjectIdPair {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
