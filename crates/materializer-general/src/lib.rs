@@ -113,7 +113,14 @@ impl GeneralMaterializer for MaterializerImpl {
         let instance =
             Arc::clone(&self.notification_publisher).and_message_body(&materialized_view);
 
-        let upsert_res = self.upsert_view_inner(materialized_view).await;
+        let upsert_res = self
+            .upsert_view_inner(materialized_view)
+            .await
+            .map_err(|err| {
+                tracing::error!("Materialization error` {:?}", err);
+                tonic::Status::internal(format!("{}", err))
+            });
+
         let notification_res = match upsert_res.as_ref() {
             Ok(()) => instance.notify("success").await,
             Err(e) => instance.notify(&format!("{:?}", e)).await,
@@ -138,25 +145,16 @@ impl MaterializerImpl {
     async fn upsert_view_inner(
         &self,
         materialized_view: MaterializedView,
-    ) -> Result<(), tonic::Status> {
+    ) -> Result<(), anyhow::Error> {
         tracing::debug!(?materialized_view, "materialized view");
 
-        let error_handler = |err| {
-            tracing::error!("Materialization error` {:?}", err);
-            tonic::Status::internal(format!("{}", err))
-        };
+        let view_id = materialized_view.view_id.parse()?;
 
-        let view_id = materialized_view
-            .view_id
-            .parse()
-            .map_err(anyhow::Error::from)
-            .map_err(error_handler)?;
-        let view_definition = self.view_cache.get(view_id).await.map_err(error_handler)?;
+        let view_definition = self.view_cache.get(view_id).await?;
 
         self.materializer
             .upsert_view(materialized_view, view_definition.clone())
-            .await
-            .map_err(error_handler)?;
+            .await?;
 
         Ok(())
     }
