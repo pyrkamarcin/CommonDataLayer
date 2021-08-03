@@ -31,8 +31,14 @@ namespace CDL.Tests.ServicesTests
         {
             var parentName = _fixture.Create<string>();
             var childName = _fixture.Create<string>();
-            var parentSchema = _schemaRegistryService.AddSchema(parentName, _fixture.Create<Person>().ToJSONString(), new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage }).Result;
-            var childSchema = _schemaRegistryService.AddSchema(childName, _fixture.Create<Car>().ToJSONString(), new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage }).Result;
+            var parentSchema = _schemaRegistryService.AddSchema(
+                parentName, 
+                _fixture.Create<Person>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var childSchema = _schemaRegistryService.AddSchema(
+                childName, 
+                _fixture.Create<Car>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
             var results = _edgeRegistryService.AddRelation(childSchema.Id_, parentSchema.Id_).Result;
             
             Assert.True(results.HasRelationId_);
@@ -43,8 +49,14 @@ namespace CDL.Tests.ServicesTests
         public void ListRelations()
         {     
             var relationListBefore = _edgeRegistryService.ListRelations().Result;
-            var parentSchema = _schemaRegistryService.AddSchema(_fixture.Create<string>(), _fixture.Create<Person>().ToJSONString(), new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage }).Result;
-            var childSchema = _schemaRegistryService.AddSchema(_fixture.Create<string>(), _fixture.Create<Car>().ToJSONString(), new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage }).Result;
+            var parentSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Person>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var childSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Car>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
             var relation = _edgeRegistryService.AddRelation(childSchema.Id_, parentSchema.Id_).Result;
             var relationListAfter = _edgeRegistryService.ListRelations().Result;
 
@@ -59,8 +71,14 @@ namespace CDL.Tests.ServicesTests
         [Fact]
         public void GetSchemaByRelation()
         {
-            var parentSchema = _schemaRegistryService.AddSchema(_fixture.Create<string>(), _fixture.Create<Person>().ToJSONString(), new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage }).Result;
-            var childSchema = _schemaRegistryService.AddSchema(_fixture.Create<string>(), _fixture.Create<Car>().ToJSONString(), new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage }).Result;
+            var parentSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Person>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var childSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Car>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
             var relation = _edgeRegistryService.AddRelation(childSchema.Id_, parentSchema.Id_).Result;
             var schemaFromRelation = _edgeRegistryService.GetSchemaByRelation(relation.RelationId_).Result;
 
@@ -76,8 +94,14 @@ namespace CDL.Tests.ServicesTests
             var objectIdForChildSchema = Guid.NewGuid().ToString();                
             var parentSchemaName = _fixture.Create<string>();
             var childSchemaName = _fixture.Create<string>();
-            var parentSchema = _schemaRegistryService.AddSchema(parentSchemaName, _fixture.Create<Person>().ToJSONString(), new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage }).Result;
-            var childSchema = _schemaRegistryService.AddSchema(childSchemaName, _fixture.Create<Car>().ToJSONString(), new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage }).Result;
+            var parentSchema = _schemaRegistryService.AddSchema(
+                parentSchemaName, 
+                _fixture.Create<Person>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var childSchema = _schemaRegistryService.AddSchema(
+                childSchemaName, 
+                _fixture.Create<Car>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
                         
             _kafkaProducer.Produce(new InsertObject()
             {
@@ -117,8 +141,14 @@ namespace CDL.Tests.ServicesTests
             var objectIdForChildSchema = Guid.NewGuid().ToString();                
             var parentSchemaName = _fixture.Create<string>();
             var childSchemaName = _fixture.Create<string>();
-            var parentSchema = _schemaRegistryService.AddSchema(parentSchemaName, _fixture.Create<Person>().ToJSONString(), new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage }).Result;
-            var childSchema = _schemaRegistryService.AddSchema(childSchemaName, _fixture.Create<Car>().ToJSONString(), new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage }).Result;
+            var parentSchema = _schemaRegistryService.AddSchema(
+                parentSchemaName, 
+                _fixture.Create<Person>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var childSchema = _schemaRegistryService.AddSchema(
+                childSchemaName, 
+                _fixture.Create<Car>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
                         
             _kafkaProducer.Produce(new InsertObject()
             {
@@ -157,8 +187,14 @@ namespace CDL.Tests.ServicesTests
         {          
             var parentSchemaName = _fixture.Create<string>();
             var childSchemaName = _fixture.Create<string>();
-            var parentSchema = _schemaRegistryService.AddSchema(parentSchemaName, _fixture.Create<Person>().ToJSONString(), new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage }).Result;
-            var childSchema = _schemaRegistryService.AddSchema(childSchemaName, _fixture.Create<Car>().ToJSONString(), new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage }).Result;       
+            var parentSchema = _schemaRegistryService.AddSchema(
+                parentSchemaName, 
+                _fixture.Create<Person>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var childSchema = _schemaRegistryService.AddSchema(
+                childSchemaName, 
+                _fixture.Create<Car>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;       
             var relation = _edgeRegistryService.AddRelation(childSchema.Id_, parentSchema.Id_).Result;
             var schemaRelations = _edgeRegistryService.GetSchemaRelations(parentSchema.Id_).Result;
 

@@ -19,16 +19,6 @@ Communication protocols:
 - gRPC with query-services (request-response)
 - gRPC with schema-registry (request-response)
 
-### Configuration (Environment Variables)
-
-| Name                 | Short Description                         | Example                      | Mandatory | Default |
-|----------------------|-------------------------------------------|------------------------------|-----------|---------|
-| INPUT_PORT           | Port to listen on                         | 50103                        | yes       |         |
-| SCHEMA_REGISTRY_ADDR | Address of schema registry gRPC API       | http://schema_registry:50101 | yes       |         |
-| CACHE_CAPACITY       | How many entries the cache can hold       | 1024                         | yes       |         |
-| METRICS_PORT         | Port to listen on for Prometheus requests | 51805                        | no        | 51805   |
-| RUST_LOG             | Log level                                 | `trace`                      | no        |         |
-
 ## Running
 To run the **query-router** requires the [Schema Registry][schema-registry] to be running and the [Query Services][query-service] or the [Timeseries Query Services][query-service-ts] connected to their respective repositories.
 

@@ -1,7 +1,4 @@
-# Materialization
-
-
-## Tutorial: How to materialize data in CDL
+# Tutorial: How to materialize data in CDL
 
 Tools used:
 

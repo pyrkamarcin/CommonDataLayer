@@ -73,20 +73,3 @@ Each entry in top level array represents one-to-many relation within `relation_i
 Such `relation_id` should be added beforehand, via gRPC api, between objects schemas.
 `ER` at this time does not validate correctness of inserted data, so it's up to user to ensure that `edges` and `relations` are configured properly.
 
-### Configuration (Environment variables)
-
-| Name              | Short Description                                 | Example           | Mandatory | Default  |
-|-------------------|---------------------------------------------------|-------------------|-----------|----------|
-| POSTGRES_USERNAME |                                                   | postgres          | yes       |          |
-| POSTGRES_PASSWORD |                                                   | 1234qwer          | yes       |          |
-| POSTGRES_HOST     |                                                   | 192.168.0.42      | yes       |          |
-| POSTGRES_PORT     |                                                   | 5432              | no        | 5432     |
-| POSTGRES_DBNAME   |                                                   | postgres          | yes       |          |
-| POSTGRES_SCHEMA   |                                                   | cdl               | no        | postgres |
-| RPC_PORT          | gRPC server port                                  | 50110             | no        | 50110    |
-| METRICS_PORT      | Port to listen on for Prometheus metrics          | 58105             | no        | 58105    |
-| STATUS_PORT       | Port exposing status of the application           | 3000              | no        | 3000     |
-| CONSUMER_METHOD   | MQ ingestion method, can be `kafka` or `rabbitmq` | kafka             | yes       |          |
-| CONSUMER_HOST     | Kafka broker or RabbitMQ host                     | 192.168.0.51:9092 | yes       |          |
-| CONSUMER_TAG      | Kafka group_id or RabbitMQ tag                    | cdl_edge_registry | yes       |          |
-| CONSUMER_SOURCE   | Kafka topic or RabbitMQ queue                     | cdl.egde.input    | yes       |          |

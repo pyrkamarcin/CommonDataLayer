@@ -19,19 +19,22 @@ namespace CDL.Tests.ServicesTests
         private QueryRouterService _queryService;
         private ITopicProducer<InsertObject> _kafkaProducer;
         private Fixture _fixture;
+        private EdgeRegistryService _edgeRegistryService;
 
         public MaterializationTests(
             OnDemandMaterializerService onDemandMaterializerService,
             SchemaRegistryService schemaRegistryService, 
             QueryRouterService queryService, 
             ITopicProducer<InsertObject> kafkaProducer, 
-            Fixture fixture)
+            Fixture fixture,
+            EdgeRegistryService edgeRegistryService)
         {
             _onDemandMaterializerService = onDemandMaterializerService;
             _schemaRegistryService = schemaRegistryService;
             _queryService = queryService;
             _kafkaProducer = kafkaProducer;
             _fixture = fixture;
+            _edgeRegistryService = edgeRegistryService;
         }
 
         [Fact]
@@ -49,8 +52,22 @@ namespace CDL.Tests.ServicesTests
             var objectId_a = Guid.NewGuid().ToString(); 
             var payload_a = _fixture.Create<Person>();
             var viewName = _fixture.Create<string>();            
-            var schema = _schemaRegistryService.AddSchema(name, _fixture.Create<GeneralObject>().ToJSONString(), new SchemaType() { SchemaType_ = SchemaType.Types.Type.DocumentStorage }).Result;
+            var schema_a = _schemaRegistryService.AddSchema(
+                name, 
+                _fixture.Create<GeneralObject>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
             var viewFields = new List<Simple>();
+            var relation = _edgeRegistryService.AddRelation(schema_a.Id_, schema_a.Id_).Result;
+            var relationForView = new List<Relation>();
+            
+            relationForView.Add(new Relation(){
+                GlobalId = relation.RelationId_,
+                LocalId = _fixture.Create<UInt32>(),
+                SearchFor = new SearchFor(){
+                    SearchFor_ = SearchFor.Types.Direction.Children,
+                }
+            });
+            
             viewFields.Add(new Simple()
                 {
                     simple = new SimpleItem()
@@ -67,19 +84,19 @@ namespace CDL.Tests.ServicesTests
                         field_type = "String" 
                     }
                 });
-            var view = _schemaRegistryService.AddViewToSchema(schema.Id_, viewName, viewFields, true).Result;
+            var view = _schemaRegistryService.AddViewToSchema(schema_a.Id_, viewName, viewFields, new List<Relation>()).Result;
             var viewDetails = _schemaRegistryService.GetView(view.Id_).Result;
-            var schemaWithView = _schemaRegistryService.GetFullSchema(schema.Id_).Result;
+            var schemaWithView = _schemaRegistryService.GetFullSchema(schema_a.Id_).Result;
             Assert.True(schemaWithView.Views.Count == 1);
             
             await _kafkaProducer.Produce(new InsertObject()
             {
-                schemaId = schema.Id_,
+                schemaId = schema_a.Id_,
                 objectId = objectId_a,
                 data = payload_a
             });
 
-            var res = _onDemandMaterializerService.Materialize(view.Id_, schema.Id_, new List<string>(){
+            var res = _onDemandMaterializerService.Materialize(view.Id_, schema_a.Id_, new List<string>(){
                 objectId_a,
             });
 
