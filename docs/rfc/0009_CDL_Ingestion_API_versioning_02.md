@@ -69,7 +69,7 @@ This feature must be revisited when encryption and compression of incoming strea
 
 #####  References:
 Parent RFC:
-[CDLF-00010-00-rfc-01](CDLF-00010-00-rfc-01.md)
+[Version 1.0](0005_CDL_Ingestion_API_versioning_01.md)
 
 CDL :
 [CDL project](https://github.com/epiphany-platform/CommonDataLayer)

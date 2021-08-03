@@ -32,30 +32,3 @@ eg.:
 627f84c7-d9f0-4665-b54d-2fcb5422ce02
 ```
 
-### Configuration (Environment variables)
-
-| Name                 | Short Description                                 | Example                      | Mandatory | Default |
-|----------------------|---------------------------------------------------|------------------------------|-----------|---------|
-| INPUT_PORT           | gRPC server port                                  | 50110                        | yes       |         |
-| METRICS_PORT         | Port to listen on for Prometheus metrics          | 58105                        | no        | 58105   |
-| STATUS_PORT          | Port exposing status of the application           | 3000                         | no        | 3000    |
-| MQ_METHOD            | MQ ingestion method, can be `kafka` or `rabbitmq` | kafka                        | no        |         |
-| SCHEMA_REGISTRY_ADDR | Address of schema registry gRPC API               | http://schema_registry:50101 | yes       |         |
-
-#### Kafka Configuration 
-*(if `MQ_METHOD` equals `kafka`)*
-
-| Name           | Short Description        | Example               | Mandatory | Default |
-|----------------|--------------------------|-----------------------|-----------|---------|
-| KAFKA_BROKERS  | Address of Kafka brokers | `kafka:9093`          | yes       |         |
-| KAFKA_GROUP_ID | Group ID of the consumer | `schema_registry`     | yes       |         |
-| MQ_SOURCE      | Topic                    | `cdl.materialization` | yes       |         |
-
-#### AMQP Configuration 
-*(if `MQ_METHOD` equals `amqp`)*
-
-| Name                   | Short Description             | Example                                  | Mandatory | Default |
-|------------------------|-------------------------------|------------------------------------------|-----------|---------|
-| AMQP_CONNECTION_STRING | Connection URL to AMQP Server | `amqp://user:CHANGEME@rabbitmq:5672/%2f` | yes       |         |
-| AMQP_CONSUMER_TAG      | Consumer tag                  | `schema_registry`                        | yes       |         |
-| MQ_SOURCE              | Queue name                    | `cdl.materialization`                    | yes       |         |

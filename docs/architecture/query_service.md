@@ -24,28 +24,6 @@ Query methods:
 Communication protocols:
 - database specific
 
-### Configuration (Environment Variables)
-
-| Name         | Short Description                         | Example | Mandatory | Default |
-|--------------|-------------------------------------------|---------|-----------|---------|
-| INPUT_PORT   | Port to listen on                         | 50103   | yes       |         |
-| METRICS_PORT | Port to listen on for Prometheus requests | 51805   | no        | 51805   |
-| RUST_LOG     | Log level                                 | `trace` | no        |         |
-
-#### Postgres Configuration
-
-| Name              | Short Description                | Example     | Mandatory | Default  |
-|-------------------|----------------------------------|-------------|-----------|----------|
-| POSTGRES_USERNAME | Username                         | `cdl`       | yes       |          |
-| POSTGRES_PASSWORD | Password                         | `cdl1234`   | yes       |          |
-| POSTGRES_HOST     | Host of the server               | `127.0.0.1` | yes       |          |
-| POSTGRES_PORT     | Port on which the server listens | 5432        | yes       |          |
-| POSTGRES_DBNAME   | Database name                    | `cdl`       | yes       |          |
-| POSTGRES_SCHEMA   | SQL Schema available for service | `cdl`       | no        | `public` |
-
-See an example [configuration][configuration] of deployment of data router and other services. 
-
 [grpc]: https://grpc.io/docs/what-is-grpc/introduction/
 [schema-registry]: schema_registry.md
-[configuration]: ../deployment/index.md
 [proto]: https://github.com/epiphany-platform/CommonDataLayer/tree/develop/crates/rpc/proto
