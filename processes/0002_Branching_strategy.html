@@ -1,0 +1,289 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Branhing strategy - The Common Data Layer</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="../favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="../favicon.png">
+        
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        
+        <link rel="stylesheet" href="../css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="../fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> Common Data Layer</a></li><li class="chapter-item expanded "><a href="../how_it_works.html"><strong aria-hidden="true">2.</strong> How does it work</a></li><li class="chapter-item expanded "><a href="../getting_started.html"><strong aria-hidden="true">3.</strong> Getting Started</a></li><li class="chapter-item expanded "><a href="../deployment/index.html"><strong aria-hidden="true">4.</strong> Deployment</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../deployment/local/index.html"><strong aria-hidden="true">4.1.</strong> Local deployment</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../deployment/local/docker-compose.html"><strong aria-hidden="true">4.1.1.</strong> docker-compose</a></li><li class="chapter-item expanded "><a href="../deployment/local/helm.html"><strong aria-hidden="true">4.1.2.</strong> Helm</a></li></ol></li><li class="chapter-item expanded "><a href="../deployment/production/index.html"><strong aria-hidden="true">4.2.</strong> Production-grade deployment</a></li></ol></li><li class="chapter-item expanded "><a href="../schemas_and_views.html"><strong aria-hidden="true">5.</strong> Schemas and Views</a></li><li class="chapter-item expanded "><a href="../examples/index.html"><strong aria-hidden="true">6.</strong> Examples</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../examples/materialization.html"><strong aria-hidden="true">6.1.</strong> Materialization</a></li></ol></li><li class="chapter-item expanded "><a href="../features/index.html"><strong aria-hidden="true">7.</strong> Features</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../features/ordering.html"><strong aria-hidden="true">7.1.</strong> Message ordering</a></li><li class="chapter-item expanded "><a href="../features/client_routing.html"><strong aria-hidden="true">7.2.</strong> Client routing</a></li></ol></li><li class="chapter-item expanded "><a href="../processes/index.html"><strong aria-hidden="true">8.</strong> Processes</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../processes/0001_Commit_message_formalization_and_enforcement.html"><strong aria-hidden="true">8.1.</strong> Commit message formalization and enforcement</a></li><li class="chapter-item expanded "><a href="../processes/0002_Branching_strategy.html" class="active"><strong aria-hidden="true">8.2.</strong> Branhing strategy</a></li><li class="chapter-item expanded "><a href="../processes/0003_Documentation_structure_and_RFC_process.html"><strong aria-hidden="true">8.3.</strong> Documentation structure and RFC process</a></li></ol></li><li class="chapter-item expanded "><a href="../versioning.html"><strong aria-hidden="true">9.</strong> Versioning</a></li><li class="chapter-item expanded "><a href="../protocol.html"><strong aria-hidden="true">10.</strong> Protocol schema</a></li><li class="chapter-item expanded "><a href="../benchmarks.html"><strong aria-hidden="true">11.</strong> Benchmarks</a></li><li class="chapter-item expanded "><a href="../architecture/index.html"><strong aria-hidden="true">12.</strong> Architecture</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/management.html"><strong aria-hidden="true">12.1.</strong> Management Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/cli.html"><strong aria-hidden="true">12.1.1.</strong> CLI</a></li><li class="chapter-item expanded "><a href="../architecture/web_admin.html"><strong aria-hidden="true">12.1.2.</strong> Admin Web Panel</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/api.html"><strong aria-hidden="true">12.2.</strong> GraphQL API</a></li><li class="chapter-item expanded "><a href="../architecture/configuration.html"><strong aria-hidden="true">12.3.</strong> Configuration Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/schema_registry.html"><strong aria-hidden="true">12.3.1.</strong> Schema Registry</a></li><li class="chapter-item expanded "><a href="../architecture/leader_elector.html"><strong aria-hidden="true">12.3.2.</strong> Leader Elector</a></li><li class="chapter-item expanded "><a href="../architecture/edge_registry.html"><strong aria-hidden="true">12.3.3.</strong> Edge Registry</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/ingestion.html"><strong aria-hidden="true">12.4.</strong> Ingestion Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/data_router.html"><strong aria-hidden="true">12.4.1.</strong> Data Router</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/storage.html"><strong aria-hidden="true">12.5.</strong> Storage Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/command_service.html"><strong aria-hidden="true">12.5.1.</strong> Command Service</a></li><li class="chapter-item expanded "><a href="../architecture/db_shrinker_storage.html"><strong aria-hidden="true">12.5.2.</strong> Db Shrinker Storage</a></li><li class="chapter-item expanded "><a href="../architecture/query_service.html"><strong aria-hidden="true">12.5.3.</strong> Query Service</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">12.6.</strong> Materialization Layer</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/object_builder.html"><strong aria-hidden="true">12.6.1.</strong> Object Builder</a></li><li class="chapter-item expanded "><a href="../architecture/partial_update_engine.html"><strong aria-hidden="true">12.6.2.</strong> Partial Update Engine</a></li><li class="chapter-item expanded "><a href="../architecture/materializer_general.html"><strong aria-hidden="true">12.6.3.</strong> General Materializer</a></li><li class="chapter-item expanded "><a href="../architecture/materializer_ondemand.html"><strong aria-hidden="true">12.6.4.</strong> On Demand Materializer</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/retrieval.html"><strong aria-hidden="true">12.7.</strong> Retrieval Layer</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../architecture/query_router.html"><strong aria-hidden="true">12.7.1.</strong> Query Router</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture/utils.html"><strong aria-hidden="true">12.8.</strong> Utils</a></li></ol></li><li class="chapter-item expanded "><a href="../configuration/index.html"><strong aria-hidden="true">13.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../configuration/api.html"><strong aria-hidden="true">13.1.</strong> api</a></li><li class="chapter-item expanded "><a href="../configuration/command-service.html"><strong aria-hidden="true">13.2.</strong> command-service</a></li><li class="chapter-item expanded "><a href="../configuration/data-router.html"><strong aria-hidden="true">13.3.</strong> data-router</a></li><li class="chapter-item expanded "><a href="../configuration/edge-registry.html"><strong aria-hidden="true">13.4.</strong> edge-registry</a></li><li class="chapter-item expanded "><a href="../configuration/materializer-general.html"><strong aria-hidden="true">13.5.</strong> materializer-general</a></li><li class="chapter-item expanded "><a href="../configuration/materializer-ondemand.html"><strong aria-hidden="true">13.6.</strong> materializer-ondemand</a></li><li class="chapter-item expanded "><a href="../configuration/object-builder.html"><strong aria-hidden="true">13.7.</strong> object-builder</a></li><li class="chapter-item expanded "><a href="../configuration/partial-update-engine.html"><strong aria-hidden="true">13.8.</strong> partial-update-engine</a></li><li class="chapter-item expanded "><a href="../configuration/query-router.html"><strong aria-hidden="true">13.9.</strong> query-router</a></li><li class="chapter-item expanded "><a href="../configuration/query-service.html"><strong aria-hidden="true">13.10.</strong> query-service</a></li><li class="chapter-item expanded "><a href="../configuration/query-service-ts.html"><strong aria-hidden="true">13.11.</strong> query-service-ts</a></li><li class="chapter-item expanded "><a href="../configuration/schema-registry.html"><strong aria-hidden="true">13.12.</strong> schema-registry</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">14.</strong> RFCs</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">14.1.</strong> 0021 - Development process</div></li><li class="chapter-item expanded "><div><strong aria-hidden="true">14.2.</strong> 0020 - Configuration service</div></li><li class="chapter-item expanded "><a href="../rfc/0019_Simplify_Schema_Definitions_01.html"><strong aria-hidden="true">14.3.</strong> 0019 - Simplify Schema Definitions</a></li><li class="chapter-item expanded "><a href="../rfc/0018_Transport_headers_passthrough_01.html"><strong aria-hidden="true">14.4.</strong> 0018 - Transport headers passthrough</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">14.5.</strong> 0017 - Edge Registry: Resolving relation trees</div></li><li class="chapter-item expanded "><div><strong aria-hidden="true">14.6.</strong> 0015 - CI/CD setup R&amp;D</div></li><li class="chapter-item expanded "><a href="../rfc/0014_Query_raw_routes_01.html"><strong aria-hidden="true">14.7.</strong> 0014 - Query raw routes</a></li><li class="chapter-item expanded "><a href="../rfc/0013_Documentation_restructure_and_RFC_process_01.html"><strong aria-hidden="true">14.8.</strong> 0013 - Documentation restructure and RFC process</a></li><li class="chapter-item expanded "><a href="../rfc/0012_CDL_documentation_generation_01.html"><strong aria-hidden="true">14.9.</strong> 0012 - CDL Documentation Generation</a></li><li class="chapter-item expanded "><a href="../rfc/0011_Branching_strategy_01.html"><strong aria-hidden="true">14.10.</strong> 0011 - Branching strategy</a></li><li class="chapter-item expanded "><a href="../rfc/0010_Schema_Registry_less_CDL_deployment_01.html"><strong aria-hidden="true">14.11.</strong> 0010 - Schema-Registry-less CDL deployment</a></li><li class="chapter-item expanded "><a href="../rfc/0008_CDL_publishing_deployment_configurations_01.html"><strong aria-hidden="true">14.12.</strong> 0008 - CDL publishing deployment configurations</a></li><li class="chapter-item expanded "><a href="../rfc/0009_CDL_Ingestion_API_versioning_02.html"><strong aria-hidden="true">14.13.</strong> 0009 - CdlIM Versioning 2.0</a></li><li class="chapter-item expanded "><a href="../rfc/0007_Materialized_views_01.html"><strong aria-hidden="true">14.14.</strong> 0007 - Materialized Views</a></li><li class="chapter-item expanded "><a href="../rfc/0006_Edge_registry_01.html"><strong aria-hidden="true">14.15.</strong> 0006 - Edge Registry</a></li><li class="chapter-item expanded "><a href="../rfc/0005_CDL_Ingestion_API_versioning_01.html"><strong aria-hidden="true">14.16.</strong> 0005 - CdlIM Versioning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../rfc/0009_CDL_Ingestion_API_versioning_02.html"><strong aria-hidden="true">14.16.1.</strong> 0009 - CdlIM Versioning 2.0</a></li></ol></li><li class="chapter-item expanded "><a href="../rfc/0004_Commit_message_formalization_and_enforcement_01.html"><strong aria-hidden="true">14.17.</strong> 0004 - Commit message formalization</a></li><li class="chapter-item expanded "><a href="../rfc/0003_Usage_of_Message_Pack_format_as_CDL_input_01.html"><strong aria-hidden="true">14.18.</strong> 0003 - MessagePack support</a></li><li class="chapter-item expanded "><a href="../rfc/0002_Materialization_01.html"><strong aria-hidden="true">14.19.</strong> 0002 - Materialization - Overview</a></li><li class="chapter-item expanded "><a href="../rfc/0001_Alternative_communication_method_01.html"><strong aria-hidden="true">14.20.</strong> 0001 - Alternative communication method</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">The Common Data Layer</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/epiphany-platform/CommonDataLayer" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#branching-strategy" id="branching-strategy">Branching strategy</a></h1>
+<pre><code>=========================================================
+shortened version is available at the end of the document
+=========================================================
+</code></pre>
+<h1><a class="header" href="#glossary" id="glossary">Glossary</a></h1>
+<ul>
+<li>Release Branch - A fork originating from the development branch, marking the point in time, in which a feature set is frozen, and an official release is made.</li>
+<li>Development Branch - The main, active branch to which all code that is currently worked on is merged. Only developer releases (a.k.a. release candidates) can be done from this main branch.</li>
+<li>MAJOR,MINOR,PATCH - The standard notation for semantic versioning. The triplet represents three main categories of versions: major release, minor release, and patches. The importance of the version section decreases from left to right. Additionally, a bump in a specific category resets everything in categories to the right to 0.</li>
+<li>Release - A fixed build of either the release branch or development branch that is then published for public usage.</li>
+</ul>
+<h1><a class="header" href="#description" id="description">Description</a></h1>
+<p>If we consider a release to be a collection of features added since a prior release, our goal in producing releases, is to provide releases using the GitHub releases feature that are accessible to end users, as well as maintaining a means by which we can conveniently and correctly provided patches for said releases.</p>
+<p>The branching strategy is a combination of the two most popular means for making releases: making and maintaining release branches, and tagging commits in those branches.</p>
+<p>When a release is planned, the next branch should be created (sprouted from the common development branch) with name based on the major and minor versions only for the release family (e.g. v1.3).
+First, all the features should be completed and then merged into develop. Develop should then be frozen and prepared for next release. A release branch should be then created from the tip of the freeze (if any last-minute fixes are applied).
+If a feature is planned but not delivered in time before the freeze, then afterward the freeze not delivered changes should not be committed (only last-minute fixes to existing ones), until release branch is created, main branch is treated as one and it can not get new features. Additionally, a release branch's origin cannot be moved after creation and features cannot be cherry-picked or merged afterward.</p>
+<p>After the release branch is created, all further development will proceed on development branch simultaneously. That means, if the release deadline will be missed by a developers, freeze does not have to wait for the feature development to release. That also means that no new features can be committed to the released branch, only patches and/or bug fixes.</p>
+<h2><a class="header" href="#bugfixes" id="bugfixes">Bugfixes</a></h2>
+<p>When bug fixes are required to fix incorrect behavior in a release. However, the incorrect behavior can also be present on the develop branch. If the code exists in develop, then a bug fix change PR should be made, tested, and squashed and merged to develop. The squashed commit should then be cherry-picked to all relevant and supported branches, resulting in a bump of the version's PATCH number.</p>
+<p>If the issue only affects the release code and no longer affects develop code, or the patch is not feasible for cherry-picking (refactored code, too many changes in history etc.) the bug fix PR can be squashed and merged directly to the version branch without needing to cherry-pick from develop.</p>
+<p>If the issue affects both development branch and supported release branch(es), but the fix is not feasible to be cherry-picked due to large amount of non-forwardable changes, then fix should be done for each release branch separately from develop, and, if appliable, also introduced to develop.</p>
+<h2><a class="header" href="#version-branch-lifetime" id="version-branch-lifetime">Version Branch Lifetime</a></h2>
+<p>Release branches have to be supported long term (term will be defined per-case). For example, if we support any release for 6 months, that branch must be kept open for any potential bug fixes that need to be added. When the version is no longer supported, the branch can be marked as obsolete and no further updates to this branch are unlikely to happen. Release branches should not be deleted, overwritten nor squashed.</p>
+<p>A set time should be decided for support for all versions generally, though 6 months is a good placeholder for the time being, although, prolonged support may be requested, and therefore it may be necessary to facilitate it.</p>
+<p>Currently, we are responsible for keeping 3 last releases in support pipeline. That means 3 quarters or 9 months of releases. Additionally, please keep in mind that RC releases are preview branches and do not have to be supported nor fixes for those are a priority.</p>
+<h1><a class="header" href="#tldr" id="tldr">TL;DR</a></h1>
+<p>This document is describing what is called, <code>scaled trunk based development</code> and many materials are freely available online in different sources.
+This document however introduces and specifies how tagging and release preparations should look like. Besides that, everything should be 1:1 with official documentation about the process.</p>
+<h3><a class="header" href="#patch-versioning" id="patch-versioning">Patch Versioning</a></h3>
+<ul>
+<li>Patches will result in a bump of the current version's PATCH number on the affected release branch.</li>
+<li>Patches will not result in bump in development (release candidates).</li>
+</ul>
+<h3><a class="header" href="#patch-application" id="patch-application">Patch Application</a></h3>
+<ul>
+<li>If the development branch is affected, the patch should be fixed and changes should be pushed to the development branch.</li>
+<li>If the supported release branch is also affected by the proposed patch... (to the developer's discretion):
+<ul>
+<li>... and the fix is easily applicable, it should be cherry-picked from develop to release branch.</li>
+<li>... but the resulting fix is not easy to forward to the release branch (i.e. missing refactor, changes in history, conflicting features, etc), the fix has to be crafted and applied manually for each branch.</li>
+</ul>
+</li>
+</ul>
+<h3><a class="header" href="#branch-tagging" id="branch-tagging">Branch Tagging</a></h3>
+<ul>
+<li>The tip of the release branch will be tagged by its (MAJOR,MINOR) tag.</li>
+<li>Each patch will additionally introduce a build tagged with (MAJOR.MINOR.PATCH).</li>
+<li>The development branch will carry release candidate builds (RC), tagged as (MAJOR.MINOR.0-rcXX) where XX is a sequential, increment-only value, and (MAJOR.MINOR) are taken from the upcoming release.</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../processes/0001_Commit_message_formalization_and_enforcement.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../processes/0003_Documentation_structure_and_RFC_process.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../processes/0001_Commit_message_formalization_and_enforcement.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="../processes/0003_Documentation_structure_and_RFC_process.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
