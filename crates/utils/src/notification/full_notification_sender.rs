@@ -73,11 +73,11 @@ where
 #[async_trait::async_trait]
 impl<T, S> NotificationService for FullNotificationSender<T, S>
 where
-    T: IntoSerialize<S> + Send + Sync + 'static,
+    T: IntoSerialize<S> + Send + Sync + 'static + Clone,
     S: Serialize + Send + Sync + 'static,
 {
-    async fn notify(self: Box<Self>, description: &str) -> anyhow::Result<()> {
-        let serialize = self.msg.into_serialize();
+    async fn notify(self: Arc<Self>, description: &str) -> anyhow::Result<()> {
+        let serialize = self.msg.clone().into_serialize();
 
         trace!(
             "Notification `{}` - `{}`",

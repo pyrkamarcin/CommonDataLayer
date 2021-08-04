@@ -410,7 +410,8 @@ namespace CDL.Tests.ServicesTests
 
             while (await materializedViewAfterUpdate.ResponseStream.MoveNext(new System.Threading.CancellationToken()))
             {
-                Assert.True(materializedViewAfterUpdate.ResponseStream.Current.Fields.Count == 3);
+
+                Assert.Equal(materializedViewAfterUpdate.ResponseStream.Current.Fields.Count, 3);
                 Assert.Contains(payload_a.FirstName, materializedViewAfterUpdate.ResponseStream.Current.Fields["firstName"]);
                 Assert.Contains(payload_a.LastName, materializedViewAfterUpdate.ResponseStream.Current.Fields["lastName"]);
                 Assert.Contains(payload_a.Birthday.ToString("s"), materializedViewAfterUpdate.ResponseStream.Current.Fields["birthday"]);

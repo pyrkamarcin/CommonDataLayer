@@ -1,6 +1,9 @@
 input_port = 50107
 chunk_capacity = 100
 
+[notifications]
+enabled = true
+
 [kafka]
 group_id = "object_builder"
 ingest_topic = "cdl.materialize"

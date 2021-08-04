@@ -394,7 +394,7 @@ impl TryFromRpc<rpc::schema_registry::FullView> for FullView {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default, Clone)]
 pub struct Request {
     pub view_id: Uuid,
     pub schemas: HashMap<Uuid, Schema>,
@@ -409,7 +409,7 @@ impl Request {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default, Clone)]
 pub struct Schema {
     pub object_ids: HashSet<Uuid>,
 }

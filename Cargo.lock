@@ -2200,6 +2200,7 @@ dependencies = [
  "bb8",
  "cdl_dto",
  "communication_utils",
+ "derive_more",
  "futures",
  "itertools 0.10.1",
  "maplit",

@@ -87,14 +87,6 @@ impl MaterializerImpl {
     }
 }
 
-impl MaterializerImpl {
-    fn validate_options_inner(&self, options: &str) -> anyhow::Result<()> {
-        let options: serde_json::Value = serde_json::from_str(options)?;
-        self.materializer.validate_options(options)?;
-        Ok(())
-    }
-}
-
 #[tonic::async_trait]
 impl GeneralMaterializer for MaterializerImpl {
     #[tracing::instrument(skip(self))]
@@ -117,30 +109,53 @@ impl GeneralMaterializer for MaterializerImpl {
         request: tonic::Request<MaterializedView>,
     ) -> Result<tonic::Response<Empty>, tonic::Status> {
         let materialized_view = request.into_inner();
-        tracing::debug!(?materialized_view, "materialized view");
-
-        let error_handler = |err| {
-            tracing::error!("Materialization error` {:?}", err);
-            tonic::Status::internal(format!("{}", err))
-        };
-
-        let view_id = materialized_view
-            .view_id
-            .parse()
-            .map_err(anyhow::Error::from)
-            .map_err(error_handler)?;
-        let view_definition = self.view_cache.get(view_id).await.map_err(error_handler)?;
 
         let instance =
             Arc::clone(&self.notification_publisher).and_message_body(&materialized_view);
 
-        self.materializer
-            .upsert_view(materialized_view, view_definition.clone())
+        let upsert_res = self
+            .upsert_view_inner(materialized_view)
             .await
-            .map_err(error_handler)?;
-        if let Err(err) = instance.notify("success").await {
+            .map_err(|err| {
+                tracing::error!("Materialization error` {:?}", err);
+                tonic::Status::internal(format!("{}", err))
+            });
+
+        let notification_res = match upsert_res.as_ref() {
+            Ok(()) => instance.notify("success").await,
+            Err(e) => instance.notify(&format!("{:?}", e)).await,
+        };
+
+        if let Err(err) = notification_res {
             tracing::error!("Failed to send notification {:?}", err)
         }
-        Ok(tonic::Response::new(Empty {}))
+
+        upsert_res.map(|_| tonic::Response::new(Empty {}))
+    }
+}
+
+impl MaterializerImpl {
+    fn validate_options_inner(&self, options: &str) -> anyhow::Result<()> {
+        let options: serde_json::Value = serde_json::from_str(options)?;
+        self.materializer.validate_options(options)?;
+        Ok(())
+    }
+
+    #[tracing::instrument(skip(self))]
+    async fn upsert_view_inner(
+        &self,
+        materialized_view: MaterializedView,
+    ) -> Result<(), anyhow::Error> {
+        tracing::debug!(?materialized_view, "materialized view");
+
+        let view_id = materialized_view.view_id.parse()?;
+
+        let view_definition = self.view_cache.get(view_id).await?;
+
+        self.materializer
+            .upsert_view(materialized_view, view_definition.clone())
+            .await?;
+
+        Ok(())
     }
 }

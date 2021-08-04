@@ -1,8 +1,10 @@
+use ::utils::notification::NotificationPublisher;
 use async_trait::async_trait;
 use bb8::Pool;
 use cdl_dto::{edges::RelationTree, materialization};
 use communication_utils::{consumer::ConsumerHandler, message::CommunicationMessage};
 use futures::{future::ready, Stream, StreamExt, TryStreamExt};
+use itertools::Itertools;
 use metrics_utils::{self as metrics, counter};
 use row_builder::RowBuilder;
 use rpc::common::{Object, RowDefinition as RpcRowDefinition};
@@ -17,6 +19,7 @@ use tracing_futures::Instrument;
 use uuid::Uuid;
 
 use crate::{buffer_stream::ObjectBufferedStream, view_plan::ViewPlan};
+use object_id_pair::ObjectIdPair;
 use rpc::edge_registry::{EdgeRegistryConnectionManager, EdgeRegistryPool};
 use rpc::schema_registry::{SchemaRegistryConnectionManager, SchemaRegistryPool};
 
@@ -27,6 +30,7 @@ mod utils;
 mod buffer_stream;
 mod view_plan;
 
+mod object_id_pair;
 mod row_builder;
 mod sources;
 
@@ -34,6 +38,7 @@ mod sources;
 pub struct ObjectBuilderImpl {
     sr_pool: SchemaRegistryPool,
     er_pool: EdgeRegistryPool,
+    report_sender: NotificationPublisher<materialization::Request>,
     chunk_capacity: usize,
 }
 
@@ -43,7 +48,10 @@ type DynStream<T, E = anyhow::Error> =
 type ObjectStream = DynStream<(Uuid, Value)>;
 type SchemaObjectStream = DynStream<(ObjectIdPair, Value)>;
 type RowStream = DynStream<RowDefinition>;
-type MaterializedChunksStream = DynStream<MaterializedView>;
+/// This type is not Sync because async_trait futures are not Sync.
+/// We require Sync in DynStream because it is requirement of tonic.
+type MaterializedChunksStream =
+    Pin<Box<dyn Stream<Item = anyhow::Result<MaterializedView>> + Send + 'static>>;
 type MaterializeStream = DynStream<RpcRowDefinition, tonic::Status>;
 
 #[derive(Serialize, Debug)]
@@ -61,70 +69,6 @@ pub struct RowDefinition {
     fields: HashMap<String, Value>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
-pub struct ObjectIdPair {
-    pub schema_id: Uuid,
-    pub object_id: Uuid,
-}
-
-mod object_id_pair {
-    use super::*;
-    use serde::{
-        de::{Error, Visitor},
-        Deserializer, Serializer,
-    };
-
-    impl Serialize for ObjectIdPair {
-        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: Serializer,
-        {
-            serializer.serialize_str(&format!("{},{}", self.schema_id, self.object_id))
-        }
-    }
-
-    impl<'de> Deserialize<'de> for ObjectIdPair {
-        fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where
-            D: Deserializer<'de>,
-        {
-            struct Helper;
-
-            impl<'de> Visitor<'de> for Helper {
-                type Value = ObjectIdPair;
-
-                fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-                    write!(formatter, "two UUID separated by single comma")
-                }
-
-                fn visit_str<E: Error>(self, value: &str) -> Result<ObjectIdPair, E> {
-                    let mut split = value.split(',');
-                    let schema_id = split.next();
-                    let object_id = split.next();
-                    let rest = split.next();
-
-                    match (schema_id, object_id, rest) {
-                        (Some(schema_id), Some(object_id), None) => {
-                            let schema_id = Uuid::parse_str(schema_id)
-                                .map_err(|e| E::custom(format!("{}", e)))?;
-                            let object_id = Uuid::parse_str(object_id)
-                                .map_err(|e| E::custom(format!("{}", e)))?;
-
-                            Ok(ObjectIdPair {
-                                schema_id,
-                                object_id,
-                            })
-                        }
-                        _ => Err(E::custom("Expected two UUID separated by single comma")),
-                    }
-                }
-            }
-
-            deserializer.deserialize_str(Helper)
-        }
-    }
-}
-
 impl ObjectBuilderImpl {
     pub async fn new(settings: &settings::Settings) -> anyhow::Result<Self> {
         let sr_pool = Pool::builder()
@@ -140,9 +84,20 @@ impl ObjectBuilderImpl {
             })
             .await
             .unwrap();
+
+        let report_sender = settings
+            .notifications
+            .publisher(
+                || async { settings.publisher().await },
+                settings.communication_method.to_string(),
+                "ObjectBuilder",
+            )
+            .await?;
+
         Ok(Self {
             sr_pool,
             er_pool,
+            report_sender,
             chunk_capacity: settings.chunk_capacity,
         })
     }
@@ -282,20 +237,38 @@ impl ObjectBuilderImpl {
         let view = self.get_view(view_id).await?;
         tracing::debug!(?view, "View");
 
+        let report_sender = self.report_sender.clone().and_message_body(&request);
+
         let rows = self.build_rows(request).await?;
         let rows = rows.chunks(self.chunk_capacity);
 
-        let chunks = rows.map(move |rows: Vec<anyhow::Result<RowDefinition>>| {
-            let rows: Vec<RowDefinition> = rows.into_iter().collect::<anyhow::Result<_>>()?;
+        let chunks = rows
+            .map(Ok)
+            .and_then(move |rows: Vec<anyhow::Result<RowDefinition>>| {
+                let options = view.materializer_options.clone();
+                let report_sender = report_sender.clone();
+                async move {
+                    let (rows, errors): (Vec<RowDefinition>, Vec<String>) = rows
+                        .into_iter()
+                        .map(|r| r.map_err(|e| format!("Could not build a row: {:?}", e)))
+                        .partition_result();
 
-            let materialized = MaterializedView {
-                view_id,
-                options: view.materializer_options.clone(),
-                rows,
-            };
+                    for error in errors.into_iter() {
+                        tracing::error!("Could not materialize row: {}", error);
+                        /*
+                        If we cannot send notification about an error,
+                        it is critical failure and we cannot continue processing materialization.
+                        */
+                        report_sender.clone().notify(error.as_str()).await?;
+                    }
 
-            Ok(materialized)
-        });
+                    Ok(MaterializedView {
+                        view_id,
+                        options,
+                        rows,
+                    })
+                }
+            });
 
         let stream = Box::pin(chunks) as MaterializedChunksStream;
 

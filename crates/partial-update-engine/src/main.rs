@@ -48,6 +48,7 @@ struct ServicesSettings {
 }
 
 #[derive(Deserialize, Debug, PartialEq, Eq, Hash)]
+#[allow(clippy::enum_variant_names)]
 #[serde(untagged)]
 enum PartialNotification {
     CommandServiceNotification(CommandServiceNotification),
@@ -110,10 +111,14 @@ async fn main() -> anyhow::Result<()> {
         // TODO: configure max items per batch(?) - otherwise we won't start view recalculation if messages are sent more often then timeout
         match message_stream.try_next().await {
             Ok(opt_message) => match opt_message {
-                Some(message) => {
-                    let (partition, offset) = new_notification(&mut changes, message?)?;
-                    offsets.insert(partition, offset);
-                }
+                Some(message) => match new_notification(&mut changes, message?) {
+                    Ok((partition, offset)) => {
+                        offsets.insert(partition, offset);
+                    }
+                    Err(error) => {
+                        tracing::error!(?error, "Could not deserialize notification");
+                    }
+                },
                 None => {
                     process_changes(&producer, &settings, &mut changes).await?;
                     acknowledge_messages(
@@ -160,7 +165,7 @@ fn new_notification(
         .ok_or_else(|| anyhow::anyhow!("Message has no payload"))??;
 
     let notification: PartialNotification = serde_json::from_str(payload)?;
-    trace!("new notification {:#?}", notification);
+    trace!(?notification, "new notification");
     changes.insert(notification);
     let partition = message.partition();
     let offset = message.offset();

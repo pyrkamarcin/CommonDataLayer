@@ -3,7 +3,7 @@ cache_capacity = 1000
 
 [notifications]
 enabled = true
-destination = "cdl.materialization.reports"
+destination = "cdl.reports"
 
 [monitoring]
 otel_service_name = "materializer-general"
