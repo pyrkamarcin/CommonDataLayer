@@ -12,6 +12,7 @@ using Xunit;
 using System.Linq;
 using CDL.Tests.Configuration;
 using Microsoft.Extensions.Options;
+using System.Threading;
 
 namespace CDL.Tests.ServicesTests
 {
@@ -367,12 +368,14 @@ namespace CDL.Tests.ServicesTests
             var schemaWithView = _schemaRegistryService.GetFullSchema(schema_a.Id_).Result;
             Assert.True(schemaWithView.Views.Count == 1);
             
-            await _kafkaProducer.Produce(new InsertObject()
+            _kafkaProducer.Produce(new InsertObject()
             {
                 schemaId = schema_a.Id_,
                 objectId = objectId_a,
                 data = payload_a
-            });
+            }).Wait();
+
+            Thread.Sleep(1000);
 
             var materializedViewBeforeUpdate = _onDemandMaterializerService.Materialize(view.Id_, schema_a.Id_, new List<string>(){
                 objectId_a,
@@ -394,13 +397,15 @@ namespace CDL.Tests.ServicesTests
                     }
                 });
             
-            await _schemaRegistryService.UpdateViewAsync(
+            _schemaRegistryService.UpdateViewAsync(
                 view.Id_, 
                 viewDetails.Name, 
                 true, 
                 false,
                 viewFields,
-                new List<Relation>());
+                new List<Relation>()).Wait();
+
+            Thread.Sleep(1000);
             
             var viewDetailsAfterUpdate = _schemaRegistryService.GetView(view.Id_).Result;
 
