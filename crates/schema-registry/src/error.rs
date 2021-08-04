@@ -1,5 +1,3 @@
-use crate::types::VersionedUuid;
-use semver::Version;
 use thiserror::Error;
 use tonic::Status;
 use uuid::Uuid;
@@ -19,18 +17,6 @@ pub enum RegistryError {
     NoInsertDestination(String),
     #[error("Given schema type is invalid")]
     InvalidSchemaType,
-    #[error("Invalid version retrieved from database: {0}")]
-    InvalidVersion(semver::Error),
-    #[error("No version of schema with id {} matches the given requirement {}", .0.id, .0.version_req)]
-    NoVersionMatchesRequirement(VersionedUuid),
-    #[error(
-        "New schema version for schema with id {schema_id} \
-         must be greater than the current max {max_version}"
-    )]
-    NewVersionMustBeGreatest {
-        schema_id: Uuid,
-        max_version: Version,
-    },
     #[error("Input data does not match schema: {}", join_with_commas(.0))]
     InvalidData(Vec<String>),
     #[error("Invalid JSON schema: {0}")]
@@ -70,9 +56,6 @@ impl From<RegistryError> for Status {
             | RegistryError::NoSchemaWithId(_)
             | RegistryError::NoViewWithId(_) => Status::not_found(error.to_string()),
             RegistryError::InvalidSchemaType
-            | RegistryError::NewVersionMustBeGreatest { .. }
-            | RegistryError::InvalidVersion(_)
-            | RegistryError::NoVersionMatchesRequirement(_)
             | RegistryError::InvalidData(_)
             | RegistryError::InvalidJsonSchema(_) => Status::invalid_argument(error.to_string()),
             RegistryError::ConnectionError(_)

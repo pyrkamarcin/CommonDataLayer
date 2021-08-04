@@ -353,10 +353,10 @@ impl ObjectBuilderImpl {
         schema_id: Uuid,
         object_ids: &HashSet<Uuid>,
     ) -> anyhow::Result<ObjectStream> {
-        let schema_meta = self.get_schema_metadata(schema_id).await?;
+        let schema = self.get_schema(schema_id).await?;
 
-        let query_address = schema_meta.query_address.clone();
-        let schema_type = schema_meta.schema_type.try_into()?;
+        let query_address = schema.query_address.clone();
+        let schema_type = schema.schema_type.try_into()?;
 
         match schema_type {
             SchemaType::DocumentStorage => {
@@ -405,15 +405,12 @@ impl ObjectBuilderImpl {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn get_schema_metadata(
-        &self,
-        schema_id: Uuid,
-    ) -> anyhow::Result<rpc::schema_registry::SchemaMetadata> {
+    async fn get_schema(&self, schema_id: Uuid) -> anyhow::Result<rpc::schema_registry::Schema> {
         let schema = self
             .sr_pool
             .get()
             .await?
-            .get_schema_metadata(rpc::schema_registry::Id {
+            .get_schema(rpc::schema_registry::Id {
                 id: schema_id.to_string(),
             })
             .await?

@@ -1,12 +1,5 @@
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct NewSchema {
-    #[prost(message, required, tag = "1")]
-    pub metadata: SchemaMetadata,
-    #[prost(bytes = "vec", required, tag = "2")]
-    pub definition: ::prost::alloc::vec::Vec<u8>,
-}
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct SchemaMetadata {
     #[prost(string, required, tag = "1")]
     pub name: ::prost::alloc::string::String,
     #[prost(string, required, tag = "2")]
@@ -15,24 +8,55 @@ pub struct SchemaMetadata {
     pub query_address: ::prost::alloc::string::String,
     #[prost(message, required, tag = "4")]
     pub schema_type: SchemaType,
-}
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct SchemaMetadataPatch {
-    #[prost(string, optional, tag = "1")]
-    pub name: ::core::option::Option<::prost::alloc::string::String>,
-    #[prost(string, optional, tag = "2")]
-    pub query_address: ::core::option::Option<::prost::alloc::string::String>,
-    #[prost(string, optional, tag = "3")]
-    pub insert_destination: ::core::option::Option<::prost::alloc::string::String>,
-    #[prost(message, optional, tag = "4")]
-    pub schema_type: ::core::option::Option<SchemaType>,
+    #[prost(bytes = "vec", required, tag = "5")]
+    pub definition: ::prost::alloc::vec::Vec<u8>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Schema {
     #[prost(string, required, tag = "1")]
     pub id: ::prost::alloc::string::String,
-    #[prost(message, required, tag = "2")]
-    pub metadata: SchemaMetadata,
+    #[prost(string, required, tag = "2")]
+    pub name: ::prost::alloc::string::String,
+    #[prost(string, required, tag = "3")]
+    pub insert_destination: ::prost::alloc::string::String,
+    #[prost(string, required, tag = "4")]
+    pub query_address: ::prost::alloc::string::String,
+    #[prost(message, required, tag = "5")]
+    pub schema_type: SchemaType,
+    #[prost(bytes = "vec", required, tag = "6")]
+    pub definition: ::prost::alloc::vec::Vec<u8>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct FullSchema {
+    #[prost(string, required, tag = "1")]
+    pub id: ::prost::alloc::string::String,
+    #[prost(string, required, tag = "2")]
+    pub name: ::prost::alloc::string::String,
+    #[prost(string, required, tag = "3")]
+    pub insert_destination: ::prost::alloc::string::String,
+    #[prost(string, required, tag = "4")]
+    pub query_address: ::prost::alloc::string::String,
+    #[prost(message, required, tag = "5")]
+    pub schema_type: SchemaType,
+    #[prost(bytes = "vec", required, tag = "6")]
+    pub definition: ::prost::alloc::vec::Vec<u8>,
+    #[prost(message, repeated, tag = "7")]
+    pub views: ::prost::alloc::vec::Vec<View>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SchemaUpdate {
+    #[prost(string, required, tag = "1")]
+    pub id: ::prost::alloc::string::String,
+    #[prost(string, optional, tag = "2")]
+    pub name: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag = "3")]
+    pub insert_destination: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, optional, tag = "4")]
+    pub query_address: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(message, optional, tag = "5")]
+    pub schema_type: ::core::option::Option<SchemaType>,
+    #[prost(bytes = "vec", optional, tag = "6")]
+    pub definition: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct View {
@@ -288,53 +312,9 @@ pub struct ViewUpdate {
     pub update_relations: bool,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct FullSchema {
-    #[prost(string, required, tag = "1")]
-    pub id: ::prost::alloc::string::String,
-    #[prost(message, required, tag = "2")]
-    pub metadata: SchemaMetadata,
-    #[prost(message, repeated, tag = "3")]
-    pub definitions: ::prost::alloc::vec::Vec<SchemaDefinition>,
-    #[prost(message, repeated, tag = "4")]
-    pub views: ::prost::alloc::vec::Vec<View>,
-}
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct NewSchemaVersion {
-    #[prost(string, required, tag = "1")]
-    pub id: ::prost::alloc::string::String,
-    #[prost(message, required, tag = "2")]
-    pub definition: SchemaDefinition,
-}
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct SchemaMetadataUpdate {
-    #[prost(string, required, tag = "1")]
-    pub id: ::prost::alloc::string::String,
-    #[prost(message, required, tag = "2")]
-    pub patch: SchemaMetadataPatch,
-}
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct VersionedId {
-    #[prost(string, required, tag = "1")]
-    pub id: ::prost::alloc::string::String,
-    #[prost(string, optional, tag = "2")]
-    pub version_req: ::core::option::Option<::prost::alloc::string::String>,
-}
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct SchemaDefinition {
-    #[prost(string, required, tag = "1")]
-    pub version: ::prost::alloc::string::String,
-    #[prost(bytes = "vec", required, tag = "2")]
-    pub definition: ::prost::alloc::vec::Vec<u8>,
-}
-#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Id {
     #[prost(string, required, tag = "1")]
     pub id: ::prost::alloc::string::String,
-}
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct SchemaVersions {
-    #[prost(string, repeated, tag = "1")]
-    pub versions: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Schemas {
@@ -353,8 +333,8 @@ pub struct SchemaViews {
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ValueToValidate {
-    #[prost(message, required, tag = "1")]
-    pub schema_id: VersionedId,
+    #[prost(string, required, tag = "1")]
+    pub schema_id: ::prost::alloc::string::String,
     #[prost(bytes = "vec", required, tag = "2")]
     pub value: ::prost::alloc::vec::Vec<u8>,
 }
@@ -454,25 +434,9 @@ pub mod schema_registry_client {
                 http::uri::PathAndQuery::from_static("/schema_registry.SchemaRegistry/AddSchema");
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn add_schema_version(
-            &mut self,
-            request: impl tonic::IntoRequest<super::NewSchemaVersion>,
-        ) -> Result<tonic::Response<super::Empty>, tonic::Status> {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/schema_registry.SchemaRegistry/AddSchemaVersion",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
         pub async fn update_schema(
             &mut self,
-            request: impl tonic::IntoRequest<super::SchemaMetadataUpdate>,
+            request: impl tonic::IntoRequest<super::SchemaUpdate>,
         ) -> Result<tonic::Response<super::Empty>, tonic::Status> {
             self.inner.ready().await.map_err(|e| {
                 tonic::Status::new(
@@ -517,10 +481,10 @@ pub mod schema_registry_client {
                 http::uri::PathAndQuery::from_static("/schema_registry.SchemaRegistry/UpdateView");
             self.inner.unary(request.into_request(), path, codec).await
         }
-        pub async fn get_schema_metadata(
+        pub async fn get_schema(
             &mut self,
             request: impl tonic::IntoRequest<super::Id>,
-        ) -> Result<tonic::Response<super::SchemaMetadata>, tonic::Status> {
+        ) -> Result<tonic::Response<super::Schema>, tonic::Status> {
             self.inner.ready().await.map_err(|e| {
                 tonic::Status::new(
                     tonic::Code::Unknown,
@@ -528,41 +492,8 @@ pub mod schema_registry_client {
                 )
             })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/schema_registry.SchemaRegistry/GetSchemaMetadata",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        pub async fn get_schema_versions(
-            &mut self,
-            request: impl tonic::IntoRequest<super::Id>,
-        ) -> Result<tonic::Response<super::SchemaVersions>, tonic::Status> {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/schema_registry.SchemaRegistry/GetSchemaVersions",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        pub async fn get_schema_definition(
-            &mut self,
-            request: impl tonic::IntoRequest<super::VersionedId>,
-        ) -> Result<tonic::Response<super::SchemaDefinition>, tonic::Status> {
-            self.inner.ready().await.map_err(|e| {
-                tonic::Status::new(
-                    tonic::Code::Unknown,
-                    format!("Service was not ready: {}", e.into()),
-                )
-            })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/schema_registry.SchemaRegistry/GetSchemaDefinition",
-            );
+            let path =
+                http::uri::PathAndQuery::from_static("/schema_registry.SchemaRegistry/GetSchema");
             self.inner.unary(request.into_request(), path, codec).await
         }
         pub async fn get_full_schema(
@@ -739,13 +670,9 @@ pub mod schema_registry_server {
             &self,
             request: tonic::Request<super::NewSchema>,
         ) -> Result<tonic::Response<super::Id>, tonic::Status>;
-        async fn add_schema_version(
-            &self,
-            request: tonic::Request<super::NewSchemaVersion>,
-        ) -> Result<tonic::Response<super::Empty>, tonic::Status>;
         async fn update_schema(
             &self,
-            request: tonic::Request<super::SchemaMetadataUpdate>,
+            request: tonic::Request<super::SchemaUpdate>,
         ) -> Result<tonic::Response<super::Empty>, tonic::Status>;
         async fn add_view_to_schema(
             &self,
@@ -755,18 +682,10 @@ pub mod schema_registry_server {
             &self,
             request: tonic::Request<super::ViewUpdate>,
         ) -> Result<tonic::Response<super::Empty>, tonic::Status>;
-        async fn get_schema_metadata(
+        async fn get_schema(
             &self,
             request: tonic::Request<super::Id>,
-        ) -> Result<tonic::Response<super::SchemaMetadata>, tonic::Status>;
-        async fn get_schema_versions(
-            &self,
-            request: tonic::Request<super::Id>,
-        ) -> Result<tonic::Response<super::SchemaVersions>, tonic::Status>;
-        async fn get_schema_definition(
-            &self,
-            request: tonic::Request<super::VersionedId>,
-        ) -> Result<tonic::Response<super::SchemaDefinition>, tonic::Status>;
+        ) -> Result<tonic::Response<super::Schema>, tonic::Status>;
         async fn get_full_schema(
             &self,
             request: tonic::Request<super::Id>,
@@ -883,50 +802,15 @@ pub mod schema_registry_server {
                     };
                     Box::pin(fut)
                 }
-                "/schema_registry.SchemaRegistry/AddSchemaVersion" => {
-                    #[allow(non_camel_case_types)]
-                    struct AddSchemaVersionSvc<T: SchemaRegistry>(pub Arc<T>);
-                    impl<T: SchemaRegistry> tonic::server::UnaryService<super::NewSchemaVersion>
-                        for AddSchemaVersionSvc<T>
-                    {
-                        type Response = super::Empty;
-                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::NewSchemaVersion>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).add_schema_version(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = AddSchemaVersionSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec).apply_compression_config(
-                            accept_compression_encodings,
-                            send_compression_encodings,
-                        );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
                 "/schema_registry.SchemaRegistry/UpdateSchema" => {
                     #[allow(non_camel_case_types)]
                     struct UpdateSchemaSvc<T: SchemaRegistry>(pub Arc<T>);
-                    impl<T: SchemaRegistry> tonic::server::UnaryService<super::SchemaMetadataUpdate>
-                        for UpdateSchemaSvc<T>
-                    {
+                    impl<T: SchemaRegistry> tonic::server::UnaryService<super::SchemaUpdate> for UpdateSchemaSvc<T> {
                         type Response = super::Empty;
                         type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::SchemaMetadataUpdate>,
+                            request: tonic::Request<super::SchemaUpdate>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move { (*inner).update_schema(request).await };
@@ -1011,15 +895,15 @@ pub mod schema_registry_server {
                     };
                     Box::pin(fut)
                 }
-                "/schema_registry.SchemaRegistry/GetSchemaMetadata" => {
+                "/schema_registry.SchemaRegistry/GetSchema" => {
                     #[allow(non_camel_case_types)]
-                    struct GetSchemaMetadataSvc<T: SchemaRegistry>(pub Arc<T>);
-                    impl<T: SchemaRegistry> tonic::server::UnaryService<super::Id> for GetSchemaMetadataSvc<T> {
-                        type Response = super::SchemaMetadata;
+                    struct GetSchemaSvc<T: SchemaRegistry>(pub Arc<T>);
+                    impl<T: SchemaRegistry> tonic::server::UnaryService<super::Id> for GetSchemaSvc<T> {
+                        type Response = super::Schema;
                         type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
                         fn call(&mut self, request: tonic::Request<super::Id>) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).get_schema_metadata(request).await };
+                            let fut = async move { (*inner).get_schema(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -1028,68 +912,7 @@ pub mod schema_registry_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetSchemaMetadataSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec).apply_compression_config(
-                            accept_compression_encodings,
-                            send_compression_encodings,
-                        );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/schema_registry.SchemaRegistry/GetSchemaVersions" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetSchemaVersionsSvc<T: SchemaRegistry>(pub Arc<T>);
-                    impl<T: SchemaRegistry> tonic::server::UnaryService<super::Id> for GetSchemaVersionsSvc<T> {
-                        type Response = super::SchemaVersions;
-                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
-                        fn call(&mut self, request: tonic::Request<super::Id>) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).get_schema_versions(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetSchemaVersionsSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec).apply_compression_config(
-                            accept_compression_encodings,
-                            send_compression_encodings,
-                        );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/schema_registry.SchemaRegistry/GetSchemaDefinition" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetSchemaDefinitionSvc<T: SchemaRegistry>(pub Arc<T>);
-                    impl<T: SchemaRegistry> tonic::server::UnaryService<super::VersionedId>
-                        for GetSchemaDefinitionSvc<T>
-                    {
-                        type Response = super::SchemaDefinition;
-                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::VersionedId>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).get_schema_definition(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetSchemaDefinitionSvc(inner);
+                        let method = GetSchemaSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec).apply_compression_config(
                             accept_compression_encodings,

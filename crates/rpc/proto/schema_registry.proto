@@ -4,13 +4,10 @@ package schema_registry;
 
 service SchemaRegistry {
     rpc AddSchema (NewSchema) returns (Id);
-    rpc AddSchemaVersion (NewSchemaVersion) returns (Empty);
-    rpc UpdateSchema (SchemaMetadataUpdate) returns (Empty);
+    rpc UpdateSchema (SchemaUpdate) returns (Empty);
     rpc AddViewToSchema (NewView) returns (Id);
     rpc UpdateView (ViewUpdate) returns (Empty);
-    rpc GetSchemaMetadata (Id) returns (SchemaMetadata);
-    rpc GetSchemaVersions (Id) returns (SchemaVersions);
-    rpc GetSchemaDefinition (VersionedId) returns (SchemaDefinition);
+    rpc GetSchema (Id) returns (Schema);
     rpc GetFullSchema (Id) returns (FullSchema);
     rpc GetView (Id) returns (FullView);
     rpc GetAllSchemas (Empty) returns (Schemas);
@@ -24,27 +21,39 @@ service SchemaRegistry {
 }
 
 message NewSchema {
-    required SchemaMetadata metadata = 1;
-    required bytes definition = 2;
-}
-
-message SchemaMetadata {
     required string name = 1;
     required string insert_destination = 2;
     required string query_address = 3;
     required SchemaType schema_type = 4;
-}
-
-message SchemaMetadataPatch {
-    optional string name = 1;
-    optional string query_address = 2;
-    optional string insert_destination = 3;
-    optional SchemaType schema_type = 4;
+    required bytes definition = 5;
 }
 
 message Schema {
     required string id = 1;
-    required SchemaMetadata metadata = 2;
+    required string name = 2;
+    required string insert_destination = 3;
+    required string query_address = 4;
+    required SchemaType schema_type = 5;
+    required bytes definition = 6;
+}
+
+message FullSchema {
+    required string id = 1;
+    required string name = 2;
+    required string insert_destination = 3;
+    required string query_address = 4;
+    required SchemaType schema_type = 5;
+    required bytes definition = 6;
+    repeated View views = 7;
+}
+
+message SchemaUpdate {
+    required string id = 1;
+    optional string name = 2;
+    optional string insert_destination = 3;
+    optional string query_address = 4;
+    optional SchemaType schema_type = 5;
+    optional bytes definition = 6;
 }
 
 message View {
@@ -193,39 +202,8 @@ message ViewUpdate {
     required bool update_relations = 10;
 }
 
-message FullSchema {
-    required string id = 1;
-    required SchemaMetadata metadata = 2;
-    repeated SchemaDefinition definitions = 3;
-    repeated View views = 4;
-}
-
-message NewSchemaVersion {
-    required string id = 1;
-    required SchemaDefinition definition = 2;
-}
-
-message SchemaMetadataUpdate {
-    required string id = 1;
-    required SchemaMetadataPatch patch = 2;
-}
-
-message VersionedId {
-    required string id = 1;
-    optional string version_req = 2;
-}
-
-message SchemaDefinition {
-    required string version = 1;
-    required bytes definition = 2;
-}
-
 message Id {
     required string id = 1;
-}
-
-message SchemaVersions {
-    repeated string versions = 1;
 }
 
 message Schemas {
@@ -241,7 +219,7 @@ message SchemaViews {
 }
 
 message ValueToValidate {
-    required VersionedId schema_id = 1;
+    required string schema_id = 1;
     required bytes value = 2;
 }
 

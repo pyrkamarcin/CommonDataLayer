@@ -22,7 +22,7 @@ impl CacheSupplier<Uuid, String> for SchemaMetadataSupplier {
         let mut client = rpc::schema_registry::connect(self.schema_registry_url.to_owned()).await?;
 
         Ok(client
-            .get_schema_metadata(Id {
+            .get_schema(Id {
                 id: key.to_string(),
             })
             .await?

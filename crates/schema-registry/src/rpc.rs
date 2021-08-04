@@ -1,29 +1,29 @@
+use std::collections::HashMap;
+use std::convert::TryInto;
+use std::pin::Pin;
+
+use bb8::Pool;
+use futures_util::future::{BoxFuture, FutureExt};
+use sqlx::types::Json;
+use tokio_stream::{Stream, StreamExt};
+use tonic::{Request, Response, Status};
+use uuid::Uuid;
+
 use crate::db::SchemaRegistryDb;
 use crate::error::{RegistryError, RegistryResult};
 use crate::settings::Settings;
-use crate::types::schema::{NewSchema, SchemaDefinition, SchemaUpdate};
+use crate::types::schema::{NewSchema, SchemaUpdate};
 use crate::types::view::{FullView, NewView, ViewUpdate};
-use crate::types::{DbExport, VersionedUuid};
-use bb8::Pool;
+use crate::types::DbExport;
 use cdl_dto::materialization::Relation;
 use cdl_dto::{TryFromRpc, TryIntoRpc};
 use communication_utils::metadata_fetcher::MetadataFetcher;
 use communication_utils::Result;
-use futures_util::future::{BoxFuture, FutureExt};
 use rpc::edge_registry::{EdgeRegistryConnectionManager, EdgeRegistryPool, ValidateRelationQuery};
 use rpc::schema_registry::{
-    schema_registry_server::SchemaRegistry, Empty, Errors, Id, SchemaMetadataUpdate, SchemaViews,
-    ValueToValidate, VersionedId,
+    schema_registry_server::SchemaRegistry, Empty, Errors, Id, SchemaUpdate as RpcSchemaUpdate,
+    SchemaViews, ValueToValidate,
 };
-use semver::Version;
-use semver::VersionReq;
-use sqlx::types::Json;
-use std::collections::HashMap;
-use std::convert::TryInto;
-use std::pin::Pin;
-use tokio_stream::{Stream, StreamExt};
-use tonic::{Request, Response, Status};
-use uuid::Uuid;
 
 pub struct SchemaRegistryImpl {
     pub edge_registry: EdgeRegistryPool,
@@ -68,12 +68,11 @@ impl SchemaRegistry for SchemaRegistryImpl {
     ) -> Result<Response<Id>, Status> {
         let request = request.into_inner();
         let new_schema = NewSchema {
-            name: request.metadata.name,
+            name: request.name,
             definition: parse_json_and_deserialize(&request.definition)?,
-            query_address: request.metadata.query_address,
-            insert_destination: request.metadata.insert_destination,
+            query_address: request.query_address,
+            insert_destination: request.insert_destination,
             schema_type: request
-                .metadata
                 .schema_type
                 .try_into()
                 .map_err(|e| tonic::Status::invalid_argument(format!("{:?}", e)))?,
@@ -99,33 +98,14 @@ impl SchemaRegistry for SchemaRegistryImpl {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn add_schema_version(
-        &self,
-        request: Request<rpc::schema_registry::NewSchemaVersion>,
-    ) -> Result<Response<Empty>, Status> {
-        let request = request.into_inner();
-        let schema_id = parse_uuid(&request.id)?;
-        let new_version = SchemaDefinition {
-            version: parse_version(&request.definition.version)?,
-            definition: parse_json_and_deserialize(&request.definition.definition)?,
-        };
-
-        self.db
-            .add_new_version_of_schema(schema_id, new_version)
-            .await?;
-
-        Ok(Response::new(Empty {}))
-    }
-
-    #[tracing::instrument(skip(self))]
     async fn update_schema(
         &self,
-        request: Request<SchemaMetadataUpdate>,
+        request: Request<RpcSchemaUpdate>,
     ) -> Result<Response<Empty>, Status> {
         let request = request.into_inner();
         let schema_id = parse_uuid(&request.id)?;
 
-        let schema_type = if let Some(st) = request.patch.schema_type {
+        let schema_type = if let Some(st) = request.schema_type {
             Some(
                 st.try_into()
                     .map_err(|e| tonic::Status::invalid_argument(format!("{:?}", e)))?,
@@ -134,7 +114,15 @@ impl SchemaRegistry for SchemaRegistryImpl {
             None
         };
 
-        if let Some(destination) = request.patch.insert_destination.as_ref() {
+        let definition = if let Some(def) = request.definition {
+            Some(serde_json::from_slice(&def).map_err(|e| {
+                Status::invalid_argument(format!("Definition was not valid JSON: {:?}", e))
+            })?)
+        } else {
+            None
+        };
+
+        if let Some(destination) = request.insert_destination.as_ref() {
             if !self
                 .mq_metadata
                 .destination_exists(destination)
@@ -149,10 +137,11 @@ impl SchemaRegistry for SchemaRegistryImpl {
             .update_schema(
                 schema_id,
                 SchemaUpdate {
-                    name: request.patch.name,
-                    query_address: request.patch.query_address,
-                    insert_destination: request.patch.insert_destination,
+                    name: request.name,
+                    query_address: request.query_address,
+                    insert_destination: request.insert_destination,
                     schema_type,
+                    definition,
                 },
             )
             .await?;
@@ -285,55 +274,22 @@ impl SchemaRegistry for SchemaRegistryImpl {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn get_schema_metadata(
+    async fn get_schema(
         &self,
         request: Request<Id>,
-    ) -> Result<Response<rpc::schema_registry::SchemaMetadata>, Status> {
+    ) -> Result<Response<rpc::schema_registry::Schema>, Status> {
         let request = request.into_inner();
         let id = parse_uuid(&request.id)?;
 
         let schema = self.db.get_schema(id).await?;
 
-        Ok(Response::new(rpc::schema_registry::SchemaMetadata {
+        Ok(Response::new(rpc::schema_registry::Schema {
+            id: schema.id.to_string(),
             name: schema.name,
             insert_destination: schema.insert_destination,
             query_address: schema.query_address,
             schema_type: schema.schema_type.into(),
-        }))
-    }
-
-    #[tracing::instrument(skip(self))]
-    async fn get_schema_versions(
-        &self,
-        request: Request<Id>,
-    ) -> Result<Response<rpc::schema_registry::SchemaVersions>, Status> {
-        let request = request.into_inner();
-        let id = parse_uuid(&request.id)?;
-
-        let versions = self.db.get_schema_versions(id).await?;
-
-        Ok(Response::new(rpc::schema_registry::SchemaVersions {
-            versions: versions.into_iter().map(|v| v.to_string()).collect(),
-        }))
-    }
-
-    #[tracing::instrument(skip(self))]
-    async fn get_schema_definition(
-        &self,
-        request: Request<VersionedId>,
-    ) -> Result<Response<rpc::schema_registry::SchemaDefinition>, Status> {
-        let request = request.into_inner();
-        let versioned_id = VersionedUuid {
-            id: parse_uuid(&request.id)?,
-            version_req: parse_optional_version_req(&request.version_req)?
-                .unwrap_or(VersionReq::STAR),
-        };
-
-        let (version, definition) = self.db.get_schema_definition(&versioned_id).await?;
-
-        Ok(Response::new(rpc::schema_registry::SchemaDefinition {
-            version: version.to_string(),
-            definition: serialize_json(&definition)?,
+            definition: serialize_json(&schema.definition)?,
         }))
     }
 
@@ -349,22 +305,11 @@ impl SchemaRegistry for SchemaRegistryImpl {
 
         Ok(Response::new(rpc::schema_registry::FullSchema {
             id: request.id,
-            metadata: rpc::schema_registry::SchemaMetadata {
-                name: schema.name,
-                insert_destination: schema.insert_destination,
-                query_address: schema.query_address,
-                schema_type: schema.schema_type.into(),
-            },
-            definitions: schema
-                .definitions
-                .into_iter()
-                .map(|definition| {
-                    Ok(rpc::schema_registry::SchemaDefinition {
-                        version: definition.version.to_string(),
-                        definition: serialize_json(&definition.definition)?,
-                    })
-                })
-                .collect::<Result<Vec<_>, Status>>()?,
+            name: schema.name,
+            insert_destination: schema.insert_destination,
+            query_address: schema.query_address,
+            schema_type: schema.schema_type.into(),
+            definition: serialize_json(&schema.definition)?,
             views: schema
                 .views
                 .into_iter()
@@ -445,16 +390,17 @@ impl SchemaRegistry for SchemaRegistryImpl {
         Ok(Response::new(rpc::schema_registry::Schemas {
             schemas: schemas
                 .into_iter()
-                .map(|schema| rpc::schema_registry::Schema {
-                    id: schema.id.to_string(),
-                    metadata: rpc::schema_registry::SchemaMetadata {
+                .map(|schema| {
+                    Ok(rpc::schema_registry::Schema {
+                        id: schema.id.to_string(),
                         name: schema.name,
                         insert_destination: schema.insert_destination,
                         query_address: schema.query_address,
                         schema_type: schema.schema_type.into(),
-                    },
+                        definition: serialize_json(&schema.definition)?,
+                    })
                 })
-                .collect(),
+                .collect::<Result<Vec<_>, Status>>()?,
         }))
     }
 
@@ -471,22 +417,11 @@ impl SchemaRegistry for SchemaRegistryImpl {
                 .map(|schema| {
                     Ok(rpc::schema_registry::FullSchema {
                         id: schema.id.to_string(),
-                        metadata: rpc::schema_registry::SchemaMetadata {
-                            name: schema.name,
-                            insert_destination: schema.insert_destination,
-                            query_address: schema.query_address,
-                            schema_type: schema.schema_type.into(),
-                        },
-                        definitions: schema
-                            .definitions
-                            .into_iter()
-                            .map(|definition| {
-                                Ok(rpc::schema_registry::SchemaDefinition {
-                                    version: definition.version.to_string(),
-                                    definition: serialize_json(&definition.definition)?,
-                                })
-                            })
-                            .collect::<Result<Vec<_>, Status>>()?,
+                        name: schema.name,
+                        insert_destination: schema.insert_destination,
+                        query_address: schema.query_address,
+                        schema_type: schema.schema_type.into(),
+                        definition: serialize_json(&schema.definition)?,
                         views: schema
                             .views
                             .into_iter()
@@ -572,12 +507,11 @@ impl SchemaRegistry for SchemaRegistryImpl {
 
         Ok(Response::new(rpc::schema_registry::Schema {
             id: schema.id.to_string(),
-            metadata: rpc::schema_registry::SchemaMetadata {
-                name: schema.name,
-                insert_destination: schema.insert_destination,
-                query_address: schema.query_address,
-                schema_type: schema.schema_type.into(),
-            },
+            name: schema.name,
+            insert_destination: schema.insert_destination,
+            query_address: schema.query_address,
+            schema_type: schema.schema_type.into(),
+            definition: serialize_json(&schema.definition)?,
         }))
     }
 
@@ -586,14 +520,10 @@ impl SchemaRegistry for SchemaRegistryImpl {
         request: Request<ValueToValidate>,
     ) -> Result<Response<Errors>, Status> {
         let request = request.into_inner();
-        let versioned_id = VersionedUuid {
-            id: parse_uuid(&request.schema_id.id)?,
-            version_req: parse_optional_version_req(&request.schema_id.version_req)?
-                .unwrap_or(VersionReq::STAR),
-        };
         let json = parse_json_and_deserialize(&request.value)?;
+        let schema_id = parse_uuid(&request.schema_id)?;
 
-        let (_version, definition) = self.db.get_schema_definition(&versioned_id).await?;
+        let definition = self.db.get_schema(schema_id).await?.definition;
         let schema = jsonschema::JSONSchema::compile(&definition)
             .map_err(|err| RegistryError::InvalidJsonSchema(err.to_string()))?;
         let errors = match schema.validate(&json) {
@@ -622,12 +552,11 @@ impl SchemaRegistry for SchemaRegistryImpl {
 
                 Ok(rpc::schema_registry::Schema {
                     id: schema.id.to_string(),
-                    metadata: rpc::schema_registry::SchemaMetadata {
-                        name: schema.name,
-                        insert_destination: schema.insert_destination,
-                        query_address: schema.query_address,
-                        schema_type: schema.schema_type.into(),
-                    },
+                    name: schema.name,
+                    insert_destination: schema.insert_destination,
+                    query_address: schema.query_address,
+                    schema_type: schema.schema_type.into(),
+                    definition: serialize_json(&schema.definition)?,
                 })
             }),
         )))
@@ -661,21 +590,6 @@ impl SchemaRegistryImpl {
         }
         .boxed()
     }
-}
-
-fn parse_optional_version_req(req: &Option<String>) -> Result<Option<VersionReq>, Status> {
-    if let Some(req) = req.as_ref() {
-        Ok(Some(VersionReq::parse(req).map_err(|err| {
-            Status::invalid_argument(format!("Invalid version requirement provided: {}", err))
-        })?))
-    } else {
-        Ok(None)
-    }
-}
-
-fn parse_version(req: &str) -> Result<Version, Status> {
-    Version::parse(req)
-        .map_err(|err| Status::invalid_argument(format!("Invalid version provided: {}", err)))
 }
 
 fn parse_json_and_deserialize<T: serde::de::DeserializeOwned>(json: &[u8]) -> Result<T, Status> {

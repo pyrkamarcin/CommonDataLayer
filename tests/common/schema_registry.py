@@ -55,9 +55,8 @@ class SchemaRegistry:
             resp = stub.AddSchema(
                 pb2.NewSchema(
                     definition=bytes(body, 'utf-8'),
-                    metadata=pb2.SchemaMetadata(name=name,
-                                                insert_destination=destination,
-                                                query_address=query,
-                                                schema_type=pb2.SchemaType(schema_type=schema_type)),
-                ))
+                    name=name,
+                    insert_destination=destination,
+                    query_address=query,
+                    schema_type=pb2.SchemaType(schema_type=schema_type)))
             return resp.id

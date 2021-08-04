@@ -15,11 +15,8 @@ pub async fn main() -> anyhow::Result<()> {
     match args.action {
         Action::Schema { action } => match action {
             SchemaAction::Names => get_schema_names(args.registry_addr).await,
-            SchemaAction::Definition { id, version } => {
-                get_schema_definition(id, version, args.registry_addr).await
-            }
+            SchemaAction::Definition { id } => get_schema_definition(id, args.registry_addr).await,
             SchemaAction::Metadata { id } => get_schema_metadata(id, args.registry_addr).await,
-            SchemaAction::Versions { id } => get_schema_versions(id, args.registry_addr).await,
             SchemaAction::Add {
                 name,
                 insert_destination,
@@ -37,15 +34,14 @@ pub async fn main() -> anyhow::Result<()> {
                 )
                 .await
             }
-            SchemaAction::AddVersion { id, version, file } => {
-                add_schema_version(id, version, file, args.registry_addr).await
-            }
             SchemaAction::Update {
                 id,
                 name,
                 insert_destination,
                 query_address,
                 schema_type,
+                update_definition,
+                file,
             } => {
                 update_schema(
                     id,
@@ -53,12 +49,14 @@ pub async fn main() -> anyhow::Result<()> {
                     insert_destination,
                     query_address,
                     schema_type,
+                    update_definition,
+                    file,
                     args.registry_addr,
                 )
                 .await
             }
-            SchemaAction::Validate { id, version, file } => {
-                validate_value(id, version, file, args.registry_addr).await
+            SchemaAction::Validate { id, file } => {
+                validate_value(id, file, args.registry_addr).await
             }
         },
         Action::View { action } => match action {

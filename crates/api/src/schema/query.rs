@@ -2,75 +2,18 @@ use std::collections::HashMap;
 
 use async_graphql::{Context, FieldResult, Json, Object};
 use itertools::Itertools;
-use semver::VersionReq;
 use uuid::Uuid;
 
 use crate::schema::utils::{get_schema, get_view};
 use crate::types::data::{CdlObject, EdgeRelations, SchemaRelation};
-use crate::types::schema::{Definition, FullSchema};
-use crate::types::view::View;
+use crate::types::schema::FullSchema;
 use crate::types::view::{MaterializedView, RowDefinition};
 use crate::{error::Result, types::view::FullView};
 use crate::{settings::Settings, types::view::OnDemandViewRequest};
 use rpc::edge_registry::EdgeRegistryPool;
 use rpc::materializer_ondemand::{OnDemandMaterializerPool, OnDemandRequest};
-use rpc::schema_registry::types::SchemaType;
 use rpc::schema_registry::SchemaRegistryPool;
 use tracing_utils::http::RequestBuilderTracingExt;
-
-#[Object]
-/// Schema is the format in which data is to be sent to the Common Data Layer.
-impl FullSchema {
-    /// Random UUID assigned on creation
-    async fn id(&self) -> &Uuid {
-        &self.id
-    }
-
-    /// The name is not required to be unique among all schemas (as `id` is the identifier)
-    async fn name(&self) -> &str {
-        &self.name
-    }
-
-    /// Message queue insert_destination to which data is inserted by data-router.
-    async fn insert_destination(&self) -> &str {
-        &self.insert_destination
-    }
-
-    /// Address of the query service responsible for retrieving data from DB
-    async fn query_address(&self) -> &str {
-        &self.query_address
-    }
-
-    /// Whether this schema represents documents or timeseries data.
-    #[graphql(name = "type")]
-    async fn schema_type(&self) -> SchemaType {
-        self.schema_type
-    }
-
-    /// Returns schema definition for given version.
-    /// Schema is following semantic versioning, querying for "2.1.0" will return "2.1.1" if exist,
-    /// querying for "=2.1.0" will return "2.1.0" if exist
-    #[tracing::instrument(skip(self))]
-    async fn definition(&self, version_req: String) -> FieldResult<&Definition> {
-        let version_req = VersionReq::parse(&version_req)?;
-        let definition = self
-            .get_definition(version_req)
-            .ok_or("No definition matches the given requirement")?;
-
-        Ok(definition)
-    }
-
-    /// All definitions connected to this schema.
-    /// Each schema can have only one active definition, under latest version but also contains history for backward compability.
-    async fn definitions(&self) -> &Vec<Definition> {
-        &self.definitions
-    }
-
-    /// All views belonging to this schema.
-    async fn views(&self) -> &Vec<View> {
-        &self.views
-    }
-}
 
 pub struct QueryRoot;
 

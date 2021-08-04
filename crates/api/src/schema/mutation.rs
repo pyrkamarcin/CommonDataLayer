@@ -1,17 +1,18 @@
+use async_graphql::{Context, FieldResult, Object};
+use serde_json::value::to_raw_value;
+use uuid::Uuid;
+
 use crate::schema::utils::{get_schema, get_view};
 use crate::types::data::{InputMessage, ObjectRelations};
-use crate::types::schema::{Definition, FullSchema, NewSchema, NewVersion, UpdateSchema};
+use crate::types::schema::{FullSchema, NewSchema, UpdateSchema};
 use crate::types::view::{NewView, View, ViewUpdate};
 use crate::{error::Error, settings::Settings};
 use crate::{types::view::FullView, types::IntoQueried};
-use async_graphql::{Context, FieldResult, Object};
 use cdl_dto::ingestion::OwnedInsertMessage;
 use cdl_dto::TryIntoRpc;
 use misc_utils::current_timestamp;
 use rpc::edge_registry::EdgeRegistryPool;
 use rpc::schema_registry::SchemaRegistryPool;
-use serde_json::value::to_raw_value;
-use uuid::Uuid;
 
 pub struct MutationRoot;
 
@@ -28,30 +29,6 @@ impl MutationRoot {
             .into_inner();
 
         FullSchema::from_rpc(schema)
-    }
-
-    #[tracing::instrument(skip(self, context))]
-    async fn add_schema_definition(
-        &self,
-        context: &Context<'_>,
-        schema_id: Uuid,
-        new_version: NewVersion,
-    ) -> FieldResult<Definition> {
-        let mut conn = context.data_unchecked::<SchemaRegistryPool>().get().await?;
-
-        conn.add_schema_version(rpc::schema_registry::NewSchemaVersion {
-            id: schema_id.to_string(),
-            definition: rpc::schema_registry::SchemaDefinition {
-                version: new_version.version.clone(),
-                definition: serde_json::to_vec(&new_version.definition)?,
-            },
-        })
-        .await?;
-
-        Ok(Definition {
-            definition: new_version.definition,
-            version: new_version.version,
-        })
     }
 
     #[tracing::instrument(skip(self, context))]
@@ -130,7 +107,7 @@ impl MutationRoot {
     ) -> FieldResult<FullSchema> {
         let mut conn = context.data_unchecked::<SchemaRegistryPool>().get().await?;
 
-        conn.update_schema(update.into_rpc(id))
+        conn.update_schema(update.into_rpc(id)?)
             .await
             .map_err(|source| rpc::error::ClientError::QueryError { source })?;
         get_schema(&mut conn, id).await

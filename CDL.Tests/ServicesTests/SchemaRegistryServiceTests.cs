@@ -81,7 +81,7 @@ namespace CDL.Tests.ServicesTests
             var results = _schemaRegistryService.GetFullSchema(schema.Id_).Result;
 
             Assert.IsType<FullSchema>(results);
-            Assert.Contains(results.Metadata.Name, name);
+            Assert.Contains(results.Name, name);
         }
 
         [Fact]
@@ -271,53 +271,18 @@ namespace CDL.Tests.ServicesTests
         } 
 
         [Fact]
-        [Trait("Category","Regression")]
-        public void AddSchemaVersion()
-        {
-            var newVersion = "1.0.1";
-            var schemaDefinitionBefore = _fixture.Create<Car>();
-            var schemaDefinitionAfter = new Car(){
-                Age = schemaDefinitionBefore.Age + 1,
-                BodyType = schemaDefinitionBefore.BodyType,
-                Color = schemaDefinitionBefore.Color + 1,
-                Id = schemaDefinitionBefore.Id + 1,
-                Licence = schemaDefinitionBefore.Licence + "new",
-                Model = schemaDefinitionBefore.Model + "new",
-                Make = schemaDefinitionBefore.Make + "new"
-
-            };
-            var schema_a = _schemaRegistryService.AddSchema(
-                _fixture.Create<string>(), 
-                schemaDefinitionBefore.ToJSONString(),
-                SchemaType.Types.Type.DocumentStorage).Result;          
-            
-            _schemaRegistryService.AddSchemaVersion(schema_a.Id_, schemaDefinitionAfter.ToJSONString(), newVersion);
-            var schemaAfterUpdate = _schemaRegistryService.GetFullSchema(schema_a.Id_).Result;
-
-            var updatedObject = schemaAfterUpdate.Definitions.SingleOrDefault(x => x.Version.Equals(newVersion));
-            var schemaDefinitionAfterUpdate = updatedObject.Definition.ToStringUtf8();
-            var schemaDefinitionObjectAfterUpdate = JsonSerializer.Deserialize<Car>(schemaDefinitionAfterUpdate);
-
-            Assert.True(schemaDefinitionObjectAfterUpdate.Age == schemaDefinitionBefore.Age + 1);
-            Assert.True(schemaDefinitionObjectAfterUpdate.Color == schemaDefinitionBefore.Color + 1);
-            Assert.True(schemaDefinitionObjectAfterUpdate.Id == schemaDefinitionBefore.Id + 1);
-            Assert.True(schemaDefinitionObjectAfterUpdate.Licence == schemaDefinitionBefore.Licence + "new");
-            Assert.True(schemaDefinitionObjectAfterUpdate.Model == schemaDefinitionBefore.Model + "new");
-            Assert.True(schemaDefinitionObjectAfterUpdate.Make == schemaDefinitionBefore.Make + "new");
-        }
-
-        [Fact]
         public void UpdateSchema()
         {
             var name = _fixture.Create<string>();
+            var definition = _fixture.Create<Car>().ToJSONString();
             var schema_a = _schemaRegistryService.AddSchema(
                 _fixture.Create<string>(),
-                _fixture.Create<Car>().ToJSONString(), 
+                definition,
                 SchemaType.Types.Type.DocumentStorage).Result;
 
-            _schemaRegistryService.UpdateSchema(schema_a.Id_, name, SchemaType.Types.Type.DocumentStorage);
+            _schemaRegistryService.UpdateSchema(schema_a.Id_, name, definition, SchemaType.Types.Type.DocumentStorage);
 
-            var updatedSchema = _schemaRegistryService.GetSchemaMetadata(schema_a.Id_).Result;
+            var updatedSchema = _schemaRegistryService.GetSchema(schema_a.Id_).Result;
 
             Assert.Equal(name, updatedSchema.Name);
         }
@@ -427,33 +392,11 @@ namespace CDL.Tests.ServicesTests
                 name, 
                 _fixture.Create<GeneralObject>().ToJSONString(), 
                 SchemaType.Types.Type.DocumentStorage).Result;
-            var schemaMetadata = _schemaRegistryService.GetSchemaMetadata(schema_a.Id_).Result;
+            var schemaMetadata = _schemaRegistryService.GetSchema(schema_a.Id_).Result;
             Assert.Contains(_options.CDL_SCHEMA_REGISTRY_DESTINATION, schemaMetadata.InsertDestination);
             Assert.Contains(name, schemaMetadata.Name);
             Assert.Contains(_options.CDL_QUERY_SERVICE_ADDRESS, schemaMetadata.QueryAddress);
             Assert.Contains("DocumentStorage", schemaMetadata.SchemaType.SchemaType_.ToString());
-        }
-
-        [Fact]
-        [Trait("Category","Regression")]
-        public void GetSchemaVersions()
-        {
-            var currentVersion = "1.0.0";
-            var newVersion = "1.0.1";          
-            var schema_a = _schemaRegistryService.AddSchema(
-                _fixture.Create<string>(), 
-                _fixture.Create<GeneralObject>().ToJSONString(), 
-                SchemaType.Types.Type.DocumentStorage).Result;
-            var schemaVersions = _schemaRegistryService.GetSchemaVersions(schema_a.Id_).Result;
-            Assert.True(schemaVersions.Versions.Count == 1);
-            Assert.NotNull(schemaVersions.Versions.Single(x => x.Equals(currentVersion)));
-
-            _schemaRegistryService.AddSchemaVersion(schema_a.Id_, _fixture.Create<GeneralObject>().ToJSONString(), newVersion);
-
-            var schemaVersionsAfter = _schemaRegistryService.GetSchemaVersions(schema_a.Id_).Result;
-            Assert.True(schemaVersionsAfter.Versions.Count == 2);
-            Assert.NotNull(schemaVersionsAfter.Versions.Single(x => x.Equals(currentVersion)));
-            Assert.NotNull(schemaVersionsAfter.Versions.Single(x => x.Equals(newVersion)));
         }
 
         [Fact]
@@ -465,7 +408,7 @@ namespace CDL.Tests.ServicesTests
                 _fixture.Create<string>(), 
                 schemaDefinition.ToJSONString(), 
                 SchemaType.Types.Type.DocumentStorage).Result;
-            var schemaDefinitionSR= _schemaRegistryService.GetSchemaDefinition(schema_a.Id_, "1.0.0").Result;
+            var schemaDefinitionSR= _schemaRegistryService.GetSchema(schema_a.Id_).Result;
             var schemaDefinitionFromResponse = JsonSerializer.Deserialize<Car>(schemaDefinitionSR.Definition.ToStringUtf8());
 
             Assert.True(schemaDefinition.Age == schemaDefinitionFromResponse.Age);
@@ -550,7 +493,7 @@ namespace CDL.Tests.ServicesTests
                 data = payload_a
             });
 
-            var validValue = _schemaRegistryService.ValidateValue(schema_a.Id_, "{\"firstNameAWES\":\"firstNameAWES\"}", "1.0.0").Result;
+            var validValue = _schemaRegistryService.ValidateValue(schema_a.Id_, "{\"firstNameAWES\":\"firstNameAWES\"}").Result;
         }
 
         [Fact(Skip = "Test not available")]

@@ -25,14 +25,11 @@ namespace CDL.Tests.Services
         {
             var schema = new NewSchema()
             {
-                Metadata = new SchemaMetadata()
-                {
-                    InsertDestination = _options.CDL_SCHEMA_REGISTRY_DESTINATION,
-                    Name = name,
-                    QueryAddress = _options.CDL_QUERY_SERVICE_ADDRESS,
-                    SchemaType = new SchemaType(){
-                        SchemaType_ = type
-                    }
+                InsertDestination = _options.CDL_SCHEMA_REGISTRY_DESTINATION,
+                Name = name,
+                QueryAddress = _options.CDL_QUERY_SERVICE_ADDRESS,
+                SchemaType = new SchemaType(){
+                    SchemaType_ = type
                 },
                 Definition = ByteString.CopyFromUtf8(definition)
             };
@@ -40,69 +37,35 @@ namespace CDL.Tests.Services
             return Task.FromResult(_client.AddSchema(schema));
         }
 
-        public Task<Empty> AddSchemaVersion(string schemaId, string definition, string version)
+        public Task<Empty> UpdateSchema(string schemaId, string name, string definition, SchemaType.Types.Type type)
         {
-            var newSchemaVersion = new NewSchemaVersion()
+            var newUpdateSchema = new SchemaUpdate()
             {
                 Id = schemaId,
-                Definition = new SchemaDefinition()
-                {
-                    Definition = ByteString.CopyFromUtf8(definition),
-                    Version = version
-                }
-            };
-
-            return  Task.FromResult(_client.AddSchemaVersion(newSchemaVersion));
-        }
-
-        public async Task<AsyncUnaryCall<Empty>> AddSchemaVersionAsync(string schemaId, string definition, string version)
-        {
-            var newSchemaVersion = new NewSchemaVersion()
-            {
-                Id = schemaId,
-                Definition = new SchemaDefinition()
-                {
-                    Definition = ByteString.CopyFromUtf8(definition),
-                    Version = version
-                }
-            };
-
-            return await Task.FromResult(_client.AddSchemaVersionAsync(newSchemaVersion));
-        }
-
-        public Task<Empty> UpdateSchema(string schemaId, string name, SchemaType.Types.Type type)
-        {
-            var newUpdateSchema = new SchemaMetadataUpdate()
-            {
-                Id = schemaId,
-                Patch = new SchemaMetadataPatch()
-                {
-                    InsertDestination = _options.CDL_SCHEMA_REGISTRY_DESTINATION,
-                    QueryAddress = _options.CDL_QUERY_SERVICE_ADDRESS,
-                    Name = name,
-                    SchemaType = new SchemaType(){
-                        SchemaType_ = type
-                    }
-                }
+                InsertDestination = _options.CDL_SCHEMA_REGISTRY_DESTINATION,
+                QueryAddress = _options.CDL_QUERY_SERVICE_ADDRESS,
+                Name = name,
+                SchemaType = new SchemaType(){
+                    SchemaType_ = type
+                },
+                Definition = ByteString.CopyFromUtf8(definition)
             };
 
             return Task.FromResult(_client.UpdateSchema(newUpdateSchema));
         }
 
-        public async Task<AsyncUnaryCall<Empty>> UpdateSchemaAsync(string schemaId, string name, SchemaType.Types.Type type)
+        public async Task<AsyncUnaryCall<Empty>> UpdateSchemaAsync(string schemaId, string name, string definition, SchemaType.Types.Type type)
         {
-            var newUpdateSchema = new SchemaMetadataUpdate()
+            var newUpdateSchema = new SchemaUpdate()
             {
                 Id = schemaId,
-                Patch = new SchemaMetadataPatch()
-                {
-                    InsertDestination = _options.CDL_SCHEMA_REGISTRY_DESTINATION,
-                    QueryAddress = _options.CDL_QUERY_SERVICE_ADDRESS,
-                    Name = name,
-                    SchemaType = new SchemaType(){
-                        SchemaType_ = type
-                    }
-                }
+                InsertDestination = _options.CDL_SCHEMA_REGISTRY_DESTINATION,
+                QueryAddress = _options.CDL_QUERY_SERVICE_ADDRESS,
+                Name = name,
+                SchemaType = new SchemaType(){
+                    SchemaType_ = type
+                },
+                Definition = ByteString.CopyFromUtf8(definition)
             };
 
             return await Task.FromResult(_client.UpdateSchemaAsync(newUpdateSchema));
@@ -169,55 +132,21 @@ namespace CDL.Tests.Services
             await Task.FromResult(_client.UpdateViewAsync(view));
         }
 
-        public Task<SchemaMetadata> GetSchemaMetadata(string schemaId)
+        public Task<Schema> GetSchema(string schemaId)
         {
-            return Task.FromResult(_client.GetSchemaMetadata(new Id()
+            return Task.FromResult(_client.GetSchema(new Id()
             {
                 Id_ = schemaId
             }));
         }
 
-        public Task<SchemaVersions> GetSchemaVersions(string schemaId)
+        public async Task<AsyncUnaryCall<Schema>> GetSchemaAsync(string schemaId)
         {
-            return Task.FromResult(_client.GetSchemaVersions(new Id()
+            return await Task.FromResult(_client.GetSchemaAsync(new Id()
             {
-                Id_ = schemaId
+                Id_ = schemaId,
             }));
         }
-
-        public async Task<AsyncUnaryCall<SchemaVersions>> GetSchemaVersionsAsync(string schemaId)
-        {
-            return await Task.FromResult(_client.GetSchemaVersionsAsync(new Id()
-            {
-                Id_ = schemaId
-            }));
-        }
-
-        public Task<SchemaDefinition> GetSchemaDefinition(string schemaId, string versionReq)
-        {
-            return Task.FromResult(_client.GetSchemaDefinition(new VersionedId()
-            {
-                Id = schemaId,
-                VersionReq =  versionReq,
-            }));
-        }
-
-        public async Task<AsyncUnaryCall<SchemaDefinition>> GetSchemaDefinitionAsync(string schemaId, string versionReq)
-        {
-            return await Task.FromResult(_client.GetSchemaDefinitionAsync(new VersionedId()
-            {
-                Id = schemaId,
-                VersionReq = versionReq,
-            }));
-        }
-
-        public async Task<AsyncUnaryCall<SchemaMetadata>> GetSchemaMetadataAsync(string schemaId)
-        {
-            return await Task.FromResult(_client.GetSchemaMetadataAsync(new Id()
-            {
-                Id_ = schemaId
-            }));
-        }        
 
         public Task<FullView> GetView(string viewId)
         {
@@ -359,29 +288,21 @@ namespace CDL.Tests.Services
             return await Task.FromResult(_client.AddViewToSchemaAsync(view));
         }
 
-        public Task<Errors> ValidateValue(string objectId, string valueToCheck, string versionReq)
+        public Task<Errors> ValidateValue(string schemaId, string valueToCheck)
         {
             var valueToValidate = new ValueToValidate()
             {
-                SchemaId = new VersionedId()
-                {
-                    Id = objectId,
-                    VersionReq = versionReq
-                },
+                SchemaId = schemaId,
                 Value = ByteString.CopyFromUtf8(valueToCheck)
             };
             return Task.FromResult(_client.ValidateValue(valueToValidate));
         }
 
-        public async Task<AsyncUnaryCall<Errors>> ValidateValueAsync(string objectId, string valueToCheck, string versionReq)
+        public async Task<AsyncUnaryCall<Errors>> ValidateValueAsync(string schemaId, string valueToCheck)
         {
             var valueToValidate = new ValueToValidate()
             {
-                SchemaId = new VersionedId()
-                {
-                    Id = objectId,
-                    VersionReq = versionReq
-                },
+                SchemaId = schemaId,
                 Value = ByteString.CopyFromUtf8(valueToCheck)
             };
             return await Task.FromResult(_client.ValidateValueAsync(valueToValidate));

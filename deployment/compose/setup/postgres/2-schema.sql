@@ -14,7 +14,8 @@ CREATE TABLE schemas (
     name               varchar not null,
     schema_type        schema_type_enum not null,
     insert_destination varchar not null,
-    query_address      varchar not null
+    query_address      varchar not null,
+    definition         json not null
 );
 
 CREATE TABLE views (
@@ -29,19 +30,6 @@ CREATE TABLE views (
 
     CONSTRAINT fk_base_schema_1
         FOREIGN KEY(base_schema)
-        REFERENCES schemas(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
-
-CREATE TABLE definitions (
-    version    varchar not null,
-    definition json not null,
-    schema     uuid not null,
-
-    PRIMARY KEY(schema, version),
-    CONSTRAINT fk_schema_2
-        FOREIGN KEY(schema)
         REFERENCES schemas(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE

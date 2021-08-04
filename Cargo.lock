@@ -117,7 +117,6 @@ dependencies = [
  "misc_utils",
  "reqwest",
  "rpc",
- "semver 1.0.3",
  "serde 1.0.126",
  "serde_json",
  "settings_utils",
@@ -471,7 +470,6 @@ dependencies = [
  "cdl_dto",
  "clap",
  "rpc",
- "semver 1.0.3",
  "serde 1.0.126",
  "serde_json",
  "tokio",
@@ -3175,7 +3173,6 @@ dependencies = [
  "metrics_utils",
  "misc_utils",
  "rpc",
- "semver 1.0.3",
  "serde 1.0.126",
  "serde_json",
  "settings_utils",
@@ -3260,9 +3257,6 @@ name = "semver"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f3aac57ee7f3272d8395c6e4f502f434f0e289fcd62876f70daa008c20dcabe"
-dependencies = [
- "serde 1.0.126",
-]
 
 [[package]]
 name = "semver-parser"

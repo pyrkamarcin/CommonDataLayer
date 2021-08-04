@@ -28,16 +28,16 @@ impl CacheSupplier<Uuid, SchemaMetadata> for SchemaMetadataSupplier {
     async fn retrieve(&self, key: Uuid) -> anyhow::Result<SchemaMetadata> {
         let mut conn = rpc::schema_registry::connect(self.schema_registry_url.clone()).await?;
 
-        let metadata = conn
-            .get_schema_metadata(rpc::schema_registry::Id {
+        let schema = conn
+            .get_schema(rpc::schema_registry::Id {
                 id: key.to_string(),
             })
             .await?
             .into_inner();
 
         Ok(SchemaMetadata {
-            query_address: metadata.query_address,
-            schema_type: metadata.schema_type.try_into()?,
+            query_address: schema.query_address,
+            schema_type: schema.schema_type.try_into()?,
         })
     }
 }

@@ -1,8 +1,9 @@
-use crate::error::{RegistryError, RegistryResult};
-use crate::{db::SchemaRegistryDb, types::VersionedUuid};
 use jsonschema::JSONSchema;
 use serde_json::Value;
 use uuid::Uuid;
+
+use crate::db::SchemaRegistryDb;
+use crate::error::{RegistryError, RegistryResult};
 
 pub async fn build_full_schema(schema: &mut Value, conn: &SchemaRegistryDb) -> RegistryResult<()> {
     if let Some(defs) = schema
@@ -20,8 +21,7 @@ pub async fn build_full_schema(schema: &mut Value, conn: &SchemaRegistryDb) -> R
             .collect();
 
         for (key, id) in schemas_to_retrieve {
-            let (_version, definition) =
-                conn.get_schema_definition(&VersionedUuid::any(id)).await?;
+            let definition = conn.get_schema(id).await?.definition;
             defs[&key] = definition;
         }
     }

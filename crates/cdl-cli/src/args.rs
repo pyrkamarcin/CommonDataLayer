@@ -1,7 +1,6 @@
 use std::path::PathBuf;
 
 use clap::Clap;
-use semver::{Version, VersionReq};
 use uuid::Uuid;
 
 use rpc::schema_registry::types::SchemaType;
@@ -39,17 +38,11 @@ pub enum SchemaAction {
     /// registry, ordered alphabetically by name.
     Names,
 
-    /// Get a schema from the registry and print it as JSON. By default, this
-    /// retrieves the latest version, but you can pass a semver range to get
-    /// a specific version.
+    /// Get a schema from the registry and print it as JSON.
     Definition {
         /// The id of the schema.
         #[clap(short, long)]
         id: Uuid,
-
-        /// An optional version requirement on the schema.
-        #[clap(short, long)]
-        version: Option<VersionReq>,
     },
 
     /// Get a schema's metadata from the registry.
@@ -59,14 +52,7 @@ pub enum SchemaAction {
         id: Uuid,
     },
 
-    /// List all semantic versions of a schema in the registry.
-    Versions {
-        /// The id of the schema.
-        #[clap(short, long)]
-        id: Uuid,
-    },
-
-    /// Add a schema to the registry. Its definition is assigned version `1.0.0`.
+    /// Add a schema to the registry.
     Add {
         /// The name of the schema.
         #[clap(short, long)]
@@ -86,20 +72,6 @@ pub enum SchemaAction {
         schema_type: SchemaType,
     },
 
-    /// Add a new version of an existing schema in the registry.
-    AddVersion {
-        /// The id of the schema.
-        #[clap(short, long)]
-        id: Uuid,
-        /// The new version of the schema. Must be greater than all existing versions.
-        #[clap(short, long)]
-        version: Version,
-        /// The file containing the JSON Schema. If not provided,
-        /// the schema definition will be read from stdin.
-        #[clap(short, long, parse(from_os_str))]
-        file: Option<PathBuf>,
-    },
-
     /// Update a schema's metadata in the registry. Only the provided fields will be updated.
     Update {
         /// The id of the schema.
@@ -117,6 +89,13 @@ pub enum SchemaAction {
         /// The new type of the schema. Possible values: DocumentStorage, Timeseries.
         #[clap(short, long = "type")]
         schema_type: Option<SchemaType>,
+        /// Whether to update the schema definition.
+        #[clap(short = 'd', long)]
+        update_definition: bool,
+        /// The file containing the JSON Schema. If not provided,
+        /// the schema definition will be read from stdin.
+        #[clap(short, long, parse(from_os_str))]
+        file: Option<PathBuf>,
     },
 
     /// Validate that a JSON value is valid under the format of the
@@ -125,9 +104,6 @@ pub enum SchemaAction {
         /// The id of the schema.
         #[clap(short, long)]
         id: Uuid,
-        /// An optional version requirement on the schema. Uses the latest by default.
-        #[clap(short, long)]
-        version: Option<VersionReq>,
         /// The file containing the JSON value. If not provided,
         /// the value will be read from stdin.
         #[clap(short, long, parse(from_os_str))]
