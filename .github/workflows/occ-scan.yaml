@@ -1,0 +1,43 @@
+on:
+  schedule:
+    - cron: 0 0 * * 0
+  push:
+    branches:
+      - develop
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Synopsys Detect
+        run: |
+          cd /tmp
+          curl -O https://detect.synopsys.com/detect7.sh
+          bash detect7.sh \
+            --detect.project.name=\"Common Data Layer\" \
+            --detect.source.path="${{ github.workspace }}" \
+            --detect.project.version.name=Dev \
+            --detect.blackduck.signature.scanner.copyright.search=true \
+            --detect.blackduck.signature.scanner.license.search=true \
+            --detect.blackduck.signature.scanner.snippet.matching=SNIPPET_MATCHING \
+            --detect.blackduck.signature.scanner.upload.source.mode=true \
+            --detect.bom.aggregate.name=\"Common Data Layer+Dev\" \
+            --detect.cleanup=false \
+            --detect.code.location.name=\"Common Data Layer+Dev\" \
+            --detect.detector.search.continue=true \
+            --detect.detector.search.depth=20 \
+            --detect.npm.include.dev.dependencies=false \
+            --detect.output.path=./detect/output \
+            --detect.timeout=300 \
+            --detect.excluded.directories=\"target,.git,tests,.cargo,CDL.Tests,deployment,docs,examples,e2e,xtask,.githooks,requirements.txt,.envrc,Dockerfile.e2e,shell.nix\" \
+            --detect.notices.report=true \
+            --detect.notices.report.path=./detect/notices \
+            --detect.risk.report.pdf=true \
+            --detect.risk.report.pdf.path=./detect/riskReport \
+            --blackduck.url="${{secrets.BLACKDUCK_URL}}" \
+            --blackduck.api.token="${{secrets.BLACKDUCK_API_TOKEN}}"
