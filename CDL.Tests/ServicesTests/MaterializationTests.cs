@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using AutoFixture;
 using CDL.Tests.MessageBroker.Kafka;
 using CDL.Tests.ServiceObjects.SchemaService;
@@ -89,12 +90,13 @@ namespace CDL.Tests.ServicesTests
             var schemaWithView = _schemaRegistryService.GetFullSchema(schema_a.Id_).Result;
             Assert.True(schemaWithView.Views.Count == 1);
             
-            await _kafkaProducer.Produce(new InsertObject()
+            _kafkaProducer.Produce(new InsertObject()
             {
                 schemaId = schema_a.Id_,
                 objectId = objectId_a,
                 data = payload_a
-            });
+            }).Wait();
+            Thread.Sleep(1000);
 
             var res = _onDemandMaterializerService.Materialize(view.Id_, schema_a.Id_, new List<string>(){
                 objectId_a,
