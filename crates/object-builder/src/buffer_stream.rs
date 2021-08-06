@@ -178,6 +178,7 @@ mod tests {
                     missing: 2,
                     root_object: a_id,
                     objects: Default::default(),
+                    relation_order: vec![a_id],
                 }),
                 Some(UnfinishedRow {
                     fields: hashmap! {
@@ -193,6 +194,7 @@ mod tests {
                     missing: 2,
                     root_object: a_id,
                     objects: Default::default(),
+                    relation_order: vec![a_id],
                 }),
             ],
             missing: hashmap! {
@@ -262,6 +264,7 @@ mod tests {
                     missing: 2,
                     root_object: a_id,
                     objects: Default::default(),
+                    relation_order: vec![a_id],
                 }),
                 Some(UnfinishedRow {
                     fields: hashmap! {
@@ -277,6 +280,7 @@ mod tests {
                     missing: 2,
                     root_object: a_id,
                     objects: Default::default(),
+                    relation_order: vec![a_id],
                 }),
             ],
             missing: hashmap! {
@@ -321,7 +325,8 @@ mod tests {
                             field_path: "".into()
                         }
                     }
-                }
+                },
+                relation_order: vec![a_id],
             },
             "second row"
         );
@@ -340,7 +345,8 @@ mod tests {
                             field_path: "".into()
                         }
                     }
-                }
+                },
+                relation_order: vec![a_id],
             },
             "first row"
         );

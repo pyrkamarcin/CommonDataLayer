@@ -65,7 +65,7 @@ struct MaterializedView {
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "snake_case")]
 pub struct RowDefinition {
-    objects: HashSet<ObjectIdPair>,
+    objects: Vec<ObjectIdPair>,
     fields: HashMap<String, Value>,
 }
 

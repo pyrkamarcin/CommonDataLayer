@@ -59,7 +59,7 @@ mod simple_views {
 
         sleep(Duration::from_secs(10)).await; // async view generation
 
-        let query = format!("SELECT object_ids, field_a FROM {}", table_name);
+        let query = format!("SELECT schema_0, field_a FROM {}", table_name);
         let pg_results = pg.query(query.as_str(), &[]).await.unwrap();
 
         assert_eq!(pg_results.len(), 1);
@@ -67,15 +67,15 @@ mod simple_views {
 
         #[derive(Debug)]
         struct TestRow {
-            object_ids: Vec<Uuid>,
+            schema_0: Uuid,
             field_a: Value,
         }
 
         let row = TestRow {
-            object_ids: row.get(0),
+            schema_0: row.get(0),
             field_a: row.get(1),
         };
-        assert_eq!(row.object_ids.first().unwrap(), &object_id);
+        assert_eq!(row.schema_0, object_id);
         assert_eq!(row.field_a.as_str().unwrap(), "A");
 
         Ok(())
@@ -155,7 +155,7 @@ mod relations {
         let pg_results = pg
             .query(
                 format!(
-                    "SELECT object_ids, field_a, field_b_field_c FROM {}",
+                    "SELECT schema_0, schema_1, field_a, field_b_field_c FROM {}",
                     table_name
                 )
                 .as_str(),
@@ -169,19 +169,20 @@ mod relations {
 
         #[derive(Debug)]
         struct TestRow {
-            object_ids: Vec<Uuid>,
+            schema_0: Uuid,
+            schema_1: Uuid,
             field_a: Value,
             field_b_c: Value,
         }
 
         let row = TestRow {
-            object_ids: row.get(0),
-            field_a: row.get(1),
-            field_b_c: row.get(2),
+            schema_0: row.get(0),
+            schema_1: row.get(1),
+            field_a: row.get(2),
+            field_b_c: row.get(3),
         };
-        // TODO: Order of ids should be deterministic - required for updates to materialized data
-        // assert_eq!(row.object_ids.first().unwrap(), &object_id_a);
-        // assert_eq!(row.object_ids.get(1).unwrap(), &object_id_b);
+        assert_eq!(row.schema_0, object_id_a);
+        assert_eq!(row.schema_1, object_id_b);
         assert_eq!(row.field_a.as_str().unwrap(), "A");
         assert_eq!(row.field_b_c.as_str().unwrap(), "D");
         Ok(())

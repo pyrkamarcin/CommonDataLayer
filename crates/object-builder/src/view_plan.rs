@@ -34,6 +34,9 @@ pub struct UnfinishedRow {
     pub fields: HashMap<String, FieldDefinitionSource>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub filters: Option<FilterSource>,
+
+    /// Mapping schema_id, object_id pairs to proper relation identifier
+    pub relation_order: Vec<ObjectIdPair>,
 }
 
 impl UnfinishedRow {
@@ -51,6 +54,7 @@ impl UnfinishedRow {
             root_object: self.root_object,
             fields: self.fields,
             filters: self.filters,
+            relation_order: self.relation_order,
         }
     }
 }

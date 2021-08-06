@@ -18,6 +18,8 @@ use serde_json::Value;
 use settings_utils::PostgresSettings;
 use uuid::Uuid;
 
+const SCHEMA_COLUMN_PREFIX: &str = "schema_";
+
 // TODO: Move some of those structs to dto crate
 
 pub struct PostgresMaterializer {
@@ -103,22 +105,12 @@ impl MaterializerPlugin for PostgresMaterializer {
             tracing::warn!("Materialized view is empty, skipping upserting");
         }
 
-        let (copy_stm, insert_stm, types, columns, fields) =
+        let (copy_stm, insert_stm, create_stm, types, fields) =
             self.build_query(&psql_view, &view_definition).await?;
+
         let tx = conn.transaction().await?;
         // Temporary table is unique per session
-        tx.batch_execute(&format!(
-            "CREATE TABLE IF NOT EXISTS {table} ( \
-                    object_ids UUID[] NOT NULL,\
-                    {columns},\
-                    PRIMARY KEY (object_ids)
-                 );\
-                 CREATE TEMP TABLE upserts ON COMMIT DROP \
-                 AS TABLE {table} WITH NO DATA;",
-            table = psql_view.options.table,
-            columns = columns
-        ))
-        .await?;
+        tx.batch_execute(&create_stm).await?;
         let sink = tx.copy_in(copy_stm.as_str()).await?;
         let writer = BinaryCopyInWriter::new(sink, &types); // Batch insert
 
@@ -148,7 +140,9 @@ impl PostgresMaterializer {
         let mut row: Vec<&'_ (dyn ToSql + Sync)> = Vec::with_capacity(view.rows.len());
         for m in view.rows.iter() {
             row.clear();
-            row.push(&m.object_ids);
+            for object_id in &m.object_ids {
+                row.push(object_id);
+            }
             for field in fields {
                 let f = m.fields.get(&field.name).context("Field not found")?;
                 row.push(f.pointer(&field.json_path).context("Subobject not found")?);
@@ -165,38 +159,73 @@ impl PostgresMaterializer {
         &self,
         view: &PsqlView,
         definition: &FullView,
-    ) -> anyhow::Result<(String, String, Vec<Type>, String, Vec<Field>)> {
+    ) -> anyhow::Result<(String, String, String, Vec<Type>, Vec<Field>)> {
         let table = &view.options.table;
 
+        let pk_fields = get_pk_field_list(definition);
         let fields = get_field_list(definition);
 
-        let columns = fields.iter().map(|x| x.sql_name.to_owned()).join(", ");
-        let update_columns = fields
+        let types = pk_fields
             .iter()
-            .map(|f| format!("{field} = EXCLUDED.{field}", field = f.sql_name))
-            .join(", ");
-        let insert_stm = format!(
-            "INSERT INTO {} \
-                                  SELECT * FROM upserts \
-                                  ON CONFLICT (object_ids) DO UPDATE SET {}",
-            table, update_columns
+            .chain(fields.iter())
+            .map(|x| x.type_.clone())
+            .collect();
+
+        let columns = fields.iter().map(|x| x.sql_name.to_owned()).join(", ");
+        let pk_columns = pk_fields.iter().map(|x| x.sql_name.to_owned()).join(", ");
+        let copy_stm = format!(
+            "COPY upserts ({}, {}) FROM STDIN BINARY",
+            pk_columns, columns
         );
-        let copy_stm = format!("COPY upserts (object_ids, {}) FROM STDIN BINARY", columns);
-        let mut types = vec![Type::UUID_ARRAY];
         // TODO: For now each column is stored as a JSON field.
         // Later we can introduce some kind of type infering mechanism here, so each field in
         // Materialized view would be stored with better column type.
         // We can achieve that by matching `Value` variants (leaving `JSON` for complex objects like arrays or structs).
 
-        let columns = fields
+        let pk_columns = pk_fields.iter().map(|f| f.sql_name.to_owned()).join(", ");
+        let pk_columns_with_types = pk_fields
+            .iter()
+            .map(|f| format!("{} UUID NOT NULL", f.sql_name))
+            .join(", ");
+        let columns_with_types = fields
             .iter()
             .map(|f| format!("{} JSON NOT NULL", f.sql_name))
             .join(", ");
+        let create_stm = format!(
+            "CREATE TABLE IF NOT EXISTS {table} ( \
+                    {pk_columns_with_types},\
+                    {columns_with_types},\
+                    PRIMARY KEY ({pk_columns}) \
+                 );\
+                 CREATE TEMP TABLE upserts ON COMMIT DROP \
+                 AS TABLE {table} WITH NO DATA;",
+            table = table,
+            columns_with_types = columns_with_types,
+            pk_columns_with_types = pk_columns_with_types,
+            pk_columns = pk_columns
+        );
 
-        types.extend(fields.iter().map(|x| x.type_.clone()));
+        let update_columns = fields
+            .iter()
+            .map(|f| format!("{field} = EXCLUDED.{field}", field = f.sql_name))
+            .join(", ");
 
-        tracing::debug!(?insert_stm, ?copy_stm, ?types, "Build query");
-        Ok((copy_stm, insert_stm, types, columns, fields))
+        let insert_stm = format!(
+            "INSERT INTO {} \
+        SELECT * FROM upserts \
+        ON CONFLICT ({}) DO UPDATE SET {}",
+            table, pk_columns, update_columns
+        );
+
+        tracing::debug!(
+            ?copy_stm,
+            ?insert_stm,
+            ?create_stm,
+            ?types,
+            ?fields,
+            "Build query"
+        );
+        Ok((copy_stm, insert_stm, create_stm, types, fields))
     }
 
     pub async fn new(args: &PostgresSettings) -> anyhow::Result<Self> {
@@ -220,6 +249,26 @@ impl PostgresMaterializer {
             schema: args.schema.clone(),
         })
     }
+}
+
+fn get_pk_field_list(definition: &FullView) -> Vec<Field> {
+    let mut fields = vec![Field {
+        json_path: "".to_owned(),
+        name: format!("{}{}", SCHEMA_COLUMN_PREFIX, 0),
+        sql_name: format!("{}{}", SCHEMA_COLUMN_PREFIX, 0),
+        type_: Type::UUID,
+    }];
+
+    for relation in &definition.relations {
+        let name = format!("{}{}", SCHEMA_COLUMN_PREFIX, relation.local_id);
+        fields.push(Field {
+            json_path: "".to_owned(),
+            name: name.clone(),
+            sql_name: name,
+            type_: Type::UUID,
+        })
+    }
+    fields
 }
 
 fn get_field_list(definition: &FullView) -> Vec<Field> {

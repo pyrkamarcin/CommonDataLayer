@@ -46,6 +46,7 @@ pub enum RowSource {
         root_object: ObjectIdPair,
         fields: HashMap<String, FieldDefinitionSource>,
         filters: Option<FilterSource>,
+        relation_order: Vec<ObjectIdPair>,
     },
     Single {
         root_object: ObjectIdPair,

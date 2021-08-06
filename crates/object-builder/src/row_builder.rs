@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 use anyhow::{Context, Result};
 use maplit::hashmap;
@@ -31,8 +31,9 @@ impl RowBuilder {
                 objects,
                 fields,
                 filters,
+                relation_order,
                 ..
-            } => self.build_join(objects, fields, filters),
+            } => self.build_join(objects, fields, filters, relation_order),
             RowSource::Single {
                 root_object,
                 value,
@@ -47,6 +48,7 @@ impl RowBuilder {
         objects: HashMap<ObjectIdPair, Value>,
         fields: HashMap<String, FieldDefinitionSource>,
         filters: Option<FilterSource>,
+        relation_order: Vec<ObjectIdPair>,
     ) -> Result<Option<RowDefinition>> {
         let field_builder = FieldBuilder { objects: &objects };
 
@@ -54,11 +56,10 @@ impl RowBuilder {
             .iter()
             .map(|field| field_builder.build(field))
             .collect::<anyhow::Result<_>>()?;
-        let object_ids = objects.keys().cloned().collect();
 
         RowFilter::new(&objects).filter(
             RowDefinition {
-                objects: object_ids,
+                objects: relation_order,
                 fields,
             },
             filters,
@@ -109,8 +110,7 @@ impl RowBuilder {
                 ))
             })
             .collect::<anyhow::Result<_>>()?;
-        let mut object_pairs = HashSet::new();
-        object_pairs.insert(pair);
+        let object_pairs = vec![pair];
 
         RowFilter::new(&objects).filter(
             RowDefinition {

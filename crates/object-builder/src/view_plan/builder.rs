@@ -7,6 +7,7 @@ use cdl_dto::{
         RawValueFilter, SchemaFieldFilter, SimpleFilter, SimpleFilterKind, ViewPathFilter,
     },
 };
+use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 use std::num::NonZeroU8;
 
@@ -50,6 +51,7 @@ impl<'a> ViewPlanBuilder<'a> {
             fields,
             filters,
             root_object,
+            relation_order: vec![root_object],
         })
     }
 
@@ -68,13 +70,16 @@ impl<'a> ViewPlanBuilder<'a> {
                     .map(|filters| self.build_filters(&variant, filters))
                     .transpose()?;
 
-                let mut set: HashSet<ObjectIdPair> = variant
-                    .objects
-                    .into_iter()
-                    .map(|(_, object)| object)
-                    .collect();
+                let mut set: HashSet<ObjectIdPair> =
+                    variant.objects.iter().map(|(_, object)| *object).collect();
 
                 set.insert(variant.root_object);
+
+                let mut relation_order = vec![variant.root_object];
+                for obj in variant.objects.iter().sorted().enumerate() {
+                    debug_assert_eq!(NonZeroU8::new(obj.0 as u8 + 1).unwrap(), *(obj.1 .0));
+                    relation_order.push(*obj.1 .1);
+                }
 
                 Ok((
                     UnfinishedRow {
@@ -83,6 +88,7 @@ impl<'a> ViewPlanBuilder<'a> {
                         fields,
                         filters,
                         root_object: variant.root_object,
+                        relation_order,
                     },
                     set,
                 ))
