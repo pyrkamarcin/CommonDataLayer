@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - occ_scan
 
 jobs:
   scan:
@@ -16,6 +17,7 @@ jobs:
           java-version: 1.8
       - name: Synopsys Detect
         run: |
+          find crates -name Cargo.toml -exec dirname {} \; | xargs -I '{}' cp Cargo.lock '{}'
           cd /tmp
           curl -O https://detect.synopsys.com/detect7.sh
           bash detect7.sh \
@@ -34,10 +36,17 @@ jobs:
             --detect.npm.include.dev.dependencies=false \
             --detect.output.path=./detect/output \
             --detect.timeout=300 \
-            --detect.excluded.directories=\"target,.git,tests,.cargo,CDL.Tests,deployment,docs,examples,e2e,xtask,.githooks,requirements.txt,.envrc,Dockerfile.e2e,shell.nix\" \
+            --detect.excluded.directories=\"target,.git,tests,.cargo,CDL.Tests,deployment,docs,examples,e2e,xtask,.githooks,requirements.txt,.envrc,Dockerfile.e2e,shell.nix,benchmarking\" \
             --detect.notices.report=true \
             --detect.notices.report.path=./detect/notices \
             --detect.risk.report.pdf=true \
             --detect.risk.report.pdf.path=./detect/riskReport \
             --blackduck.url="${{secrets.BLACKDUCK_URL}}" \
             --blackduck.api.token="${{secrets.BLACKDUCK_API_TOKEN}}"
+      - name: Archive Synopsys Detect artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: synopsys-detect-reports
+          path: |
+            /tmp/detect/notices/**.txt
+            /tmp/detect/riskReport/**.pdf
