@@ -20,7 +20,7 @@ pub struct FullView {
     pub filters: Json<Option<Filter>>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct View {
     pub id: Uuid,
     pub name: String,

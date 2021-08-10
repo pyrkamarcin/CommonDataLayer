@@ -10,7 +10,7 @@ use crate::error::{RegistryError, RegistryResult};
 use crate::settings::Settings;
 use crate::types::schema::{FullSchema, NewSchema, Schema, SchemaUpdate};
 use crate::types::view::{FullView, NewView, View, ViewUpdate};
-use crate::types::DbExport;
+use crate::types::{DbExport, ExportSchema};
 use crate::utils::build_full_schema;
 use futures::future;
 use futures_util::stream::{StreamExt, TryStreamExt};
@@ -459,7 +459,32 @@ impl SchemaRegistryDb {
 
     pub async fn export_all(&self) -> RegistryResult<DbExport> {
         Ok(DbExport {
-            schemas: self.get_all_full_schemas().await?,
+            schemas: self
+                .get_all_full_schemas()
+                .await?
+                .into_iter()
+                .map(|schema| ExportSchema {
+                    id: schema.id,
+                    name: schema.name,
+                    insert_destination: schema.insert_destination,
+                    query_address: schema.query_address,
+                    schema_type: schema.schema_type,
+                    definition: schema.definition,
+                    views: schema
+                        .views
+                        .into_iter()
+                        .map(|view| View {
+                            id: view.id,
+                            name: view.name,
+                            materializer_address: view.materializer_address,
+                            materializer_options: view.materializer_options,
+                            fields: view.fields,
+                            relations: view.relations,
+                            filters: view.filters,
+                        })
+                        .collect(),
+                })
+                .collect(),
         })
     }
 }

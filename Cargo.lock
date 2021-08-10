@@ -933,9 +933,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "diff_assert"
+version = "1.0.0-pre1"
+source = "git+https://github.com/anixe/diff-assert.git#24238dbd2e7037c1a2665b95070b8267c43b9d1d"
+dependencies = [
+ "diff_utils",
+]
+
+[[package]]
 name = "diff_utils"
 version = "1.0.0-pre1"
-source = "git+https://github.com/frondeus/diff-assert.git#ec3857677310e49992d5e8ad29445b2e9816ce31"
+source = "git+https://github.com/anixe/diff-assert.git#24238dbd2e7037c1a2665b95070b8267c43b9d1d"
 dependencies = [
  "chrono",
  "colored",
@@ -3166,6 +3174,7 @@ dependencies = [
  "bb8",
  "cdl_dto",
  "communication_utils",
+ "diff_assert",
  "futures",
  "futures-util",
  "jsonschema",
@@ -3425,7 +3434,7 @@ checksum = "fe0f37c9e8f3c5a4a66ad655a93c74daac4ad00c441533bf5c6e7990bb42604e"
 [[package]]
 name = "snapshot-runner"
 version = "0.1.0"
-source = "git+https://github.com/frondeus/snapshot-runner.git#05beacad44af0976e0106487dbfea2b21bad73fc"
+source = "git+https://github.com/frondeus/snapshot-runner.git#ed024457c6542508ab89b84a8cc769f5941995e2"
 dependencies = [
  "anyhow",
  "chrono",

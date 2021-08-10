@@ -45,3 +45,4 @@ tracing-futures         = "0.2.5"
 
 [dev-dependencies]
 maplit = "1.0.2"
+diff_assert = { git = "https://github.com/anixe/diff-assert.git" }

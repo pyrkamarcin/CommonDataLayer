@@ -38,12 +38,22 @@ pub async fn main() -> anyhow::Result<()> {
     }
 
     if let Some(import_path) = settings.import_file {
-        let imported = File::open(import_path).map_err(|err| anyhow::anyhow!("{}", err))?;
-        let imported = serde_json::from_reader(imported)?;
-        registry
-            .import_all(imported)
-            .await
-            .map_err(|err| anyhow::anyhow!("Failed to import database: {}", err))?;
+        let imported = File::open(&import_path).map_err(|err| {
+            anyhow::anyhow!(
+                "Could not open import file {}: {}",
+                import_path.display(),
+                err
+            )
+        })?;
+        let imported = serde_json::from_reader(imported)
+            .with_context(|| format!("Failed to read import file: {}", import_path.display()))?;
+        registry.import_all(imported).await.map_err(|err| {
+            anyhow::anyhow!(
+                "Failed to import database from file {}: {}",
+                import_path.display(),
+                err
+            )
+        })?;
     }
 
     let addr = SocketAddrV4::new(Ipv4Addr::new(0, 0, 0, 0), settings.input_port);
