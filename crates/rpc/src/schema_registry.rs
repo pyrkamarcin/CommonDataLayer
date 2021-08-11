@@ -17,13 +17,7 @@ pub struct SchemaRegistryConnectionManager {
 }
 
 pub async fn connect(addr: String) -> Result<SchemaRegistryConn, ClientError> {
-    connect_inner(addr)
-        .await
-        .map_err(|err| ClientError::ConnectionError { source: err })
-}
-
-async fn connect_inner(addr: String) -> Result<SchemaRegistryConn, tonic::transport::Error> {
-    let conn = tonic::transport::Endpoint::new(addr)?.connect().await?;
+    let conn = crate::open_channel(addr, "schema registry").await?;
 
     Ok(SchemaRegistryClient::with_interceptor(
         conn,
@@ -37,7 +31,7 @@ impl bb8::ManageConnection for SchemaRegistryConnectionManager {
     type Error = ClientError;
 
     async fn connect(&self) -> Result<Self::Connection, Self::Error> {
-        tracing::debug!("Connecting to registry");
+        tracing::debug!("Connecting to schema registry");
 
         connect(self.address.clone()).await
     }

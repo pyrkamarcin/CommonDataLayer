@@ -12,3 +12,47 @@ pub mod query_service_ts;
 pub mod schema_registry;
 
 pub use tonic;
+
+use error::ClientError;
+use std::error::Error;
+use std::io;
+use tonic::transport::{Channel, TimeoutExpired};
+
+pub async fn open_channel(
+    addr: String,
+    service_name: &'static str,
+) -> Result<Channel, ClientError> {
+    let endpoint = tonic::transport::Endpoint::new(addr)
+        .map_err(|err| ClientError::ConnectionError { source: err })?
+        .connect_timeout(std::time::Duration::from_secs(5))
+        .timeout(std::time::Duration::from_secs(5));
+
+    endpoint.connect().await.map_err(|err| {
+        eprintln!(
+            "Failed to connect to endpoint: {} - {:?}",
+            err,
+            err.source()
+        );
+
+        if err
+            .source()
+            .map(|s| s.is::<TimeoutExpired>())
+            .unwrap_or(false)
+        {
+            return ClientError::TimeoutError {
+                service: service_name,
+            };
+        }
+
+        match err.source().and_then(|s| s.downcast_ref::<io::Error>()) {
+            Some(ioe) if ioe.kind() == io::ErrorKind::TimedOut => {
+                return ClientError::TimeoutError {
+                    service: service_name,
+                };
+            }
+            _ => {}
+        }
+
+        ClientError::ConnectionError { source: err }
+    })
+}

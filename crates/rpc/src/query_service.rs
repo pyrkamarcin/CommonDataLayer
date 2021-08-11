@@ -4,7 +4,7 @@ use futures_util::{Stream, TryStreamExt};
 use query_service_client::QueryServiceClient;
 use std::pin::Pin;
 use tonic::service::interceptor::InterceptedService;
-use tonic::transport::{Channel, Endpoint, Error};
+use tonic::transport::Channel;
 use tracing_utils::grpc::InterceptorType;
 
 pub type ObjectStream<Error = ClientError> =
@@ -16,15 +16,7 @@ pub async fn connect(
     QueryServiceClient<InterceptedService<Channel, &'static dyn InterceptorType>>,
     ClientError,
 > {
-    connect_inner(addr)
-        .await
-        .map_err(|err| ClientError::ConnectionError { source: err })
-}
-
-async fn connect_inner(
-    addr: String,
-) -> Result<QueryServiceClient<InterceptedService<Channel, &'static dyn InterceptorType>>, Error> {
-    let conn = Endpoint::new(addr)?.connect().await?;
+    let conn = crate::open_channel(addr, "query service").await?;
 
     Ok(QueryServiceClient::with_interceptor(
         conn,

@@ -40,7 +40,7 @@ impl OnDemandMaterializer for MaterializerImpl {
             .map(|(k, v)| (k, into_object_builder_schemas(v)))
             .collect();
 
-        let stream = rpc::object_builder::connect(self.object_builder_addr.as_str())
+        let stream = rpc::object_builder::connect(self.object_builder_addr.clone())
             .await
             .map_err(|e| tonic::Status::internal(format!("{}", e)))?
             .materialize(View { view_id, schemas })

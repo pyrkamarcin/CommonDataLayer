@@ -1,10 +1,10 @@
-use std::collections::HashMap;
-use std::convert::TryInto;
-use std::pin::Pin;
-
 use bb8::Pool;
 use futures_util::future::{BoxFuture, FutureExt};
 use sqlx::types::Json;
+use std::collections::HashMap;
+use std::convert::TryInto;
+use std::pin::Pin;
+use std::time::Duration;
 use tokio_stream::{Stream, StreamExt};
 use tonic::{Request, Response, Status};
 use uuid::Uuid;
@@ -37,6 +37,7 @@ impl SchemaRegistryImpl {
         let db = SchemaRegistryDb::new(settings).await?;
 
         let edge_registry = Pool::builder()
+            .connection_timeout(Duration::from_secs(5))
             .build(EdgeRegistryConnectionManager {
                 address: settings.services.edge_registry_url.clone(),
             })

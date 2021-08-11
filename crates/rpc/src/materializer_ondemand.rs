@@ -15,13 +15,7 @@ pub struct OnDemandMaterializerConnectionManager {
 }
 
 pub async fn connect(addr: String) -> Result<OnDemandMaterializerConn, ClientError> {
-    connect_inner(addr)
-        .await
-        .map_err(|err| ClientError::ConnectionError { source: err })
-}
-
-async fn connect_inner(addr: String) -> Result<OnDemandMaterializerConn, tonic::transport::Error> {
-    let conn = tonic::transport::Endpoint::new(addr)?.connect().await?;
+    let conn = crate::open_channel(addr, "materializer on-demand").await?;
 
     Ok(OnDemandMaterializerClient::with_interceptor(
         conn,

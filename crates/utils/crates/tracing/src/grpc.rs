@@ -12,7 +12,7 @@ pub trait InterceptorType = (Fn(Request<()>) -> Result<Request<()>, Status>) + S
 /// # Example:
 /// ```ignore
 /// pub async fn connect(addr: String) -> Result<MyServiceClient<tonic::transport::Channel>, tonic::transport::Error> {
-///     let conn = tonic::transport::Endpoint::new(addr)?.connect().await?;
+///     let conn = crate::open_channel(addr).await?;
 ///
 ///     Ok(MyServiceClient::with_interceptor(conn, &tracing_utils::grpc::interceptor))
 /// }

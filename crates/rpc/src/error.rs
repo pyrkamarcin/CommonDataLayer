@@ -6,6 +6,8 @@ pub use tonic::{Code, Status};
 pub enum ClientError {
     #[error("Failed to connect to: {source}")]
     ConnectionError { source: tonic::transport::Error },
-    #[error("Error durign query: {source}")]
+    #[error("Timed out trying to connect to {service}. Is the service up?")]
+    TimeoutError { service: &'static str },
+    #[error("Error during query: {source}")]
     QueryError { source: Status },
 }

@@ -6,23 +6,12 @@ use tonic::transport::Channel;
 use tracing_utils::grpc::InterceptorType;
 
 pub async fn connect(
-    addr: impl Into<String>,
+    addr: String,
 ) -> Result<
     ObjectBuilderClient<InterceptedService<Channel, &'static dyn InterceptorType>>,
     ClientError,
 > {
-    connect_inner(addr.into())
-        .await
-        .map_err(|err| ClientError::ConnectionError { source: err })
-}
-
-async fn connect_inner(
-    addr: String,
-) -> Result<
-    ObjectBuilderClient<InterceptedService<Channel, &'static dyn InterceptorType>>,
-    tonic::transport::Error,
-> {
-    let conn = tonic::transport::Endpoint::new(addr)?.connect().await?;
+    let conn = crate::open_channel(addr, "object builder").await?;
 
     Ok(ObjectBuilderClient::with_interceptor(
         conn,

@@ -11,18 +11,7 @@ pub async fn connect(
     GeneralMaterializerClient<InterceptedService<Channel, &'static dyn InterceptorType>>,
     ClientError,
 > {
-    connect_inner(addr)
-        .await
-        .map_err(|err| ClientError::ConnectionError { source: err })
-}
-
-async fn connect_inner(
-    addr: String,
-) -> Result<
-    GeneralMaterializerClient<InterceptedService<Channel, &'static dyn InterceptorType>>,
-    tonic::transport::Error,
-> {
-    let conn = tonic::transport::Endpoint::new(addr)?.connect().await?;
+    let conn = crate::open_channel(addr, "materializer general").await?;
 
     Ok(GeneralMaterializerClient::with_interceptor(
         conn,

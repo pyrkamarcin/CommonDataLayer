@@ -3,7 +3,7 @@ use crate::error::ClientError;
 use bb8::{Pool, PooledConnection};
 use edge_registry_client::EdgeRegistryClient;
 use tonic::service::interceptor::InterceptedService;
-use tonic::transport::{Channel, Endpoint, Error};
+use tonic::transport::Channel;
 use tracing_utils::grpc::InterceptorType;
 
 pub type EdgeRegistryPool = Pool<EdgeRegistryConnectionManager>;
@@ -15,13 +15,7 @@ pub struct EdgeRegistryConnectionManager {
 }
 
 pub async fn connect(addr: String) -> Result<EdgeRegistryConn, ClientError> {
-    connect_inner(addr)
-        .await
-        .map_err(|err| ClientError::ConnectionError { source: err })
-}
-
-async fn connect_inner(addr: String) -> Result<EdgeRegistryConn, Error> {
-    let conn = Endpoint::new(addr)?.connect().await?;
+    let conn = crate::open_channel(addr, "edge registry").await?;
 
     Ok(EdgeRegistryClient::with_interceptor(
         conn,
@@ -35,7 +29,7 @@ impl bb8::ManageConnection for EdgeRegistryConnectionManager {
     type Error = ClientError;
 
     async fn connect(&self) -> Result<Self::Connection, Self::Error> {
-        tracing::debug!("Connecting to registry");
+        tracing::debug!("Connecting to edge registry");
 
         connect(self.address.clone()).await
     }

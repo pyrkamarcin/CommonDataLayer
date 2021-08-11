@@ -2,7 +2,7 @@ pub use crate::codegen::query_service_ts::*;
 use crate::error::ClientError;
 use query_service_ts_client::QueryServiceTsClient;
 use tonic::service::interceptor::InterceptedService;
-use tonic::transport::{Channel, Endpoint, Error};
+use tonic::transport::Channel;
 use tracing_utils::grpc::InterceptorType;
 
 pub async fn connect(
@@ -11,16 +11,7 @@ pub async fn connect(
     QueryServiceTsClient<InterceptedService<Channel, &'static dyn InterceptorType>>,
     ClientError,
 > {
-    connect_inner(addr)
-        .await
-        .map_err(|err| ClientError::ConnectionError { source: err })
-}
-
-async fn connect_inner(
-    addr: String,
-) -> Result<QueryServiceTsClient<InterceptedService<Channel, &'static dyn InterceptorType>>, Error>
-{
-    let conn = Endpoint::new(addr)?.connect().await?;
+    let conn = crate::open_channel(addr, "query service (timeseries)").await?;
 
     Ok(QueryServiceTsClient::with_interceptor(
         conn,
