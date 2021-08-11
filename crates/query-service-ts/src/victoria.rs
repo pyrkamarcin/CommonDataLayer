@@ -5,7 +5,7 @@ use rpc::query_service_ts::{
     query_service_ts_server::QueryServiceTs, Range, RawStatement, SchemaId, TimeSeries, ValueBytes,
 };
 use serde::Deserialize;
-use settings_utils::VictoriaMetricsSettings;
+use settings_utils::apps::query_service_ts::QueryServiceTsVictoriaMetricsSettings;
 use tonic::{Request, Response, Status};
 
 pub struct VictoriaConnectionManager;
@@ -41,7 +41,7 @@ struct RawStatementParameters {
 }
 
 impl VictoriaQuery {
-    pub async fn load(config: VictoriaMetricsSettings) -> anyhow::Result<Self> {
+    pub async fn load(config: QueryServiceTsVictoriaMetricsSettings) -> anyhow::Result<Self> {
         let pool = Pool::builder()
             .build(VictoriaConnectionManager)
             .await

@@ -1,4 +1,5 @@
-use crate::{events::EventStream, events::EventSubscriber, settings::Settings};
+use crate::{events::EventStream, events::EventSubscriber};
+use settings_utils::apps::api::ApiSettings;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -12,7 +13,7 @@ impl MQEvents {
     pub async fn subscribe_on_communication_method(
         &self,
         topic: &str,
-        settings: &Settings,
+        settings: &ApiSettings,
     ) -> anyhow::Result<EventStream> {
         tracing::debug!("subscribe on message queue: {}", topic);
 

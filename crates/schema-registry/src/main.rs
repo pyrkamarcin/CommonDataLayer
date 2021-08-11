@@ -2,7 +2,7 @@ use anyhow::Context;
 use metrics_utils as metrics;
 use rpc::schema_registry::schema_registry_server::SchemaRegistryServer;
 use schema_registry::rpc::SchemaRegistryImpl;
-use schema_registry::settings::Settings;
+use settings_utils::apps::schema_registry::SchemaRegistrySettings;
 use settings_utils::load_settings;
 use std::fs::File;
 use std::net::{Ipv4Addr, SocketAddrV4};
@@ -16,7 +16,7 @@ use utils::status_endpoints;
 pub async fn main() -> anyhow::Result<()> {
     misc_utils::set_aborting_panic_hook();
 
-    let settings: Settings = load_settings()?;
+    let settings: SchemaRegistrySettings = load_settings()?;
     tracing_utils::init(
         settings.log.rust_log.as_str(),
         settings.monitoring.otel_service_name.as_str(),

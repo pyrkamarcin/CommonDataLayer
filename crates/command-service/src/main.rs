@@ -7,18 +7,18 @@ use command_service::input::{Error, Service};
 use command_service::output::{
     DruidOutputPlugin, OutputPlugin, PostgresOutputPlugin, VictoriaMetricsOutputPlugin,
 };
-use command_service::settings::{RepositoryKind, Settings};
 use communication_utils::parallel_consumer::ParallelCommonConsumer;
 use metrics_utils as metrics;
+use notification_utils::NotificationPublisher;
+use settings_utils::apps::command_service::{CommandServiceRepositoryKind, CommandServiceSettings};
 use settings_utils::load_settings;
 use tracing::debug;
-use utils::notification::NotificationPublisher;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     misc_utils::set_aborting_panic_hook();
 
-    let settings: Settings = load_settings()?;
+    let settings: CommandServiceSettings = load_settings()?;
     tracing_utils::init(
         settings.log.rust_log.as_str(),
         settings.monitoring.otel_service_name.as_str(),
@@ -28,7 +28,7 @@ async fn main() -> anyhow::Result<()> {
 
     metrics::serve(&settings.monitoring);
 
-    let consumers = settings.consumers(settings.async_task_limit).await?;
+    let consumers = settings.consumers().await?;
     let notification_publisher = settings
         .notifications
         .publisher(
@@ -44,7 +44,7 @@ async fn main() -> anyhow::Result<()> {
         settings.druid,
         settings.repository_kind,
     ) {
-        (Some(postgres), _, _, RepositoryKind::Postgres) => {
+        (Some(postgres), _, _, CommandServiceRepositoryKind::Postgres) => {
             start_services(
                 consumers,
                 notification_publisher,
@@ -52,7 +52,7 @@ async fn main() -> anyhow::Result<()> {
             )
             .await
         }
-        (_, Some(victoria_metrics), _, RepositoryKind::VictoriaMetrics) => {
+        (_, Some(victoria_metrics), _, CommandServiceRepositoryKind::VictoriaMetrics) => {
             start_services(
                 consumers,
                 notification_publisher,
@@ -60,7 +60,7 @@ async fn main() -> anyhow::Result<()> {
             )
             .await
         }
-        (_, _, Some(druid), RepositoryKind::Druid) => {
+        (_, _, Some(druid), CommandServiceRepositoryKind::Druid) => {
             if let Some(kafka) = settings.kafka {
                 start_services(
                     consumers,
@@ -79,14 +79,14 @@ async fn main() -> anyhow::Result<()> {
 }
 
 async fn start_services(
-    communication_config: Vec<ParallelCommonConsumer>,
+    consumers: Vec<ParallelCommonConsumer>,
     notification_publisher: NotificationPublisher<OwnedInsertMessage>,
     output: impl OutputPlugin,
 ) -> Result<(), Error> {
     let message_router = MessageRouter::new(notification_publisher, output);
 
     debug!("Starting command service on a message-queue");
-    Service::new(communication_config, message_router)
+    Service::new(consumers, message_router)
         .await?
         .listen()
         .await?;

@@ -11,7 +11,6 @@ use uuid::Uuid;
 
 use crate::db::SchemaRegistryDb;
 use crate::error::{RegistryError, RegistryResult};
-use crate::settings::Settings;
 use crate::types::schema::{NewSchema, SchemaUpdate};
 use crate::types::view::{FullView, NewView, ViewUpdate};
 use crate::types::DbExport;
@@ -24,6 +23,7 @@ use rpc::schema_registry::{
     schema_registry_server::SchemaRegistry, Empty, Errors, Id, SchemaUpdate as RpcSchemaUpdate,
     SchemaViews, ValueToValidate,
 };
+use settings_utils::apps::schema_registry::SchemaRegistrySettings;
 
 pub struct SchemaRegistryImpl {
     pub edge_registry: EdgeRegistryPool,
@@ -32,7 +32,7 @@ pub struct SchemaRegistryImpl {
 }
 
 impl SchemaRegistryImpl {
-    pub async fn new(settings: &Settings) -> anyhow::Result<Self> {
+    pub async fn new(settings: &SchemaRegistrySettings) -> anyhow::Result<Self> {
         let mq_metadata = settings.metadata_fetcher().await?;
         let db = SchemaRegistryDb::new(settings).await?;
 

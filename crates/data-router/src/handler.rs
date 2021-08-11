@@ -10,7 +10,7 @@ use lenient_semver::Version;
 use metrics_utils::{self as metrics, counter};
 use misc_utils::current_timestamp;
 use serde_json::Value;
-use settings_utils::RepositoryStaticRouting;
+use settings_utils::apps::RepositoryStaticRouting;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tracing::{error, trace};

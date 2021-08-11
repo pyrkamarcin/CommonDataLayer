@@ -1,0 +1,22 @@
+communication_method = "kafka"
+sleep_phase_length = 15
+
+[kafka]
+brokers = "localhost:9092"
+egest_topic = "cdl.materialization"
+
+[notification_consumer]
+brokers = "localhost:9092"
+group_id = "partial_update_engine"
+source = "cdl.reports"
+
+[services]
+schema_registry_url = "http://localhost:50401"
+
+[monitoring]
+metrics_port = 0
+status_port = 0
+otel_service_name = "partial_update_engine"
+
+[log]
+rust_log = "info,partial_update_engine=debug"

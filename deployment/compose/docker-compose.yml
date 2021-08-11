@@ -27,17 +27,17 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPICS: >-
         cdl.data.input:1:1,
-        cdl.reports:1:1,
-        cdl.timeseries.vm.1.data:1:1,
-        cdl.timeseries.vm.2.data:1:1,
-        cdl.timeseries.druid.1.data:1:1,
-        cdl.timeseries.druid.2.data:1:1,
-        cdl.timeseries.internal.druid:1:1,
-        cdl.document.1.data:1:1,
-        cdl.document.2.data:1:1,
         cdl.edge.input:1:1,
-        cdl.materialize:1:1,
-        cdl.materialization.reports:1:1
+        cdl.reports:1:1,
+        cdl.materialization:1:1,
+        cdl.materialization.reports:1:1,
+        cdl.timeseries.vm.ordered.1.data:1:1,
+        cdl.timeseries.vm.unordered.1.data:1:1,
+        cdl.timeseries.druid.ordered.1.data:1:1,
+        cdl.timeseries.druid.unordered.1.data:1:1,
+        cdl.timeseries.internal.druid:1:1,
+        cdl.document.ordered.1.data:1:1,
+        cdl.document.unordered.1.data:1:1
     depends_on:
       - zookeeper
 

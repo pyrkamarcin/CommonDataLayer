@@ -5,8 +5,8 @@ use futures::{Stream, TryStreamExt};
 use tracing::Instrument;
 
 use crate::schema::context::MQEvents;
-use crate::settings::Settings;
 use crate::types::report::Report;
+use settings_utils::apps::api::ApiSettings;
 
 type ReportStream = Pin<Box<dyn Stream<Item = FieldResult<Report>> + Send>>;
 
@@ -21,7 +21,7 @@ impl SubscriptionRoot {
 }
 
 async fn reports_inner(context: &Context<'_>) -> FieldResult<ReportStream> {
-    let settings = &context.data_unchecked::<Settings>();
+    let settings = &context.data_unchecked::<ApiSettings>();
 
     match settings.notification_consumer {
         Some(ref notifications) => {

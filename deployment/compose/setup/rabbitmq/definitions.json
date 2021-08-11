@@ -23,25 +23,7 @@
   ],
   "queues": [
     {
-      "name": "cdl.schema_registry.internal",
-      "vhost": "/",
-      "durable": true,
-      "auto_delete": false,
-      "arguments": {
-        "x-queue-type": "classic"
-      }
-    },
-    {
       "name": "cdl.data.input",
-      "vhost": "/",
-      "durable": true,
-      "auto_delete": false,
-      "arguments": {
-        "x-queue-type": "classic"
-      }
-    },
-    {
-      "name": "cdl.reports",
       "vhost": "/",
       "durable": true,
       "auto_delete": false,
@@ -59,7 +41,7 @@
       }
     },
     {
-      "name": "cdl.document.2.data",
+      "name": "cdl.reports",
       "vhost": "/",
       "durable": true,
       "auto_delete": false,
@@ -68,7 +50,7 @@
       }
     },
     {
-      "name": "cdl.document.1.data",
+      "name": "cdl.materialization",
       "vhost": "/",
       "durable": true,
       "auto_delete": false,
@@ -77,7 +59,7 @@
       }
     },
     {
-      "name": "cdl.timeseries.1.data",
+      "name": "cdl.materialization.reports",
       "vhost": "/",
       "durable": true,
       "auto_delete": false,
@@ -86,7 +68,7 @@
       }
     },
     {
-      "name": "cdl.timeseries.2.data",
+      "name": "cdl.timeseries.vm.ordered.1.data",
       "vhost": "/",
       "durable": true,
       "auto_delete": false,
@@ -95,7 +77,43 @@
       }
     },
     {
-      "name": "cdl.materialize",
+      "name": "cdl.timeseries.vm.unordered.1.data",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "cdl.timeseries.druid.ordered.1.data",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "cdl.timeseries.druid.unordered.1.data",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "cdl.document.ordered.1.data",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "cdl.document.unordered.1.data",
       "vhost": "/",
       "durable": true,
       "auto_delete": false,
@@ -179,54 +197,6 @@
       "arguments": {}
     },
     {
-      "source": "cdl.reports",
-      "vhost": "/",
-      "destination": "cdl.reports",
-      "destination_type": "queue",
-      "routing_key": "",
-      "arguments": {}
-    },
-    {
-      "source": "cdl.schema_registry.internal",
-      "vhost": "/",
-      "destination": "cdl.schema_registry.internal",
-      "destination_type": "queue",
-      "routing_key": "",
-      "arguments": {}
-    },
-    {
-      "source": "cdl.document.data",
-      "vhost": "/",
-      "destination": "cdl.document.1.data",
-      "destination_type": "queue",
-      "routing_key": "*.*.*.*.*",
-      "arguments": {}
-    },
-    {
-      "source": "cdl.document.data",
-      "vhost": "/",
-      "destination": "cdl.document.2.data",
-      "destination_type": "queue",
-      "routing_key": "unordered",
-      "arguments": {}
-    },
-    {
-      "source": "cdl.timeseries.data",
-      "vhost": "/",
-      "destination": "cdl.timeseries.1.data",
-      "destination_type": "queue",
-      "routing_key": "*.*.*.*.*",
-      "arguments": {}
-    },
-    {
-      "source": "cdl.timeseries.data",
-      "vhost": "/",
-      "destination": "cdl.timeseries.2.data",
-      "destination_type": "queue",
-      "routing_key": "unordered",
-      "arguments": {}
-    },
-    {
       "source": "cdl.edge.input",
       "vhost": "/",
       "destination": "cdl.edge.input",
@@ -235,9 +205,73 @@
       "arguments": {}
     },
     {
-      "source": "cdl.materialize",
+      "source": "cdl.reports",
       "vhost": "/",
-      "destination": "cdl.materialize",
+      "destination": "cdl.reports",
+      "destination_type": "queue",
+      "routing_key": "",
+      "arguments": {}
+    },
+    {
+      "source": "cdl.materialization",
+      "vhost": "/",
+      "destination": "cdl.materialization",
+      "destination_type": "queue",
+      "routing_key": "unordered",
+      "arguments": {}
+    },
+    {
+      "source": "cdl.materialization.reports",
+      "vhost": "/",
+      "destination": "cdl.materialization.reports",
+      "destination_type": "queue",
+      "routing_key": "unordered",
+      "arguments": {}
+    },
+    {
+      "source": "cdl.document.data",
+      "vhost": "/",
+      "destination": "cdl.document.ordered.1.data",
+      "destination_type": "queue",
+      "routing_key": "*.*.*.*.*",
+      "arguments": {}
+    },
+    {
+      "source": "cdl.document.data",
+      "vhost": "/",
+      "destination": "cdl.document.unordered.1.data",
+      "destination_type": "queue",
+      "routing_key": "unordered",
+      "arguments": {}
+    },
+    {
+      "source": "cdl.timeseries.vm.data",
+      "vhost": "/",
+      "destination": "cdl.timeseries.vm.ordered.1.data",
+      "destination_type": "queue",
+      "routing_key": "*.*.*.*.*",
+      "arguments": {}
+    },
+    {
+      "source": "cdl.timeseries.vm.data",
+      "vhost": "/",
+      "destination": "cdl.timeseries.vm.unordered.1.data",
+      "destination_type": "queue",
+      "routing_key": "unordered",
+      "arguments": {}
+    },
+    {
+      "source": "cdl.timeseries.druid.data",
+      "vhost": "/",
+      "destination": "cdl.timeseries.druid.ordered.1.data",
+      "destination_type": "queue",
+      "routing_key": "*.*.*.*.*",
+      "arguments": {}
+    },
+    {
+      "source": "cdl.timeseries.druid.data",
+      "vhost": "/",
+      "destination": "cdl.timeseries.druid.unordered.1.data",
       "destination_type": "queue",
       "routing_key": "unordered",
       "arguments": {}

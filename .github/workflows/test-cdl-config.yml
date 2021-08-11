@@ -1,0 +1,48 @@
+name: Configuration
+
+on:
+  pull_request:
+
+
+jobs:
+  check-config:
+    name: Check .cdl configuration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          override: true
+
+      - name: Cache cargo directories
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Cache cargo target dir
+        uses: actions/cache@v2.1.6
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-build-target-
+
+      - name: Generate new configuration
+        run: >
+          cargo xtask config-generator --communication-method kafka --brokers localhost:9092 --repository postgres --pg-host localhost --pg-port 5432 --pg-schema public --pg-dbname postgres --pg-username postgres --pg-password 1234 --target-dir .cdl/development-kafka;
+          cargo xtask config-generator --communication-method amqp --exchange-url amqp://user:CHANGEME@localhost:5672/%2f --repository postgres --pg-host localhost --pg-port 5432 --pg-schema public --pg-dbname postgres --pg-username postgres --pg-password 1234 --target-dir .cdl/development-amqp;
+          cargo xtask config-generator --communication-method grpc --repository postgres --pg-host localhost --pg-port 5432 --pg-schema public --pg-dbname postgres --pg-username postgres --pg-password 1234 --target-dir .cdl/development-grpc;
+
+      - name: Check for changes
+        run: test -z "$(git status --porcelain)"
+
+      - name: Clear bloat
+        run: find . -path "./target/debug/deps*" -type f ! -name "*.*" | xargs rm

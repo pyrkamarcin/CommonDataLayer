@@ -2,9 +2,9 @@ use crate::communication::resolution::Resolution;
 use crate::output::OutputPlugin;
 use cdl_dto::ingestion::{BorrowedInsertMessage, OwnedInsertMessage};
 use metrics_utils::*;
+use notification_utils::NotificationPublisher;
 use std::sync::Arc;
 use tracing::trace;
-use utils::notification::NotificationPublisher;
 
 pub mod config;
 pub mod resolution;

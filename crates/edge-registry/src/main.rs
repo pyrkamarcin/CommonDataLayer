@@ -1,10 +1,10 @@
 #![feature(async_closure)]
 
-use edge_registry::settings::Settings;
 use edge_registry::EdgeRegistryImpl;
 use metrics_utils as metrics;
 use rpc::edge_registry::edge_registry_server::EdgeRegistryServer;
-use settings_utils::{load_settings, CommunicationMethod};
+use settings_utils::apps::edge_registry::EdgeRegistrySettings;
+use settings_utils::{apps::CommunicationMethod, load_settings};
 use std::process;
 use std::sync::Arc;
 use tonic::transport::Server;
@@ -15,7 +15,7 @@ use utils::status_endpoints;
 async fn main() -> anyhow::Result<()> {
     misc_utils::set_aborting_panic_hook();
 
-    let settings: Settings = load_settings()?;
+    let settings: EdgeRegistrySettings = load_settings()?;
     tracing_utils::init(
         settings.log.rust_log.as_str(),
         settings.monitoring.otel_service_name.as_str(),

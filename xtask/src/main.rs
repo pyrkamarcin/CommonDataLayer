@@ -1,8 +1,11 @@
+#![feature(try_blocks)]
+
 use anyhow::{Context, Result};
 use pico_args::Arguments;
 use std::path::PathBuf;
 
 mod codegen;
+mod config_generator;
 
 fn main() -> Result<()> {
     let mut args = Arguments::from_env();
@@ -27,7 +30,14 @@ fn main() -> Result<()> {
 
             codegen::codegen(&protos)?;
         }
-        _ => eprintln!("cargo xtask codegen"),
+        "config-generator" => {
+            if args.contains("-i") {
+                config_generator::interactive()?;
+            } else {
+                config_generator::from_args(args.finish())?
+            }
+        }
+        _ => eprintln!("cargo xtask codegen|config-generator"),
     }
 
     Ok(())

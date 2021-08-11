@@ -8,7 +8,7 @@ use cdl_dto::ingestion::BorrowedInsertMessage;
 pub use error::Error;
 use metrics_utils::{self as metrics, counter};
 use serde_json::Value;
-use settings_utils::PostgresSettings;
+use settings_utils::apps::PostgresSettings;
 use std::time;
 use tracing::{error, trace};
 use utils::psql::validate_schema;

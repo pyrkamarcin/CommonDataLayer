@@ -1,4 +1,4 @@
-# CDL configuration (WIP)
+# CDL configuration
 
 Each application accepts a configuration file in `.toml` format.
 Example configuration is present in this directory:
@@ -65,3 +65,7 @@ DATA_ROUTER_KAFKA__BROKERS
 COMMAND_SERVICE_AMQP__CONSUME_OPTIONS__NO_LOCAL
 QUERY_SERVICE_REPOSITORY_KIND
 ```
+
+## Configuration generator
+
+[Configuration generator](./generator.md) is a tool available in cdl repository that provides interactive config creator.

@@ -1,5 +1,6 @@
-use object_builder::{settings::Settings, ObjectBuilderImpl};
+use object_builder::ObjectBuilderImpl;
 use rpc::object_builder::object_builder_server::ObjectBuilderServer;
+use settings_utils::apps::object_builder::ObjectBuilderSettings;
 use settings_utils::load_settings;
 use tonic::transport::Server;
 
@@ -7,7 +8,7 @@ use tonic::transport::Server;
 async fn main() -> anyhow::Result<()> {
     misc_utils::set_aborting_panic_hook();
 
-    let settings: Settings = load_settings()?;
+    let settings: ObjectBuilderSettings = load_settings()?;
     tracing_utils::init(
         settings.log.rust_log.as_str(),
         settings.monitoring.otel_service_name.as_str(),

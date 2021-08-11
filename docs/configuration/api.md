@@ -20,11 +20,6 @@ query_router_url = ""
 [notification_consumer]
 source = ""
 
-[monitoring]
-metrics_port = 0
-status_port = 0
-otel_service_name = "api"
-
 [log]
 rust_log = "info,api=debug"
 ```

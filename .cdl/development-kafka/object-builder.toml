@@ -1,0 +1,24 @@
+communication_method = "kafka"
+input_port = 50303
+chunk_capacity = 128
+
+[kafka]
+brokers = "localhost:9092"
+group_id = "object_builder"
+ingest_topic = "cdl.materialization"
+
+[services]
+schema_registry_url = "http://localhost:50401"
+edge_registry_url = "http://localhost:50402"
+
+[monitoring]
+metrics_port = 0
+status_port = 0
+otel_service_name = "object_builder"
+
+[log]
+rust_log = "info,object_builder=debug"
+
+[notifications]
+enabled = true
+destination = "cdl.reports"

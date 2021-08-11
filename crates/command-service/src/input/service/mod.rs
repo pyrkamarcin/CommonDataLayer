@@ -1,5 +1,6 @@
+use crate::communication::MessageRouter;
+use crate::input::Error;
 use crate::output::OutputPlugin;
-use crate::{communication::MessageRouter, input::Error};
 use async_trait::async_trait;
 use cdl_dto::ingestion::BorrowedInsertMessage;
 use communication_utils::get_order_group_id;

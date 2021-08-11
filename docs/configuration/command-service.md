@@ -39,8 +39,8 @@ nowait = false
 address = ""
 
 [listener]
-ordered_sources = [""]
-unordered_sources = [""]
+ordered_sources = "comma,separated,list"
+unordered_sources = "of,topics,queues,or,urls"
 
 [monitoring]
 metrics_port = 0

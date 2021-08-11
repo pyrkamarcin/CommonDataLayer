@@ -7,12 +7,13 @@ use uuid::Uuid;
 use crate::schema::utils::{get_schema, get_view};
 use crate::types::data::{CdlObject, EdgeRelations, SchemaRelation};
 use crate::types::schema::FullSchema;
+use crate::types::view::OnDemandViewRequest;
 use crate::types::view::{MaterializedView, RowDefinition};
 use crate::{error::Result, types::view::FullView};
-use crate::{settings::Settings, types::view::OnDemandViewRequest};
 use rpc::edge_registry::EdgeRegistryPool;
 use rpc::materializer_ondemand::{OnDemandMaterializerPool, OnDemandRequest};
 use rpc::schema_registry::SchemaRegistryPool;
+use settings_utils::apps::api::ApiSettings;
 use tracing_utils::http::RequestBuilderTracingExt;
 
 pub struct QueryRoot;
@@ -62,7 +63,7 @@ impl QueryRoot {
             .post(&format!(
                 "{}/single/{}",
                 &context
-                    .data_unchecked::<Settings>()
+                    .data_unchecked::<ApiSettings>()
                     .services
                     .query_router_url,
                 object_id
@@ -97,7 +98,7 @@ impl QueryRoot {
             .get(&format!(
                 "{}/multiple/{}",
                 &context
-                    .data_unchecked::<Settings>()
+                    .data_unchecked::<ApiSettings>()
                     .services
                     .query_router_url,
                 id_list
@@ -131,7 +132,7 @@ impl QueryRoot {
             .get(&format!(
                 "{}/schema",
                 &context
-                    .data_unchecked::<Settings>()
+                    .data_unchecked::<ApiSettings>()
                     .services
                     .query_router_url,
             ))

@@ -45,6 +45,7 @@
         - [Query Router](architecture/query_router.md)
     - [Utils](architecture/utils.md)
 - [Configuration](configuration/index.md)
+    - [(tool) generator](configuration/generator.md)
     - [api](configuration/api.md)
     - [command-service](configuration/command-service.md)
     - [data-router](configuration/data-router.md)

@@ -1,0 +1,17 @@
+input_port = 50202
+
+[postgres]
+host = "localhost"
+port = 5432
+username = "postgres"
+password = "1234"
+dbname = "postgres"
+schema = "public"
+
+[monitoring]
+metrics_port = 0
+status_port = 0
+otel_service_name = "query_service"
+
+[log]
+rust_log = "info,query_service=debug"

@@ -7,13 +7,14 @@ use tracing::{trace, warn};
 use uuid::Uuid;
 
 use crate::error::{RegistryError, RegistryResult};
-use crate::settings::Settings;
 use crate::types::schema::{FullSchema, NewSchema, Schema, SchemaUpdate};
-use crate::types::view::{FullView, NewView, View, ViewUpdate};
+use crate::types::view::FullView;
+use crate::types::view::{NewView, View, ViewUpdate};
 use crate::types::{DbExport, ExportSchema};
 use crate::utils::build_full_schema;
 use futures::future;
 use futures_util::stream::{StreamExt, TryStreamExt};
+use settings_utils::apps::schema_registry::SchemaRegistrySettings;
 
 const SCHEMAS_LISTEN_CHANNEL: &str = "schemas";
 const VIEWS_LISTEN_CHANNEL: &str = "views";
@@ -24,7 +25,7 @@ pub struct SchemaRegistryDb {
 }
 
 impl SchemaRegistryDb {
-    pub async fn new(config: &Settings) -> RegistryResult<Self> {
+    pub async fn new(config: &SchemaRegistrySettings) -> RegistryResult<Self> {
         let options = PgConnectOptions::new()
             .host(&config.postgres.host)
             .port(config.postgres.port)

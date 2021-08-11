@@ -1,9 +1,8 @@
 use cache::DynamicCache;
 use metrics_utils as metrics;
 use schema::SchemaMetadataSupplier;
-use serde::Deserialize;
-use settings_utils::{load_settings, LogSettings, MonitoringSettings, RepositoryStaticRouting};
-use std::collections::HashMap;
+use settings_utils::apps::query_router::QueryRouterSettings;
+use settings_utils::load_settings;
 use std::sync::Arc;
 use uuid::Uuid;
 use warp::Filter;
@@ -12,32 +11,11 @@ pub mod error;
 pub mod handler;
 pub mod schema;
 
-#[derive(Debug, Deserialize)]
-struct Settings {
-    cache_capacity: usize,
-    input_port: u16,
-
-    services: ServicesSettings,
-
-    monitoring: MonitoringSettings,
-
-    #[serde(default)]
-    log: LogSettings,
-
-    #[serde(default)]
-    repositories: HashMap<String, RepositoryStaticRouting>,
-}
-
-#[derive(Debug, Deserialize)]
-struct ServicesSettings {
-    schema_registry_url: String,
-}
-
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     misc_utils::set_aborting_panic_hook();
 
-    let settings: Settings = load_settings()?;
+    let settings: QueryRouterSettings = load_settings()?;
     tracing_utils::init(
         settings.log.rust_log.as_str(),
         settings.monitoring.otel_service_name.as_str(),

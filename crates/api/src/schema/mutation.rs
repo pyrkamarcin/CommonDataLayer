@@ -1,18 +1,18 @@
-use async_graphql::{Context, FieldResult, Object};
-use serde_json::value::to_raw_value;
-use uuid::Uuid;
-
+use crate::error::Error;
 use crate::schema::utils::{get_schema, get_view};
 use crate::types::data::{InputMessage, ObjectRelations};
 use crate::types::schema::{FullSchema, NewSchema, UpdateSchema};
 use crate::types::view::{NewView, View, ViewUpdate};
-use crate::{error::Error, settings::Settings};
-use crate::{types::view::FullView, types::IntoQueried};
+use crate::{publisher, types::view::FullView, types::IntoQueried};
+use async_graphql::{Context, FieldResult, Object};
 use cdl_dto::ingestion::OwnedInsertMessage;
 use cdl_dto::TryIntoRpc;
 use misc_utils::current_timestamp;
 use rpc::edge_registry::EdgeRegistryPool;
 use rpc::schema_registry::SchemaRegistryPool;
+use serde_json::value::to_raw_value;
+use settings_utils::apps::api::ApiSettings;
+use uuid::Uuid;
 
 pub struct MutationRoot;
 
@@ -119,7 +119,8 @@ impl MutationRoot {
         context: &Context<'_>,
         message: InputMessage,
     ) -> FieldResult<bool> {
-        let publisher = context.data_unchecked::<Settings>().publisher().await?;
+        let settings = context.data_unchecked::<ApiSettings>();
+        let publisher = crate::publisher(settings).await?;
 
         let payload = serde_json::to_vec(&OwnedInsertMessage {
             version: message.version,
@@ -130,11 +131,7 @@ impl MutationRoot {
         })?;
 
         publisher
-            .publish_message(
-                &context.data_unchecked::<Settings>().insert_destination,
-                "",
-                payload,
-            )
+            .publish_message(&settings.insert_destination, "", payload)
             .await
             .map_err(Error::PublisherError)?;
         Ok(true)
@@ -146,7 +143,8 @@ impl MutationRoot {
         context: &Context<'_>,
         messages: Vec<InputMessage>,
     ) -> FieldResult<bool> {
-        let publisher = context.data_unchecked::<Settings>().publisher().await?;
+        let settings = context.data_unchecked::<ApiSettings>();
+        let publisher = publisher(settings).await?;
         let order_group_id = Uuid::new_v4().to_string();
 
         for message in messages {
@@ -159,11 +157,7 @@ impl MutationRoot {
             })?;
 
             publisher
-                .publish_message(
-                    &context.data_unchecked::<Settings>().insert_destination,
-                    &order_group_id,
-                    payload,
-                )
+                .publish_message(&settings.insert_destination, &order_group_id, payload)
                 .await
                 .map_err(Error::PublisherError)?;
         }

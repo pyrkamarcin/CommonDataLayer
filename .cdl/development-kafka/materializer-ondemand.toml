@@ -1,0 +1,12 @@
+input_port = 50302
+
+[services]
+object_builder_url = "http://localhost:50303"
+
+[monitoring]
+metrics_port = 0
+status_port = 0
+otel_service_name = "materializer_ondemand"
+
+[log]
+rust_log = "info,materializer_ondemand=debug"

@@ -585,6 +585,7 @@ dependencies = [
  "futures",
  "metrics_utils",
  "misc_utils",
+ "notification_utils",
  "rdkafka",
  "reqwest",
  "rpc",
@@ -640,6 +641,21 @@ dependencies = [
  "serde_json",
  "toml",
  "yaml-rust",
+]
+
+[[package]]
+name = "console"
+version = "0.14.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3993e6445baa160675931ec041a5e03ca84b9c6e32a056150d3aa2bdda0a1f45"
+dependencies = [
+ "encode_unicode",
+ "lazy_static",
+ "libc",
+ "regex",
+ "terminal_size",
+ "unicode-width",
+ "winapi",
 ]
 
 [[package]]
@@ -933,6 +949,40 @@ dependencies = [
 ]
 
 [[package]]
+name = "dialoguer"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c9dd058f8b65922819fabb4a41e7d1964e56344042c26efbccd465202c23fa0c"
+dependencies = [
+ "console",
+ "lazy_static",
+ "tempfile",
+ "zeroize",
+]
+
+[[package]]
+name = "dialoguer_macro"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a14f9517eb6eba10e58bd12d69469087f3241506fdeb6d99f0140db40b24f7a9"
+dependencies = [
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "dialoguer_trait"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dfc5be8d43ac891c1f6c014ef286da24e2c5b273eee5f1078ee0799daa0db9e4"
+dependencies = [
+ "dialoguer",
+ "dialoguer_macro",
+]
+
+[[package]]
 name = "diff_assert"
 version = "1.0.0-pre1"
 source = "git+https://github.com/anixe/diff-assert.git#24238dbd2e7037c1a2665b95070b8267c43b9d1d"
@@ -1036,6 +1086,7 @@ dependencies = [
  "itertools 0.10.1",
  "metrics_utils",
  "misc_utils",
+ "notification_utils",
  "rpc",
  "serde 1.0.126",
  "serde_json",
@@ -1059,6 +1110,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "encode_unicode"
+version = "0.3.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a357d28ed41a50f9c765dbfe56cbc04a64e53e5fc58ba79fbc34c10ef3df831f"
+
+[[package]]
 name = "encoding_rs"
 version = "0.8.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1072,6 +1129,15 @@ name = "endian-type"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c34f04666d835ff5d62e058c3995147c06f42fe86ff053337632bca83e42702d"
+
+[[package]]
+name = "erased-serde"
+version = "0.3.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3de9ad4541d99dc22b59134e7ff8dc3d6c988c89ecd7324bf10a8362b07a2afa"
+dependencies = [
+ "serde 1.0.126",
+]
 
 [[package]]
 name = "fake-simd"
@@ -1771,6 +1837,7 @@ dependencies = [
  "itertools 0.10.1",
  "metrics_utils",
  "misc_utils",
+ "notification_utils",
  "rpc",
  "serde 1.0.126",
  "serde_json",
@@ -2065,6 +2132,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "notification_utils"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cdl_dto",
+ "communication_utils",
+ "serde 1.0.126",
+ "serde_json",
+ "tracing",
+]
+
+[[package]]
 name = "ntapi"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2212,6 +2292,7 @@ dependencies = [
  "maplit",
  "metrics_utils",
  "misc_utils",
+ "notification_utils",
  "pin-project-lite",
  "rpc",
  "serde 1.0.126",
@@ -3354,6 +3435,7 @@ dependencies = [
  "derive_more",
  "dirs",
  "lapin",
+ "notification_utils",
  "rpc",
  "serde 1.0.126",
  "task_utils",
@@ -3674,6 +3756,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2dfed899f0eb03f32ee8c6a0aabdb8a7949659e3466561fc0adf54e26d88c5f4"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "terminal_size"
+version = "0.1.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "633c1a546cee861a1a6d0dc69ebeca693bf4296661ba7852b9d21d159e0506df"
+dependencies = [
+ "libc",
+ "winapi",
 ]
 
 [[package]]
@@ -4551,8 +4643,14 @@ name = "xtask"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "dialoguer",
+ "dialoguer_trait",
+ "erased-serde",
  "itertools 0.10.1",
  "pico-args",
+ "serde 1.0.126",
+ "settings_utils",
+ "toml",
  "tonic-build",
  "xshell",
 ]
@@ -4565,3 +4663,9 @@ checksum = "56c1936c4cc7a1c9ab21a1ebb602eb942ba868cbd44a99cb7cdc5892335e1c85"
 dependencies = [
  "linked-hash-map",
 ]
+
+[[package]]
+name = "zeroize"
+version = "1.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "377db0846015f7ae377174787dd452e1c5f5a9050bc6f954911d01f116daa0cd"

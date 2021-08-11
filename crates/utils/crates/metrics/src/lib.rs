@@ -2,7 +2,7 @@ use std::net::{Ipv4Addr, SocketAddrV4};
 
 pub use metrics::{self, counter, gauge, try_recorder, Key, SharedString};
 use metrics_exporter_prometheus::PrometheusBuilder;
-use settings_utils::MonitoringSettings;
+use settings_utils::apps::MonitoringSettings;
 use tracing::debug;
 
 pub const DEFAULT_PORT: &str = "51805";

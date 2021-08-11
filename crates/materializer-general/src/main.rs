@@ -1,7 +1,8 @@
 #![feature(async_closure)]
 
-use materializer_general::{settings::Settings, MaterializerImpl};
+use materializer_general::MaterializerImpl;
 use rpc::materializer_general::general_materializer_server::GeneralMaterializerServer;
+use settings_utils::apps::materializer_general::MaterializerGeneralSettings;
 use settings_utils::load_settings;
 use std::sync::Arc;
 use tonic::transport::Server;
@@ -10,7 +11,7 @@ use tonic::transport::Server;
 async fn main() -> anyhow::Result<()> {
     misc_utils::set_aborting_panic_hook();
 
-    let settings: Settings = load_settings()?;
+    let settings: MaterializerGeneralSettings = load_settings()?;
     tracing_utils::init(
         settings.log.rust_log.as_str(),
         settings.monitoring.otel_service_name.as_str(),

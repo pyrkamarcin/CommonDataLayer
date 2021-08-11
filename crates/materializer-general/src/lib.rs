@@ -1,17 +1,16 @@
 use crate::view::ViewCache;
 use cache::DynamicCache;
+use notification_utils::{IntoSerialize, NotificationPublisher};
 use plugins::{MaterializerPlugin, PostgresMaterializer};
 use rpc::materializer_general::{general_materializer_server::GeneralMaterializer, Empty, Options};
 use rpc::{common::RowDefinition, materializer_general::MaterializedView};
 use serde::Serialize;
-use settings_utils::PostgresSettings;
+use settings_utils::apps::PostgresSettings;
 use std::collections::HashMap;
 use std::sync::Arc;
-use utils::notification::{IntoSerialize, NotificationPublisher};
 use view::ViewSupplier;
 
 mod plugins;
-pub mod settings;
 mod view;
 
 #[derive(Serialize, Clone)]

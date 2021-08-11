@@ -1,0 +1,24 @@
+communication_method = "kafka"
+input_port = 50401
+
+[services]
+edge_registry_url = "http://localhost:50402"
+
+[postgres]
+host = "localhost"
+port = 5432
+username = "postgres"
+password = "1234"
+dbname = "postgres"
+schema = "public"
+
+[kafka]
+brokers = "localhost:9092"
+
+[monitoring]
+metrics_port = 0
+status_port = 0
+otel_service_name = "schema_registry"
+
+[log]
+rust_log = "info,schema_registry=debug"

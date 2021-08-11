@@ -7,6 +7,7 @@ use rpc::query_service_ts::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+use settings_utils::apps::query_service_ts::QueryServiceTsDruidSettings;
 use tonic::{Request, Response, Status};
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -42,7 +43,7 @@ pub struct DruidQuery {
 }
 
 impl DruidQuery {
-    pub async fn load(settings: DruidSettings) -> anyhow::Result<Self> {
+    pub async fn load(settings: QueryServiceTsDruidSettings) -> anyhow::Result<Self> {
         let pool = Pool::builder()
             .build(DruidConnectionManager)
             .await

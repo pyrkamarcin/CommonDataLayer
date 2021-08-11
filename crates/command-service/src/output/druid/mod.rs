@@ -1,6 +1,5 @@
 use crate::communication::resolution::Resolution;
 use crate::output::OutputPlugin;
-use crate::settings::DruidSettings;
 use anyhow::Context;
 use cdl_dto::ingestion::BorrowedInsertMessage;
 use futures::stream::{self, StreamExt};
@@ -9,6 +8,7 @@ use rdkafka::producer::{FutureProducer, FutureRecord};
 use rdkafka::ClientConfig;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use settings_utils::apps::command_service::CommandServiceDruidSettings;
 use std::time::Duration;
 use tracing::error;
 use uuid::Uuid;
@@ -33,7 +33,7 @@ pub struct DruidOutputPlugin {
 }
 
 impl DruidOutputPlugin {
-    pub async fn new(settings: DruidSettings, brokers: &str) -> anyhow::Result<Self> {
+    pub async fn new(settings: CommandServiceDruidSettings, brokers: &str) -> anyhow::Result<Self> {
         Ok(Self {
             producer: ClientConfig::new()
                 .set("bootstrap.servers", brokers)

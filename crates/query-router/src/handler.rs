@@ -9,7 +9,7 @@ use crate::schema::{SchemaCache, SchemaMetadata};
 use futures_util::TryStreamExt;
 use rpc::schema_registry::types::SchemaType;
 use rpc::{query_service, query_service_ts};
-use settings_utils::RepositoryStaticRouting;
+use settings_utils::apps::RepositoryStaticRouting;
 
 const APPLICATION_JSON: &str = "application/json";
 
@@ -232,7 +232,7 @@ async fn get_routing_info(
         if let Some(routing) = entry {
             SchemaMetadata {
                 query_address: routing.query_address.clone(),
-                schema_type: routing.repository_type,
+                schema_type: routing.repository_type.into(),
             }
         } else {
             return Err(Error::InvalidRepository(repository_id));

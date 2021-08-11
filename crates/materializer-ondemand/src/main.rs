@@ -1,5 +1,6 @@
-use materializer_ondemand::{settings::Settings, MaterializerImpl};
+use materializer_ondemand::MaterializerImpl;
 use rpc::materializer_ondemand::on_demand_materializer_server::OnDemandMaterializerServer;
+use settings_utils::apps::materializer_ondemand::MaterializerOndemandSettings;
 use settings_utils::load_settings;
 use tonic::transport::Server;
 
@@ -7,7 +8,7 @@ use tonic::transport::Server;
 async fn main() -> anyhow::Result<()> {
     misc_utils::set_aborting_panic_hook();
 
-    let settings: Settings = load_settings()?;
+    let settings: MaterializerOndemandSettings = load_settings()?;
     tracing_utils::init(
         settings.log.rust_log.as_str(),
         settings.monitoring.otel_service_name.as_str(),

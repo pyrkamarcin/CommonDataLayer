@@ -10,14 +10,14 @@ use warp::{http::Response as HttpResponse, hyper::header::CONTENT_TYPE, hyper::M
 
 use api::schema::context::MQEvents;
 use api::schema::{mutation::MutationRoot, query::QueryRoot, subscription::SubscriptionRoot};
-use api::settings::Settings;
+use settings_utils::apps::api::ApiSettings;
 use settings_utils::load_settings;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     misc_utils::set_aborting_panic_hook();
 
-    let settings: Settings = load_settings()?;
+    let settings: ApiSettings = load_settings()?;
     tracing_utils::init(settings.log.rust_log.as_str(), "web-api")?;
 
     tracing::debug!(?settings, "application environment");

@@ -1,4 +1,3 @@
-use ::utils::notification::NotificationPublisher;
 use async_trait::async_trait;
 use bb8::Pool;
 use cdl_dto::{edges::RelationTree, materialization};
@@ -19,11 +18,11 @@ use tracing_futures::Instrument;
 use uuid::Uuid;
 
 use crate::{buffer_stream::ObjectBufferedStream, view_plan::ViewPlan};
+use notification_utils::NotificationPublisher;
 use object_id_pair::ObjectIdPair;
 use rpc::edge_registry::{EdgeRegistryConnectionManager, EdgeRegistryPool};
 use rpc::schema_registry::{SchemaRegistryConnectionManager, SchemaRegistryPool};
-
-pub mod settings;
+use settings_utils::apps::object_builder::ObjectBuilderSettings;
 
 mod utils;
 
@@ -70,7 +69,7 @@ pub struct RowDefinition {
 }
 
 impl ObjectBuilderImpl {
-    pub async fn new(settings: &settings::Settings) -> anyhow::Result<Self> {
+    pub async fn new(settings: &ObjectBuilderSettings) -> anyhow::Result<Self> {
         let sr_pool = Pool::builder()
             .build(SchemaRegistryConnectionManager {
                 address: settings.services.schema_registry_url.to_string(),

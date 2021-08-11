@@ -18,6 +18,7 @@ communication_utils     = { path = "../utils/crates/communication" }
 settings_utils          = { path = "../utils/crates/settings" }
 metrics_utils           = { path = "../utils/crates/metrics" }
 tracing_utils           = { path = "../utils/crates/tracing" }
+notification_utils      = { path = "../utils/crates/notifications" }
 
 # Crates.io
 anyhow      = "1.0.42"

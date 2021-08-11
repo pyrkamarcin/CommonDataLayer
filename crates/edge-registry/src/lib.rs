@@ -8,6 +8,7 @@ use futures::future::BoxFuture;
 use futures::FutureExt;
 use itertools::Itertools;
 use metrics_utils::{self as metrics, counter};
+use notification_utils::NotificationPublisher;
 use rpc::edge_registry::edge_registry_server::EdgeRegistry;
 use rpc::edge_registry::{
     AddSchemaRelation, Edge, Empty, ObjectIdQuery, ObjectRelations, RelationDetails, RelationId,
@@ -15,7 +16,7 @@ use rpc::edge_registry::{
     SchemaRelation, TreeObject, TreeQuery, ValidateRelationQuery,
 };
 use serde::{Deserialize, Serialize};
-use settings_utils::PostgresSettings;
+use settings_utils::apps::PostgresSettings;
 use std::cmp::min;
 use std::convert::TryInto;
 use std::str::FromStr;
@@ -24,10 +25,7 @@ use std::{fmt, time};
 use thiserror::Error;
 use tonic::{Request, Response, Status};
 use tracing::{debug, error, trace};
-use utils::notification::NotificationPublisher;
 use uuid::Uuid;
-
-pub mod settings;
 
 #[derive(Debug, Error)]
 pub enum ValidationError {

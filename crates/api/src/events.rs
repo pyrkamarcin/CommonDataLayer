@@ -11,12 +11,12 @@ use futures::task::{Context as FutCtx, Poll};
 use futures::{Future, Stream};
 use tokio::sync::broadcast::{self, Sender};
 
-use crate::settings::Settings;
 use communication_utils::{
     consumer::{CommonConsumer, CommonConsumerConfig, ConsumerHandler},
     message::CommunicationMessage,
 };
-use settings_utils::CommunicationMethod;
+use settings_utils::apps::api::ApiSettings;
+use settings_utils::apps::CommunicationMethod;
 
 /// Owned generic message received from message queue.
 #[derive(Clone, Debug)]
@@ -54,7 +54,7 @@ impl ConsumerHandler for Handler {
 impl EventSubscriber {
     /// Connects to kafka and sends all messages to broadcast channel.
     pub async fn new<F, Fut>(
-        settings: &Settings,
+        settings: &ApiSettings,
         source: &str,
         on_close: F,
     ) -> Result<(Self, EventStream), anyhow::Error>
@@ -82,7 +82,7 @@ impl EventSubscriber {
                 queue_name: source,
                 options: None,
             },
-            (_, _, CommunicationMethod::GRpc) => {
+            (_, _, CommunicationMethod::Grpc) => {
                 anyhow::bail!("GRPC communication method does not support event subscription")
             }
             _ => anyhow::bail!("Unsupported consumer specification"),

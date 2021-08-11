@@ -10,6 +10,7 @@ license = "Apache-2.0"
 [dependencies]
 # Workspace
 communication_utils     = { path    = "../communication", features = ["kafka", "amqp", "grpc"] }
+notification_utils      = { path = "../notifications" }
 task_utils  = { path    = "../task" }
 rpc         = { path    = "../../../rpc" }
 

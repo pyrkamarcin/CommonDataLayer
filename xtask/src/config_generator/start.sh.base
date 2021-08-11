@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+mkdir -p "$SCRIPT_DIR/.tmp"
+
+export CDL_CONFIG="$SCRIPT_DIR"
+cargo build --workspace || exit 1

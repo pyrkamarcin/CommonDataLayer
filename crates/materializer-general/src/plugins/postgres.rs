@@ -15,7 +15,7 @@ use itertools::Itertools;
 use metrics_utils::{self as metrics, counter};
 use rpc::materializer_general::MaterializedView;
 use serde_json::Value;
-use settings_utils::PostgresSettings;
+use settings_utils::apps::PostgresSettings;
 use uuid::Uuid;
 
 const SCHEMA_COLUMN_PREFIX: &str = "schema_";

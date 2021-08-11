@@ -1,0 +1,30 @@
+communication_method = "grpc"
+repository_kind = "postgres"
+async_task_limit = 32
+
+[postgres]
+host = "localhost"
+port = 5432
+username = "postgres"
+password = "1234"
+dbname = "postgres"
+schema = "public"
+
+[grpc]
+address = "0.0.0.0:50201"
+
+[notifications]
+enabled = true
+destination = "cdl.reports"
+
+[listener]
+ordered_sources = "cdl.document.ordered.1.data"
+unordered_sources = "cdl.document.unordered.1.data"
+
+[monitoring]
+metrics_port = 0
+status_port = 0
+otel_service_name = "command_service"
+
+[log]
+rust_log = "info,command_service=debug"

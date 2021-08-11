@@ -1,0 +1,19 @@
+communication_method = "amqp"
+input_port = 50106
+insert_destination = "cdl.data.input"
+
+[amqp]
+exchange_url = "amqp://user:CHANGEME@localhost:5672/%2f"
+tag = "api"
+
+[services]
+schema_registry_url = "http://localhost:50401"
+edge_registry_url = "http://localhost:50402"
+on_demand_materializer_url = "http://localhost:50302"
+query_router_url = "http://localhost:50103"
+
+[notification_consumer]
+source = "cdl.reports"
+
+[log]
+rust_log = "info,api=debug"

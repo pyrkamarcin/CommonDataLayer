@@ -9,7 +9,8 @@ use rdkafka::{
     ClientConfig, Message, Offset, TopicPartitionList,
 };
 use rpc::schema_registry::{FullView, Id};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+use settings_utils::apps::partial_update_engine::PartialUpdateEngineSettings;
 use settings_utils::*;
 use std::collections::hash_map::Entry;
 use std::{
@@ -20,32 +21,6 @@ use tokio::time::sleep;
 use tokio_stream::StreamExt;
 use tracing::{trace, Instrument};
 use uuid::Uuid;
-
-#[derive(Deserialize, Debug, Serialize)]
-struct Settings {
-    communication_method: CommunicationMethod,
-    sleep_phase_length: u64,
-
-    kafka: PublisherKafkaSettings,
-    notification_consumer: NotificationConsumerSettings,
-    services: ServicesSettings,
-
-    monitoring: MonitoringSettings,
-
-    log: LogSettings,
-}
-
-#[derive(Deserialize, Debug, Serialize)]
-struct NotificationConsumerSettings {
-    pub brokers: String,
-    pub group_id: String,
-    pub source: String,
-}
-
-#[derive(Deserialize, Debug, Serialize)]
-struct ServicesSettings {
-    pub schema_registry_url: String,
-}
 
 #[derive(Deserialize, Debug, PartialEq, Eq, Hash)]
 #[allow(clippy::enum_variant_names)]
@@ -73,7 +48,7 @@ struct EdgeRegistryNotification {
 async fn main() -> anyhow::Result<()> {
     set_aborting_panic_hook();
 
-    let settings: Settings = load_settings()?;
+    let settings: PartialUpdateEngineSettings = load_settings()?;
     tracing_utils::init(
         settings.log.rust_log.as_str(),
         settings.monitoring.otel_service_name.as_str(),
@@ -175,7 +150,7 @@ fn new_notification(
 #[tracing::instrument(skip(producer, settings))]
 async fn process_changes(
     producer: &FutureProducer,
-    settings: &Settings,
+    settings: &PartialUpdateEngineSettings,
     changes: &mut HashSet<PartialNotification>,
 ) -> Result<()> {
     trace!("processing changes {:#?}", changes);

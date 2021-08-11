@@ -1,14 +1,14 @@
 #![feature(exact_size_is_empty)]
 
+use crate::handler::Handler;
 use crate::schema::SchemaMetadataSupplier;
-use crate::{config::Settings, handler::Handler};
 use cache::DynamicCache;
 use metrics_utils as metrics;
+use settings_utils::apps::data_router::DataRouterSettings;
 use settings_utils::load_settings;
 use std::sync::Arc;
 use utils::parallel_task_queue::ParallelTaskQueue;
 
-mod config;
 mod handler;
 mod schema;
 
@@ -16,7 +16,7 @@ mod schema;
 async fn main() -> anyhow::Result<()> {
     misc_utils::set_aborting_panic_hook();
 
-    let settings: Settings = load_settings()?;
+    let settings: DataRouterSettings = load_settings()?;
     tracing_utils::init(
         settings.log.rust_log.as_str(),
         settings.monitoring.otel_service_name.as_str(),

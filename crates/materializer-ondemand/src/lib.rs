@@ -1,5 +1,3 @@
-pub mod settings;
-
 use std::pin::Pin;
 
 use futures::Stream;

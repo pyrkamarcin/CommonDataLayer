@@ -1,0 +1,27 @@
+communication_method = "kafka"
+input_port = 50402
+
+[postgres]
+host = "localhost"
+port = 5432
+username = "postgres"
+password = "1234"
+dbname = "postgres"
+schema = "public"
+
+[kafka]
+brokers = "localhost:9092"
+group_id = "edge_registry"
+ingest_topic = "cdl.edge.input"
+
+[notifications]
+enabled = true
+destination = "cdl.reports"
+
+[monitoring]
+metrics_port = 0
+status_port = 0
+otel_service_name = "edge_registry"
+
+[log]
+rust_log = "info,edge_registry=debug"
