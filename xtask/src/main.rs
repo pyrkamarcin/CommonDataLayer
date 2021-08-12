@@ -1,8 +1,9 @@
 #![feature(try_blocks)]
 
+use std::path::PathBuf;
+
 use anyhow::{Context, Result};
 use pico_args::Arguments;
-use std::path::PathBuf;
 
 mod codegen;
 mod config_generator;

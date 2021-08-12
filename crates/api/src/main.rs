@@ -1,17 +1,27 @@
 use std::convert::Infallible;
 
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql::Schema;
+use api::schema::{
+    context::MQEvents,
+    mutation::MutationRoot,
+    query::QueryRoot,
+    subscription::SubscriptionRoot,
+};
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    Schema,
+};
 use async_graphql_warp::{graphql_subscription, Response};
-use rpc::edge_registry::EdgeRegistryConnectionManager;
-use rpc::materializer_ondemand::OnDemandMaterializerConnectionManager;
-use rpc::schema_registry::SchemaRegistryConnectionManager;
-use warp::{http::Response as HttpResponse, hyper::header::CONTENT_TYPE, hyper::Method, Filter};
-
-use api::schema::context::MQEvents;
-use api::schema::{mutation::MutationRoot, query::QueryRoot, subscription::SubscriptionRoot};
-use settings_utils::apps::api::ApiSettings;
-use settings_utils::load_settings;
+use rpc::{
+    edge_registry::EdgeRegistryConnectionManager,
+    materializer_ondemand::OnDemandMaterializerConnectionManager,
+    schema_registry::SchemaRegistryConnectionManager,
+};
+use settings_utils::{apps::api::ApiSettings, load_settings};
+use warp::{
+    http::Response as HttpResponse,
+    hyper::{header::CONTENT_TYPE, Method},
+    Filter,
+};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

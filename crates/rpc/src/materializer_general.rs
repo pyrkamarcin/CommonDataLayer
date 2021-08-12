@@ -1,9 +1,9 @@
+use general_materializer_client::GeneralMaterializerClient;
+use tonic::{service::interceptor::InterceptedService, transport::Channel};
+use tracing_utils::grpc::InterceptorType;
+
 pub use crate::codegen::materializer_general::*;
 use crate::error::ClientError;
-use general_materializer_client::GeneralMaterializerClient;
-use tonic::service::interceptor::InterceptedService;
-use tonic::transport::Channel;
-use tracing_utils::grpc::InterceptorType;
 
 pub async fn connect(
     addr: String,

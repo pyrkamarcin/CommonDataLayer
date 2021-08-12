@@ -1,12 +1,26 @@
 use anyhow::Context;
-use bb8_postgres::bb8::{Pool, PooledConnection};
-use bb8_postgres::tokio_postgres::config::Config as PgConfig;
-use bb8_postgres::tokio_postgres::{types::ToSql, NoTls, RowStream, SimpleQueryMessage};
-use bb8_postgres::PostgresConnectionManager;
+use bb8_postgres::{
+    bb8::{Pool, PooledConnection},
+    tokio_postgres::{
+        config::Config as PgConfig,
+        types::ToSql,
+        NoTls,
+        RowStream,
+        SimpleQueryMessage,
+    },
+    PostgresConnectionManager,
+};
 use futures_util::TryStreamExt;
 use metrics_utils::{self as metrics, counter};
-use rpc::query_service::query_service_server::QueryService;
-use rpc::query_service::{Object, ObjectIds, ObjectStream, RawStatement, SchemaId, ValueBytes};
+use rpc::query_service::{
+    query_service_server::QueryService,
+    Object,
+    ObjectIds,
+    ObjectStream,
+    RawStatement,
+    SchemaId,
+    ValueBytes,
+};
 use serde_json::Value;
 use settings_utils::apps::PostgresSettings;
 use tonic::{Request, Response, Status};

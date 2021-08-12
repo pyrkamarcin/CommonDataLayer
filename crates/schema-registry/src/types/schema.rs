@@ -1,9 +1,9 @@
+use rpc::schema_registry::types::SchemaType;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
 
 use crate::types::view::FullView;
-use rpc::schema_registry::types::SchemaType;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Schema {

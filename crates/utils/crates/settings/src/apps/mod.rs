@@ -1,14 +1,15 @@
-use std::future::Future;
-
-use derive_more::Display;
-use serde::{Deserialize, Serialize};
+use std::{env, future::Future};
 
 use communication_utils::publisher::CommonPublisher;
+use derive_more::Display;
 use lapin::options::BasicConsumeOptions;
-use notification_utils::full_notification_sender::FullNotificationSenderBase;
-use notification_utils::{IntoSerialize, NotificationPublisher};
+use notification_utils::{
+    full_notification_sender::FullNotificationSenderBase,
+    IntoSerialize,
+    NotificationPublisher,
+};
 use rpc::schema_registry::types::SchemaType;
-use std::env;
+use serde::{Deserialize, Serialize};
 
 pub mod api;
 pub mod command_service;

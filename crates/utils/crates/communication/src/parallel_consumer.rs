@@ -1,4 +1,6 @@
 #![allow(unused_imports, unused_variables)]
+use std::{net::SocketAddrV4, sync::Arc};
+
 use anyhow::Context;
 use async_trait::async_trait;
 use futures_util::TryStreamExt;
@@ -17,7 +19,6 @@ use rpc::generic as proto;
 use rpc::generic::generic_rpc_server::GenericRpc;
 #[cfg(feature = "grpc")]
 use rpc::generic::generic_rpc_server::GenericRpcServer;
-use std::{net::SocketAddrV4, sync::Arc};
 use task_utils::task_limiter::TaskLimiter;
 #[cfg(feature = "amqp")]
 use tokio_amqp::LapinTokioExt;

@@ -1,9 +1,16 @@
-use crate::apps::{
-    AmqpConsumeOptions, CommunicationMethod, LogSettings, MonitoringSettings, NotificationSettings,
+use communication_utils::{
+    consumer::{CommonConsumer, CommonConsumerConfig},
+    publisher::CommonPublisher,
 };
-use communication_utils::consumer::{CommonConsumer, CommonConsumerConfig};
-use communication_utils::publisher::CommonPublisher;
 use serde::{Deserialize, Serialize};
+
+use crate::apps::{
+    AmqpConsumeOptions,
+    CommunicationMethod,
+    LogSettings,
+    MonitoringSettings,
+    NotificationSettings,
+};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ObjectBuilderSettings {

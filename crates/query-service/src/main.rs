@@ -1,9 +1,9 @@
+use std::net::{Ipv4Addr, SocketAddrV4};
+
 use anyhow::Context;
 use metrics_utils as metrics;
 use rpc::query_service::query_service_server::{QueryService, QueryServiceServer};
-use settings_utils::apps::query_service::QueryServiceSettings;
-use settings_utils::*;
-use std::net::{Ipv4Addr, SocketAddrV4};
+use settings_utils::{apps::query_service::QueryServiceSettings, *};
 use tonic::transport::Server;
 
 async fn spawn_server<Q: QueryService>(service: Q, port: u16) -> anyhow::Result<()> {

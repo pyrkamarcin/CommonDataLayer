@@ -1,16 +1,20 @@
-use crate::apps::default_async_task_limit;
+use std::{collections::HashMap, net::SocketAddrV4};
+
+use communication_utils::{
+    parallel_consumer::{ParallelCommonConsumer, ParallelCommonConsumerConfig},
+    publisher::CommonPublisher,
+};
+use serde::{Deserialize, Serialize};
+use task_utils::task_limiter::TaskLimiter;
+
 use crate::apps::{
-    AmqpConsumeOptions, CommunicationMethod, LogSettings, MonitoringSettings,
+    default_async_task_limit,
+    AmqpConsumeOptions,
+    CommunicationMethod,
+    LogSettings,
+    MonitoringSettings,
     RepositoryStaticRouting,
 };
-use communication_utils::parallel_consumer::{
-    ParallelCommonConsumer, ParallelCommonConsumerConfig,
-};
-use communication_utils::publisher::CommonPublisher;
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::net::SocketAddrV4;
-use task_utils::task_limiter::TaskLimiter;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct DataRouterSettings {

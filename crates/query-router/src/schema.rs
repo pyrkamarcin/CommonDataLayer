@@ -1,6 +1,7 @@
+use std::convert::TryInto;
+
 use cache::{CacheSupplier, DynamicCache};
 use rpc::schema_registry::types::SchemaType;
-use std::convert::TryInto;
 use uuid::Uuid;
 
 pub type SchemaCache = DynamicCache<SchemaMetadataSupplier, Uuid, SchemaMetadata>;

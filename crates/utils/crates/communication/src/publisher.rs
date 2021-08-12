@@ -1,4 +1,6 @@
 #![allow(unused_imports, unused_variables)]
+use std::time::Duration;
+
 #[cfg(feature = "amqp")]
 use lapin::{options::BasicPublishOptions, BasicProperties, Channel};
 #[cfg(feature = "kafka")]
@@ -9,7 +11,6 @@ use rdkafka::{
 };
 #[cfg(feature = "http")]
 use reqwest::Client;
-use std::time::Duration;
 #[cfg(feature = "amqp")]
 use tokio_amqp::LapinTokioExt;
 #[cfg(feature = "http")]

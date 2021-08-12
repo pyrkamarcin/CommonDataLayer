@@ -1,5 +1,5 @@
-use std::future::Future;
-use std::sync::Arc;
+use std::{future::Future, sync::Arc};
+
 use tokio::sync::Semaphore;
 
 #[derive(Clone)]

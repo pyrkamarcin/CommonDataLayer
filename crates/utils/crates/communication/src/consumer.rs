@@ -17,14 +17,11 @@ use tracing_futures::Instrument;
 
 #[cfg(feature = "kafka")]
 use super::kafka_ack_queue::KafkaAckQueue;
-
-#[cfg(feature = "kafka")]
-use crate::message::KafkaCommunicationMessage;
-
+use super::{message::CommunicationMessage, Result};
 #[cfg(feature = "amqp")]
 use crate::message::AmqpCommunicationMessage;
-
-use super::{message::CommunicationMessage, Result};
+#[cfg(feature = "kafka")]
+use crate::message::KafkaCommunicationMessage;
 
 #[async_trait]
 pub trait ConsumerHandler {

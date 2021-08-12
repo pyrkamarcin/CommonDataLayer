@@ -1,7 +1,9 @@
-use crate::apps::{CommunicationMethod, LogSettings, MonitoringSettings, PostgresSettings};
+use std::path::PathBuf;
+
 use communication_utils::metadata_fetcher::MetadataFetcher;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+
+use crate::apps::{CommunicationMethod, LogSettings, MonitoringSettings, PostgresSettings};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct SchemaRegistrySettings {

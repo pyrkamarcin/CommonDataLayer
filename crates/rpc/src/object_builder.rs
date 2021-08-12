@@ -1,9 +1,9 @@
+use object_builder_client::ObjectBuilderClient;
+use tonic::{service::interceptor::InterceptedService, transport::Channel};
+use tracing_utils::grpc::InterceptorType;
+
 pub use crate::codegen::object_builder::*;
 use crate::error::ClientError;
-use object_builder_client::ObjectBuilderClient;
-use tonic::service::interceptor::InterceptedService;
-use tonic::transport::Channel;
-use tracing_utils::grpc::InterceptorType;
 
 pub async fn connect(
     addr: String,

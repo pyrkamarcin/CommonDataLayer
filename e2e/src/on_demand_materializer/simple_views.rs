@@ -1,8 +1,10 @@
-use crate::{api::*, *};
-use anyhow::Result;
 use std::time::Duration;
+
+use anyhow::Result;
 use tokio::time::sleep;
 use uuid::Uuid;
+
+use crate::{api::*, *};
 
 #[tokio::test]
 async fn should_generate_empty_result_set_for_view_without_objects() -> Result<()> {

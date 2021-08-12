@@ -1,7 +1,9 @@
 use std::path::PathBuf;
 
-use cdl_dto::materialization::{Filter, Relation};
-use cdl_dto::TryIntoRpc;
+use cdl_dto::{
+    materialization::{Filter, Relation},
+    TryIntoRpc,
+};
 use rpc::schema_registry::{Id, NewView, ViewUpdate};
 use uuid::Uuid;
 

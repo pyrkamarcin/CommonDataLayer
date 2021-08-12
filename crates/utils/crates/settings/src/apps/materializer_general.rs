@@ -1,6 +1,7 @@
-use crate::apps::{LogSettings, MonitoringSettings, NotificationSettings, PostgresSettings};
 use communication_utils::publisher::CommonPublisher;
 use serde::{Deserialize, Serialize};
+
+use crate::apps::{LogSettings, MonitoringSettings, NotificationSettings, PostgresSettings};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct MaterializerGeneralSettings {

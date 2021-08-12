@@ -1,5 +1,6 @@
-use crate::apps::{LogSettings, MonitoringSettings};
 use serde::{Deserialize, Serialize};
+
+use crate::apps::{LogSettings, MonitoringSettings};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct MaterializerOndemandSettings {

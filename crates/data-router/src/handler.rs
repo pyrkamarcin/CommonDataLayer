@@ -1,9 +1,12 @@
-use crate::schema::SchemaCache;
+use std::{collections::HashMap, sync::Arc};
+
 use anyhow::{bail, Context};
 use async_trait::async_trait;
 use cdl_dto::ingestion::{BorrowedInsertMessage, DataRouterInsertMessage};
 use communication_utils::{
-    get_order_group_id, message::CommunicationMessage, parallel_consumer::ParallelConsumerHandler,
+    get_order_group_id,
+    message::CommunicationMessage,
+    parallel_consumer::ParallelConsumerHandler,
     publisher::CommonPublisher,
 };
 use lenient_semver::Version;
@@ -11,10 +14,10 @@ use metrics_utils::{self as metrics, counter};
 use misc_utils::current_timestamp;
 use serde_json::Value;
 use settings_utils::apps::RepositoryStaticRouting;
-use std::collections::HashMap;
-use std::sync::Arc;
 use tracing::{error, trace};
 use utils::parallel_task_queue::ParallelTaskQueue;
+
+use crate::schema::SchemaCache;
 
 static CDL_INPUT_PROTOCOL_VERSION_MAJOR: u64 = 1;
 static CDL_INPUT_PROTOCOL_VERSION_MINOR: u64 = 0;

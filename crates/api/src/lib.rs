@@ -1,6 +1,5 @@
 use communication_utils::publisher::CommonPublisher;
-use settings_utils::apps::api::ApiSettings;
-use settings_utils::apps::CommunicationMethod;
+use settings_utils::apps::{api::ApiSettings, CommunicationMethod};
 
 pub mod error;
 pub mod events;

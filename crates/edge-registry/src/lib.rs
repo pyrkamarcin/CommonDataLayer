@@ -1,27 +1,39 @@
+use std::{cmp::min, convert::TryInto, fmt, str::FromStr, sync::Arc, time};
+
 use anyhow::{Context, Error};
-use bb8_postgres::bb8::{Pool, PooledConnection};
-use bb8_postgres::tokio_postgres::{Config, NoTls};
-use bb8_postgres::{bb8, PostgresConnectionManager};
-use communication_utils::consumer::ConsumerHandler;
-use communication_utils::message::CommunicationMessage;
-use futures::future::BoxFuture;
-use futures::FutureExt;
+use bb8_postgres::{
+    bb8,
+    bb8::{Pool, PooledConnection},
+    tokio_postgres::{Config, NoTls},
+    PostgresConnectionManager,
+};
+use communication_utils::{consumer::ConsumerHandler, message::CommunicationMessage};
+use futures::{future::BoxFuture, FutureExt};
 use itertools::Itertools;
 use metrics_utils::{self as metrics, counter};
 use notification_utils::NotificationPublisher;
-use rpc::edge_registry::edge_registry_server::EdgeRegistry;
 use rpc::edge_registry::{
-    AddSchemaRelation, Edge, Empty, ObjectIdQuery, ObjectRelations, RelationDetails, RelationId,
-    RelationIdQuery, RelationList, RelationQuery, RelationResponse, RelationTree, SchemaId,
-    SchemaRelation, TreeObject, TreeQuery, ValidateRelationQuery,
+    edge_registry_server::EdgeRegistry,
+    AddSchemaRelation,
+    Edge,
+    Empty,
+    ObjectIdQuery,
+    ObjectRelations,
+    RelationDetails,
+    RelationId,
+    RelationIdQuery,
+    RelationList,
+    RelationQuery,
+    RelationResponse,
+    RelationTree,
+    SchemaId,
+    SchemaRelation,
+    TreeObject,
+    TreeQuery,
+    ValidateRelationQuery,
 };
 use serde::{Deserialize, Serialize};
 use settings_utils::apps::PostgresSettings;
-use std::cmp::min;
-use std::convert::TryInto;
-use std::str::FromStr;
-use std::sync::Arc;
-use std::{fmt, time};
 use thiserror::Error;
 use tonic::{Request, Response, Status};
 use tracing::{debug, error, trace};

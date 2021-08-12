@@ -4,13 +4,13 @@ use anyhow::{Context, Result};
 use rpc::schema_registry::types::LogicOperator;
 use serde_json::Value;
 
+use super::field_builder::ComputationEngine;
 use crate::{
     sources::{FilterSource, FilterValueSource},
     utils::get_sub_object,
-    ObjectIdPair, RowDefinition,
+    ObjectIdPair,
+    RowDefinition,
 };
-
-use super::field_builder::ComputationEngine;
 
 pub struct RowFilter<'a> {
     objects: &'a HashMap<ObjectIdPair, Value>,

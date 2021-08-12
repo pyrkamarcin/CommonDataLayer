@@ -1,5 +1,4 @@
-use rpc::error::ClientError;
-use rpc::schema_registry::types::SchemaType;
+use rpc::{error::ClientError, schema_registry::types::SchemaType};
 use warp::{hyper::StatusCode, reject::Reject, Rejection};
 
 #[derive(Debug)]

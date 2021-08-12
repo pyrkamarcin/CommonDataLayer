@@ -1,8 +1,10 @@
-use crate::config_generator::context::{Context, FromContext, Repo};
-use crate::config_generator::defaults::DEFAULT_QUERY_SERVICE_PORT;
 use anyhow::bail;
-use settings_utils::apps::query_service::QueryServiceSettings;
-use settings_utils::apps::{LogSettings, MonitoringSettings};
+use settings_utils::apps::{query_service::QueryServiceSettings, LogSettings, MonitoringSettings};
+
+use crate::config_generator::{
+    context::{Context, FromContext, Repo},
+    defaults::DEFAULT_QUERY_SERVICE_PORT,
+};
 
 pub const QUERY_SERVICE_NAMESPACE: &str = "query_service";
 

@@ -1,9 +1,9 @@
+use std::{env, fmt::Debug};
+
 use anyhow::bail;
 use communication_utils::publisher::CommonPublisher;
 use config::{Config, Environment, File};
 use serde::Deserialize;
-use std::env;
-use std::fmt::Debug;
 
 pub mod apps;
 

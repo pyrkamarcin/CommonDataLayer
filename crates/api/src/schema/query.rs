@@ -2,19 +2,24 @@ use std::collections::HashMap;
 
 use async_graphql::{Context, FieldResult, Json, Object};
 use itertools::Itertools;
-use uuid::Uuid;
-
-use crate::schema::utils::{get_schema, get_view};
-use crate::types::data::{CdlObject, EdgeRelations, SchemaRelation};
-use crate::types::schema::FullSchema;
-use crate::types::view::OnDemandViewRequest;
-use crate::types::view::{MaterializedView, RowDefinition};
-use crate::{error::Result, types::view::FullView};
-use rpc::edge_registry::EdgeRegistryPool;
-use rpc::materializer_ondemand::{OnDemandMaterializerPool, OnDemandRequest};
-use rpc::schema_registry::SchemaRegistryPool;
+use rpc::{
+    edge_registry::EdgeRegistryPool,
+    materializer_ondemand::{OnDemandMaterializerPool, OnDemandRequest},
+    schema_registry::SchemaRegistryPool,
+};
 use settings_utils::apps::api::ApiSettings;
 use tracing_utils::http::RequestBuilderTracingExt;
+use uuid::Uuid;
+
+use crate::{
+    error::Result,
+    schema::utils::{get_schema, get_view},
+    types::{
+        data::{CdlObject, EdgeRelations, SchemaRelation},
+        schema::FullSchema,
+        view::{FullView, MaterializedView, OnDemandViewRequest, RowDefinition},
+    },
+};
 
 pub struct QueryRoot;
 

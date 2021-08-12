@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
-use opentelemetry::global;
-use opentelemetry::propagation::{Extractor, Injector};
+use opentelemetry::{
+    global,
+    propagation::{Extractor, Injector},
+};
 use rdkafka::{
     message::{BorrowedHeaders, BorrowedMessage, Headers, OwnedHeaders},
     Message,

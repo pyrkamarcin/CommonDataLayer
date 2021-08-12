@@ -1,11 +1,13 @@
-use crate::config_generator::context::{Context, FromContext};
-use crate::config_generator::defaults::{
-    DEFAULT_OBJECT_BUILDER_HOST, DEFAULT_ON_DEMAND_MATERIALIZER_PORT,
+use settings_utils::apps::{
+    materializer_ondemand::{MaterializerOndemandServicesSettings, MaterializerOndemandSettings},
+    LogSettings,
+    MonitoringSettings,
 };
-use settings_utils::apps::materializer_ondemand::{
-    MaterializerOndemandServicesSettings, MaterializerOndemandSettings,
+
+use crate::config_generator::{
+    context::{Context, FromContext},
+    defaults::{DEFAULT_OBJECT_BUILDER_HOST, DEFAULT_ON_DEMAND_MATERIALIZER_PORT},
 };
-use settings_utils::apps::{LogSettings, MonitoringSettings};
 
 pub const MATERIALIZER_ONDEMAND_NAMESPACE: &str = "materializer_ondemand";
 

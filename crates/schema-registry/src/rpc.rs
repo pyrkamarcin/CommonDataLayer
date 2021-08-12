@@ -1,29 +1,36 @@
+use std::{collections::HashMap, convert::TryInto, pin::Pin, time::Duration};
+
 use bb8::Pool;
+use cdl_dto::{materialization::Relation, TryFromRpc, TryIntoRpc};
+use communication_utils::{metadata_fetcher::MetadataFetcher, Result};
 use futures_util::future::{BoxFuture, FutureExt};
+use rpc::{
+    edge_registry::{EdgeRegistryConnectionManager, EdgeRegistryPool, ValidateRelationQuery},
+    schema_registry::{
+        schema_registry_server::SchemaRegistry,
+        Empty,
+        Errors,
+        Id,
+        SchemaUpdate as RpcSchemaUpdate,
+        SchemaViews,
+        ValueToValidate,
+    },
+};
+use settings_utils::apps::schema_registry::SchemaRegistrySettings;
 use sqlx::types::Json;
-use std::collections::HashMap;
-use std::convert::TryInto;
-use std::pin::Pin;
-use std::time::Duration;
 use tokio_stream::{Stream, StreamExt};
 use tonic::{Request, Response, Status};
 use uuid::Uuid;
 
-use crate::db::SchemaRegistryDb;
-use crate::error::{RegistryError, RegistryResult};
-use crate::types::schema::{NewSchema, SchemaUpdate};
-use crate::types::view::{FullView, NewView, ViewUpdate};
-use crate::types::DbExport;
-use cdl_dto::materialization::Relation;
-use cdl_dto::{TryFromRpc, TryIntoRpc};
-use communication_utils::metadata_fetcher::MetadataFetcher;
-use communication_utils::Result;
-use rpc::edge_registry::{EdgeRegistryConnectionManager, EdgeRegistryPool, ValidateRelationQuery};
-use rpc::schema_registry::{
-    schema_registry_server::SchemaRegistry, Empty, Errors, Id, SchemaUpdate as RpcSchemaUpdate,
-    SchemaViews, ValueToValidate,
+use crate::{
+    db::SchemaRegistryDb,
+    error::{RegistryError, RegistryResult},
+    types::{
+        schema::{NewSchema, SchemaUpdate},
+        view::{FullView, NewView, ViewUpdate},
+        DbExport,
+    },
 };
-use settings_utils::apps::schema_registry::SchemaRegistrySettings;
 
 pub struct SchemaRegistryImpl {
     pub edge_registry: EdgeRegistryPool,

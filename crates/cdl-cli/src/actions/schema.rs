@@ -1,13 +1,17 @@
-use std::convert::TryInto;
-use std::path::PathBuf;
+use std::{convert::TryInto, path::PathBuf};
 
+use rpc::schema_registry::{
+    types::SchemaType,
+    Empty,
+    Id,
+    NewSchema,
+    SchemaUpdate,
+    ValueToValidate,
+};
 use serde_json::Value;
 use uuid::Uuid;
 
 use crate::utils::*;
-use rpc::schema_registry::{
-    types::SchemaType, Empty, Id, NewSchema, SchemaUpdate, ValueToValidate,
-};
 
 pub async fn get_schema_definition(schema_id: Uuid, registry_addr: String) -> anyhow::Result<()> {
     let mut client = rpc::schema_registry::connect(registry_addr).await?;

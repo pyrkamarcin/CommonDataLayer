@@ -1,7 +1,13 @@
-use crate::config_generator::context::{Context, FromContext};
-use crate::config_generator::defaults::{DEFAULT_QUERY_ROUTER_PORT, DEFAULT_SCHEMA_REGISTRY_HOST};
-use settings_utils::apps::query_router::{QueryRouterServicesSettings, QueryRouterSettings};
-use settings_utils::apps::{LogSettings, MonitoringSettings};
+use settings_utils::apps::{
+    query_router::{QueryRouterServicesSettings, QueryRouterSettings},
+    LogSettings,
+    MonitoringSettings,
+};
+
+use crate::config_generator::{
+    context::{Context, FromContext},
+    defaults::{DEFAULT_QUERY_ROUTER_PORT, DEFAULT_SCHEMA_REGISTRY_HOST},
+};
 
 pub const QUERY_ROUTER_NAMESPACE: &str = "query_router";
 

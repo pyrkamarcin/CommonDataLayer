@@ -1,14 +1,24 @@
-use crate::config_generator::context::{Communication, Context, FromContext, Repo};
-use crate::config_generator::defaults::{
-    DEFAULT_CDL_NOTIFICATION_CHANNEL, DEFAULT_COMMAND_SERVICE_LISTEN_URL,
-};
-use settings_utils::apps::command_service::{
-    CommandServiceAmqpSettings, CommandServiceDruidSettings, CommandServiceGRpcSettings,
-    CommandServiceKafkaSettings, CommandServiceListenerSettings, CommandServiceRepositoryKind,
-    CommandServiceSettings, CommandServiceVictoriaMetricsSettings,
-};
 use settings_utils::apps::{
-    AmqpConsumeOptions, CommunicationMethod, LogSettings, MonitoringSettings, NotificationSettings,
+    command_service::{
+        CommandServiceAmqpSettings,
+        CommandServiceDruidSettings,
+        CommandServiceGRpcSettings,
+        CommandServiceKafkaSettings,
+        CommandServiceListenerSettings,
+        CommandServiceRepositoryKind,
+        CommandServiceSettings,
+        CommandServiceVictoriaMetricsSettings,
+    },
+    AmqpConsumeOptions,
+    CommunicationMethod,
+    LogSettings,
+    MonitoringSettings,
+    NotificationSettings,
+};
+
+use crate::config_generator::{
+    context::{Communication, Context, FromContext, Repo},
+    defaults::{DEFAULT_CDL_NOTIFICATION_CHANNEL, DEFAULT_COMMAND_SERVICE_LISTEN_URL},
 };
 
 pub const COMMAND_SERVICE_NAMESPACE: &str = "command_service";

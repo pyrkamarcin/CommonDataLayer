@@ -1,9 +1,9 @@
+use query_service_ts_client::QueryServiceTsClient;
+use tonic::{service::interceptor::InterceptedService, transport::Channel};
+use tracing_utils::grpc::InterceptorType;
+
 pub use crate::codegen::query_service_ts::*;
 use crate::error::ClientError;
-use query_service_ts_client::QueryServiceTsClient;
-use tonic::service::interceptor::InterceptedService;
-use tonic::transport::Channel;
-use tracing_utils::grpc::InterceptorType;
 
 pub async fn connect(
     addr: String,

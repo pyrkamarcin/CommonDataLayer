@@ -1,30 +1,32 @@
-use std::fs;
-use std::fs::Permissions;
-
-use dialoguer_trait::Dialogue;
+use std::{ffi::OsString, fs, fs::Permissions, path::Path};
 
 use anyhow::bail;
 use context::{Communication, Context, FromContext, Repo};
-use settings_utils::apps::api::ApiSettings;
-use settings_utils::apps::command_service::CommandServiceSettings;
-use settings_utils::apps::data_router::DataRouterSettings;
-use settings_utils::apps::edge_registry::EdgeRegistrySettings;
-use settings_utils::apps::materializer_general::MaterializerGeneralSettings;
-use settings_utils::apps::materializer_ondemand::MaterializerOndemandSettings;
-use settings_utils::apps::object_builder::ObjectBuilderSettings;
-use settings_utils::apps::partial_update_engine::PartialUpdateEngineSettings;
-use settings_utils::apps::query_router::QueryRouterSettings;
-use settings_utils::apps::query_service::QueryServiceSettings;
-use settings_utils::apps::query_service_ts::QueryServiceTsSettings;
-use settings_utils::apps::schema_registry::SchemaRegistrySettings;
-
-use crate::config_generator::context::{
-    AmqpCommunication, DruidContext, KafkaCommunication, PostgresContext, VictoriaMetricsContext,
-};
+use dialoguer_trait::Dialogue;
 use pico_args::Arguments;
 use serde::Serialize;
-use std::ffi::OsString;
-use std::path::Path;
+use settings_utils::apps::{
+    api::ApiSettings,
+    command_service::CommandServiceSettings,
+    data_router::DataRouterSettings,
+    edge_registry::EdgeRegistrySettings,
+    materializer_general::MaterializerGeneralSettings,
+    materializer_ondemand::MaterializerOndemandSettings,
+    object_builder::ObjectBuilderSettings,
+    partial_update_engine::PartialUpdateEngineSettings,
+    query_router::QueryRouterSettings,
+    query_service::QueryServiceSettings,
+    query_service_ts::QueryServiceTsSettings,
+    schema_registry::SchemaRegistrySettings,
+};
+
+use crate::config_generator::context::{
+    AmqpCommunication,
+    DruidContext,
+    KafkaCommunication,
+    PostgresContext,
+    VictoriaMetricsContext,
+};
 
 mod context;
 mod defaults;

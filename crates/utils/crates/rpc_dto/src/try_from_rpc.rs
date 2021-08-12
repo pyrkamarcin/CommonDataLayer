@@ -2,8 +2,7 @@ use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use proc_macro_error::{abort, OptionExt};
 use quote::quote;
-use syn::parse_quote;
-use syn::spanned::Spanned;
+use syn::{parse_quote, spanned::Spanned};
 
 pub struct TryFromRpc {
     ident: syn::Ident,

@@ -1,5 +1,4 @@
-pub use crate::input::error::Error;
-pub use crate::input::service::Service;
+pub use crate::input::{error::Error, service::Service};
 
 mod error;
 mod service;

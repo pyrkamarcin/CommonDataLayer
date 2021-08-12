@@ -1,17 +1,20 @@
-use crate::communication::resolution::Resolution;
-use crate::output::OutputPlugin;
+use std::time::Duration;
+
 use anyhow::Context;
 use cdl_dto::ingestion::BorrowedInsertMessage;
 use futures::stream::{self, StreamExt};
 use metrics_utils::{self as metrics, counter};
-use rdkafka::producer::{FutureProducer, FutureRecord};
-use rdkafka::ClientConfig;
+use rdkafka::{
+    producer::{FutureProducer, FutureRecord},
+    ClientConfig,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use settings_utils::apps::command_service::CommandServiceDruidSettings;
-use std::time::Duration;
 use tracing::error;
 use uuid::Uuid;
+
+use crate::{communication::resolution::Resolution, output::OutputPlugin};
 
 #[derive(Deserialize)]
 struct TimeseriesInputMessage {

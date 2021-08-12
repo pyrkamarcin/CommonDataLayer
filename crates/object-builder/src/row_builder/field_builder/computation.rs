@@ -3,9 +3,8 @@ use std::collections::HashMap;
 use anyhow::{Context, Result};
 use serde_json::Value;
 
-use crate::{sources::ComputationSource, utils::get_sub_object, ObjectIdPair};
-
 use super::FieldBuilder;
+use crate::{sources::ComputationSource, utils::get_sub_object, ObjectIdPair};
 
 #[derive(Clone, Copy)]
 pub struct ComputationEngine<'a> {

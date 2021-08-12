@@ -27,11 +27,12 @@ pub struct ExportSchema {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use cdl_dto::materialization::{FieldDefinition, FieldType};
     use maplit::hashmap;
     use serde_json::json;
     use sqlx::types::Json;
+
+    use super::*;
 
     #[test]
     fn test_deserialize_db_export() {

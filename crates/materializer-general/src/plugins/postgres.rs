@@ -1,13 +1,19 @@
-use std::collections::VecDeque;
-use std::{collections::HashMap, convert::TryFrom, convert::TryInto};
+use std::{
+    collections::{HashMap, VecDeque},
+    convert::{TryFrom, TryInto},
+};
 
-use super::MaterializerPlugin;
 use anyhow::Context;
-use bb8_postgres::tokio_postgres::{types::Type, Config, NoTls};
-use bb8_postgres::{bb8, PostgresConnectionManager};
 use bb8_postgres::{
+    bb8,
     bb8::{Pool, PooledConnection},
-    tokio_postgres::{binary_copy::BinaryCopyInWriter, types::ToSql},
+    tokio_postgres::{
+        binary_copy::BinaryCopyInWriter,
+        types::{ToSql, Type},
+        Config,
+        NoTls,
+    },
+    PostgresConnectionManager,
 };
 use cdl_dto::materialization::{FieldDefinition, FullView, PostgresMaterializerOptions};
 use futures::pin_mut;
@@ -17,6 +23,8 @@ use rpc::materializer_general::MaterializedView;
 use serde_json::Value;
 use settings_utils::apps::PostgresSettings;
 use uuid::Uuid;
+
+use super::MaterializerPlugin;
 
 const SCHEMA_COLUMN_PREFIX: &str = "schema_";
 

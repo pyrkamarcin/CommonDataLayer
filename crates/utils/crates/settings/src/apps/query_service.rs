@@ -1,5 +1,6 @@
-use crate::apps::{LogSettings, MonitoringSettings, PostgresSettings};
 use serde::{Deserialize, Serialize};
+
+use crate::apps::{LogSettings, MonitoringSettings, PostgresSettings};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct QueryServiceSettings {

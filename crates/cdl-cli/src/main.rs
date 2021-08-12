@@ -2,8 +2,7 @@ pub mod actions;
 pub mod args;
 pub mod utils;
 
-use actions::schema::*;
-use actions::view::*;
+use actions::{schema::*, view::*};
 use args::*;
 use clap::Clap;
 

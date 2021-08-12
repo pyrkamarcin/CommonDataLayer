@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 
 use async_graphql::{FieldResult, Json, SimpleObject};
+use cdl_dto::{
+    materialization::{Filter, Relation},
+    TryFromRpc,
+};
 use serde_json::Value;
 use uuid::Uuid;
-
-use cdl_dto::materialization::{Filter, Relation};
-use cdl_dto::TryFromRpc;
 
 /// A view under a schema.
 #[derive(Debug, SimpleObject)]

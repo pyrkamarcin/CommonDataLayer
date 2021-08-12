@@ -1,13 +1,24 @@
-use crate::config_generator::context::{Communication, Context, FromContext};
-use crate::config_generator::defaults::{
-    DEFAULT_CDL_NOTIFICATION_CHANNEL, DEFAULT_PUE_EGEST_TOPIC, DEFAULT_SCHEMA_REGISTRY_HOST,
-};
 use anyhow::bail;
-use settings_utils::apps::partial_update_engine::{
-    PartialUpdateEngineKafkaSettings, PartialUpdateEngineNotificationConsumerSettings,
-    PartialUpdateEngineServicesSettings, PartialUpdateEngineSettings,
+use settings_utils::apps::{
+    partial_update_engine::{
+        PartialUpdateEngineKafkaSettings,
+        PartialUpdateEngineNotificationConsumerSettings,
+        PartialUpdateEngineServicesSettings,
+        PartialUpdateEngineSettings,
+    },
+    CommunicationMethod,
+    LogSettings,
+    MonitoringSettings,
 };
-use settings_utils::apps::{CommunicationMethod, LogSettings, MonitoringSettings};
+
+use crate::config_generator::{
+    context::{Communication, Context, FromContext},
+    defaults::{
+        DEFAULT_CDL_NOTIFICATION_CHANNEL,
+        DEFAULT_PUE_EGEST_TOPIC,
+        DEFAULT_SCHEMA_REGISTRY_HOST,
+    },
+};
 
 pub const PARTIAL_UPDATE_ENGINE_NAMESPACE: &str = "partial_update_engine";
 

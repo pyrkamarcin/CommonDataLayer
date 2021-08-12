@@ -1,17 +1,25 @@
-use crate::{api::*, *};
+use std::{collections::HashMap, num::NonZeroU8, time::Duration};
+
 use anyhow::Result;
 use cdl_api::types::view::NewRelation;
 use cdl_dto::materialization::{
-    Computation, EqualsFilter, FieldValueComputation, Filter, FilterValue, RawValueFilter,
-    SchemaFieldFilter, SimpleFilter, SimpleFilterKind,
+    Computation,
+    EqualsFilter,
+    FieldDefinition,
+    FieldType,
+    FieldValueComputation,
+    Filter,
+    FilterValue,
+    RawValueFilter,
+    SchemaFieldFilter,
+    SimpleFilter,
+    SimpleFilterKind,
 };
-use cdl_dto::materialization::{FieldDefinition, FieldType};
 use cdl_rpc::schema_registry::types::SearchFor;
-use std::collections::HashMap;
-use std::num::NonZeroU8;
-use std::time::Duration;
 use tokio::time::sleep;
 use uuid::Uuid;
+
+use crate::{api::*, *};
 
 #[tokio::test]
 async fn should_return_no_results_when_one_of_related_objects_does_not_exist() -> Result<()> {

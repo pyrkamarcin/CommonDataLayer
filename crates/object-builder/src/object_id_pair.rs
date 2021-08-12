@@ -1,9 +1,11 @@
-use super::*;
 use serde::{
     de::{Error, Visitor},
-    Deserializer, Serializer,
+    Deserializer,
+    Serializer,
 };
 use uuid::Uuid;
+
+use super::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub struct ObjectIdPair {

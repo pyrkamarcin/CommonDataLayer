@@ -1,11 +1,20 @@
-use crate::apps::{
-    AmqpConsumeOptions, CommunicationMethod, LogSettings, MonitoringSettings, NotificationSettings,
-    PostgresSettings,
+use communication_utils::{
+    consumer::{CommonConsumer, CommonConsumerConfig},
+    publisher::CommonPublisher,
 };
-use crate::publisher;
-use communication_utils::consumer::{CommonConsumer, CommonConsumerConfig};
-use communication_utils::publisher::CommonPublisher;
 use serde::{Deserialize, Serialize};
+
+use crate::{
+    apps::{
+        AmqpConsumeOptions,
+        CommunicationMethod,
+        LogSettings,
+        MonitoringSettings,
+        NotificationSettings,
+        PostgresSettings,
+    },
+    publisher,
+};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct EdgeRegistrySettings {

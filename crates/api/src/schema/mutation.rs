@@ -1,18 +1,22 @@
-use crate::error::Error;
-use crate::schema::utils::{get_schema, get_view};
-use crate::types::data::{InputMessage, ObjectRelations};
-use crate::types::schema::{FullSchema, NewSchema, UpdateSchema};
-use crate::types::view::{NewView, View, ViewUpdate};
-use crate::{publisher, types::view::FullView, types::IntoQueried};
 use async_graphql::{Context, FieldResult, Object};
-use cdl_dto::ingestion::OwnedInsertMessage;
-use cdl_dto::TryIntoRpc;
+use cdl_dto::{ingestion::OwnedInsertMessage, TryIntoRpc};
 use misc_utils::current_timestamp;
-use rpc::edge_registry::EdgeRegistryPool;
-use rpc::schema_registry::SchemaRegistryPool;
+use rpc::{edge_registry::EdgeRegistryPool, schema_registry::SchemaRegistryPool};
 use serde_json::value::to_raw_value;
 use settings_utils::apps::api::ApiSettings;
 use uuid::Uuid;
+
+use crate::{
+    error::Error,
+    publisher,
+    schema::utils::{get_schema, get_view},
+    types::{
+        data::{InputMessage, ObjectRelations},
+        schema::{FullSchema, NewSchema, UpdateSchema},
+        view::{FullView, NewView, View, ViewUpdate},
+        IntoQueried,
+    },
+};
 
 pub struct MutationRoot;
 

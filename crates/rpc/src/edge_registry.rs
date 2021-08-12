@@ -1,10 +1,10 @@
-pub use crate::codegen::edge_registry::*;
-use crate::error::ClientError;
 use bb8::{Pool, PooledConnection};
 use edge_registry_client::EdgeRegistryClient;
-use tonic::service::interceptor::InterceptedService;
-use tonic::transport::Channel;
+use tonic::{service::interceptor::InterceptedService, transport::Channel};
 use tracing_utils::grpc::InterceptorType;
+
+pub use crate::codegen::edge_registry::*;
+use crate::error::ClientError;
 
 pub type EdgeRegistryPool = Pool<EdgeRegistryConnectionManager>;
 pub type EdgeRegistryConn =
