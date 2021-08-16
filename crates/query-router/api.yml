@@ -6,6 +6,10 @@ paths:
   /single/{object_id}:
     post:
       summary: Retrieve single object
+      description: >-
+        Retrieve single object from CDL.
+        When retrieving timeseries data it's mandatory to specify range in a request, to let the underlying database fold data values into single response.
+        When querying document data, body has to be omitted.
       operationId: getSingleObject
       parameters:
         - name: object_id
@@ -30,13 +34,11 @@ paths:
             type: string
             example: document_backup_repository
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
-              oneOf:
-                - $ref: '#/components/schemas/Empty'
-                - $ref: '#/components/schemas/Range'
+              - $ref: '#/components/schemas/Range'
       responses:
         '200':
           description: >-
@@ -151,8 +153,6 @@ paths:
 
 components:
   schemas:
-    Empty:
-      type: object
     Range:
       type: object
       properties:

@@ -33,11 +33,17 @@ class QueryRouter:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.svc.kill()
 
-    def query_get_single(self, schema_id, object_id, body):
-        return requests.post(
+    def query_get_single(self, schema_id, object_id, body=None):
+        print(object_id, body)
+
+        resp = requests.post(
             f"http://localhost:{self.input_port}/single/{object_id}",
             body,
             headers={'SCHEMA_ID': schema_id})
+
+        print(resp, resp.text)
+
+        return resp
 
     def query_get_multiple(self, schema_id, object_ids):
         return requests.get(

@@ -2,13 +2,14 @@ use std::sync::Arc;
 
 use cache::DynamicCache;
 use metrics_utils as metrics;
+use routes::{by_schema, multiple, raw, single};
 use schema::SchemaMetadataSupplier;
 use settings_utils::{apps::query_router::QueryRouterSettings, load_settings};
 use uuid::Uuid;
 use warp::Filter;
 
 pub mod error;
-pub mod handler;
+pub mod routes;
 pub mod schema;
 
 #[tokio::main]
@@ -38,40 +39,46 @@ async fn main() -> anyhow::Result<()> {
 
     let schema_id_filter = warp::header::header::<Uuid>("SCHEMA_ID");
     let repository_id_filter = warp::header::optional::<String>("REPOSITORY_ID");
-    let body_filter = warp::body::content_length_limit(1024 * 32).and(warp::body::json());
 
-    let single_route = warp::path!("single" / Uuid)
+    let single_route_ds = warp::path!("single" / Uuid)
         .and(schema_id_filter)
         .and(repository_id_filter)
         .and(cache_filter.clone())
         .and(routing_filter.clone())
-        .and(body_filter)
-        .and_then(handler::query_single);
+        .and_then(single::query_single_ds);
+
+    let single_route_ts = warp::path!("single" / Uuid)
+        .and(schema_id_filter)
+        .and(repository_id_filter)
+        .and(cache_filter.clone())
+        .and(routing_filter.clone())
+        .and(warp::body::content_length_limit(1024 * 32).and(warp::body::json()))
+        .and_then(single::query_single_ts);
 
     let multiple_route = warp::path!("multiple" / String)
         .and(schema_id_filter)
         .and(repository_id_filter)
         .and(cache_filter.clone())
         .and(routing_filter.clone())
-        .and_then(handler::query_multiple);
+        .and_then(multiple::query_multiple);
 
     let schema_route = warp::path!("schema")
         .and(schema_id_filter)
         .and(repository_id_filter)
         .and(cache_filter.clone())
         .and(routing_filter.clone())
-        .and_then(handler::query_by_schema);
+        .and_then(by_schema::query_by_schema);
 
     let raw_route = warp::path!("raw")
         .and(schema_id_filter)
         .and(repository_id_filter)
         .and(cache_filter.clone())
-        .and(body_filter)
+        .and(warp::body::content_length_limit(1024 * 32).and(warp::body::json()))
         .and(routing_filter.clone())
-        .and_then(handler::query_raw);
+        .and_then(raw::query_raw);
 
     let routes = warp::post()
-        .and(single_route.or(raw_route))
+        .and(single_route_ds.or(single_route_ts).or(raw_route))
         .or(warp::get().and(multiple_route.or(schema_route)));
 
     tracing_utils::http::serve(routes, ([0, 0, 0, 0], settings.input_port)).await;

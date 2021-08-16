@@ -93,7 +93,7 @@ def prepare_victoria_metrics(tmp_path):
 def test_endpoint_single_document_storage(prepare_postgres):
     data, expected, qr, schema_id = prepare_postgres
 
-    response = qr.query_get_single(schema_id, data['query_for'], "{}")
+    response = qr.query_get_single(schema_id, data['query_for'])
 
     assert_json(response.json(), expected)
 
