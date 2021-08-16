@@ -1,11 +1,19 @@
-use crate::config_generator::context::{Context, FromContext, Repo};
-use crate::config_generator::defaults::DEFAULT_QUERY_SERVICE_TS_PORT;
 use anyhow::bail;
-use settings_utils::apps::query_service_ts::{
-    QueryServiceTsDruidSettings, QueryServiceTsRepositoryKind, QueryServiceTsSettings,
-    QueryServiceTsVictoriaMetricsSettings,
+use settings_utils::apps::{
+    query_service_ts::{
+        QueryServiceTsDruidSettings,
+        QueryServiceTsRepositoryKind,
+        QueryServiceTsSettings,
+        QueryServiceTsVictoriaMetricsSettings,
+    },
+    LogSettings,
+    MonitoringSettings,
 };
-use settings_utils::apps::{LogSettings, MonitoringSettings};
+
+use crate::config_generator::{
+    context::{Context, FromContext, Repo},
+    defaults::DEFAULT_QUERY_SERVICE_TS_PORT,
+};
 
 pub const QUERY_SERVICE_TS_NAMESPACE: &str = "query_service_ts";
 

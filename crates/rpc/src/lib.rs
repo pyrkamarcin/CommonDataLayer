@@ -11,11 +11,10 @@ pub mod query_service;
 pub mod query_service_ts;
 pub mod schema_registry;
 
-pub use tonic;
+use std::{error::Error, io};
 
 use error::ClientError;
-use std::error::Error;
-use std::io;
+pub use tonic;
 use tonic::transport::{Channel, TimeoutExpired};
 
 pub async fn open_channel(

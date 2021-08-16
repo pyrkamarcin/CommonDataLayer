@@ -1,7 +1,6 @@
 use object_builder::ObjectBuilderImpl;
 use rpc::object_builder::object_builder_server::ObjectBuilderServer;
-use settings_utils::apps::object_builder::ObjectBuilderSettings;
-use settings_utils::load_settings;
+use settings_utils::{apps::object_builder::ObjectBuilderSettings, load_settings};
 use tonic::transport::Server;
 
 #[tokio::main]

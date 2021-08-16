@@ -1,9 +1,9 @@
+use std::sync::Arc;
+
 use cache::DynamicCache;
 use metrics_utils as metrics;
 use schema::SchemaMetadataSupplier;
-use settings_utils::apps::query_router::QueryRouterSettings;
-use settings_utils::load_settings;
-use std::sync::Arc;
+use settings_utils::{apps::query_router::QueryRouterSettings, load_settings};
 use uuid::Uuid;
 use warp::Filter;
 

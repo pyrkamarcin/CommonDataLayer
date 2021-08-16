@@ -1,3 +1,9 @@
+use std::{
+    collections::{HashMap, HashSet},
+    convert::TryInto,
+    pin::Pin,
+};
+
 use async_trait::async_trait;
 use bb8::Pool;
 use cdl_dto::{edges::RelationTree, materialization};
@@ -5,24 +11,23 @@ use communication_utils::{consumer::ConsumerHandler, message::CommunicationMessa
 use futures::{future::ready, Stream, StreamExt, TryStreamExt};
 use itertools::Itertools;
 use metrics_utils::{self as metrics, counter};
+use notification_utils::NotificationPublisher;
+use object_id_pair::ObjectIdPair;
 use row_builder::RowBuilder;
-use rpc::common::{Object, RowDefinition as RpcRowDefinition};
-use rpc::materializer_general::{MaterializedView as RpcMaterializedView, Options};
-use rpc::object_builder::{object_builder_server::ObjectBuilder, Empty, View};
-use rpc::schema_registry::types::SchemaType;
+use rpc::{
+    common::{Object, RowDefinition as RpcRowDefinition},
+    edge_registry::{EdgeRegistryConnectionManager, EdgeRegistryPool},
+    materializer_general::{MaterializedView as RpcMaterializedView, Options},
+    object_builder::{object_builder_server::ObjectBuilder, Empty, View},
+    schema_registry::{types::SchemaType, SchemaRegistryConnectionManager, SchemaRegistryPool},
+};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::HashSet;
-use std::{collections::HashMap, convert::TryInto, pin::Pin};
+use settings_utils::apps::object_builder::ObjectBuilderSettings;
 use tracing_futures::Instrument;
 use uuid::Uuid;
 
 use crate::{buffer_stream::ObjectBufferedStream, view_plan::ViewPlan};
-use notification_utils::NotificationPublisher;
-use object_id_pair::ObjectIdPair;
-use rpc::edge_registry::{EdgeRegistryConnectionManager, EdgeRegistryPool};
-use rpc::schema_registry::{SchemaRegistryConnectionManager, SchemaRegistryPool};
-use settings_utils::apps::object_builder::ObjectBuilderSettings;
 
 mod utils;
 

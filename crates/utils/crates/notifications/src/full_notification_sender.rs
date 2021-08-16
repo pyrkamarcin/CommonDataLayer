@@ -1,10 +1,11 @@
-use crate::{IntoSerialize, NotificationService};
+use std::{marker::PhantomData, sync::Arc};
+
 use anyhow::Context;
 use communication_utils::publisher::CommonPublisher;
 use serde::Serialize;
-use std::marker::PhantomData;
-use std::sync::Arc;
 use tracing::{debug, trace};
+
+use crate::{IntoSerialize, NotificationService};
 
 #[derive(Clone)]
 pub struct FullNotificationSenderBase<T, S>

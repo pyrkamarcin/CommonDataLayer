@@ -1,10 +1,10 @@
 #![feature(async_closure)]
 
+use std::sync::Arc;
+
 use materializer_general::MaterializerImpl;
 use rpc::materializer_general::general_materializer_server::GeneralMaterializerServer;
-use settings_utils::apps::materializer_general::MaterializerGeneralSettings;
-use settings_utils::load_settings;
-use std::sync::Arc;
+use settings_utils::{apps::materializer_general::MaterializerGeneralSettings, load_settings};
 use tonic::transport::Server;
 
 #[tokio::main]

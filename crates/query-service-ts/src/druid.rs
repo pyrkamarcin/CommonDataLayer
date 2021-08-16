@@ -3,7 +3,12 @@ use bb8::{Pool, PooledConnection};
 use metrics_utils::{self as metrics, counter};
 use reqwest::Client;
 use rpc::query_service_ts::{
-    query_service_ts_server::QueryServiceTs, Range, RawStatement, SchemaId, TimeSeries, ValueBytes,
+    query_service_ts_server::QueryServiceTs,
+    Range,
+    RawStatement,
+    SchemaId,
+    TimeSeries,
+    ValueBytes,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};

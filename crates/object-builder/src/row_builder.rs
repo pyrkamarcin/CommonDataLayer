@@ -7,7 +7,8 @@ use serde_json::Value;
 use crate::{
     row_builder::field_builder::ComputationEngine,
     sources::{FieldDefinitionSource, FilterSource, RowSource},
-    ObjectIdPair, RowDefinition,
+    ObjectIdPair,
+    RowDefinition,
 };
 
 mod field_builder;

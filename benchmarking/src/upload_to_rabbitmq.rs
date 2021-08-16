@@ -1,15 +1,22 @@
+use std::{io::Stdout, sync::Arc, time::Duration};
+
 use anyhow::Context;
 use clap::Clap;
 use lapin::{
-    options::BasicPublishOptions, BasicProperties, Channel, Connection, ConnectionProperties,
+    options::BasicPublishOptions,
+    BasicProperties,
+    Channel,
+    Connection,
+    ConnectionProperties,
 };
 use pbr::ProgressBar;
-use std::io::Stdout;
-use std::sync::Arc;
-use std::time::Duration;
-use tokio::sync::mpsc::{channel, Sender};
-use tokio::sync::Mutex;
-use tokio::time::sleep;
+use tokio::{
+    sync::{
+        mpsc::{channel, Sender},
+        Mutex,
+    },
+    time::sleep,
+};
 use uuid::Uuid;
 
 mod utils;

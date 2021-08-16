@@ -3,8 +3,8 @@ use std::pin::Pin;
 use futures::Stream;
 use rpc::{
     common::RowDefinition,
-    materializer_ondemand::on_demand_materializer_server::OnDemandMaterializer,
-    materializer_ondemand::Empty, object_builder::View,
+    materializer_ondemand::{on_demand_materializer_server::OnDemandMaterializer, Empty},
+    object_builder::View,
 };
 
 pub struct MaterializerImpl {

@@ -1,5 +1,6 @@
-use crate::apps::{CommunicationMethod, LogSettings, MonitoringSettings};
 use serde::{Deserialize, Serialize};
+
+use crate::apps::{CommunicationMethod, LogSettings, MonitoringSettings};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PartialUpdateEngineSettings {

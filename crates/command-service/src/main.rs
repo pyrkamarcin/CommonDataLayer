@@ -2,16 +2,18 @@
 
 use anyhow::bail;
 use cdl_dto::ingestion::OwnedInsertMessage;
-use command_service::communication::MessageRouter;
-use command_service::input::{Error, Service};
-use command_service::output::{
-    DruidOutputPlugin, OutputPlugin, PostgresOutputPlugin, VictoriaMetricsOutputPlugin,
+use command_service::{
+    communication::MessageRouter,
+    input::{Error, Service},
+    output::{DruidOutputPlugin, OutputPlugin, PostgresOutputPlugin, VictoriaMetricsOutputPlugin},
 };
 use communication_utils::parallel_consumer::ParallelCommonConsumer;
 use metrics_utils as metrics;
 use notification_utils::NotificationPublisher;
-use settings_utils::apps::command_service::{CommandServiceRepositoryKind, CommandServiceSettings};
-use settings_utils::load_settings;
+use settings_utils::{
+    apps::command_service::{CommandServiceRepositoryKind, CommandServiceSettings},
+    load_settings,
+};
 use tracing::debug;
 
 #[tokio::main]

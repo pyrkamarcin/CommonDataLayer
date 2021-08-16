@@ -1,10 +1,10 @@
-pub use crate::codegen::materializer_ondemand::*;
-use crate::error::ClientError;
 use bb8::{Pool, PooledConnection};
 use on_demand_materializer_client::OnDemandMaterializerClient;
-use tonic::service::interceptor::InterceptedService;
-use tonic::transport::Channel;
+use tonic::{service::interceptor::InterceptedService, transport::Channel};
 use tracing_utils::grpc::InterceptorType;
+
+pub use crate::codegen::materializer_ondemand::*;
+use crate::error::ClientError;
 
 pub type OnDemandMaterializerConn =
     OnDemandMaterializerClient<InterceptedService<Channel, &'static dyn InterceptorType>>;

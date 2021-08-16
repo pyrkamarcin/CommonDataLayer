@@ -1,22 +1,40 @@
+use std::{
+    collections::{HashMap, HashSet},
+    num::NonZeroU8,
+};
+
 use anyhow::{Context, Result};
 use cdl_dto::{
     edges::{RelationTree, TreeObject},
     materialization::{
-        ComplexFilter, Computation, ComputedFilter, EqualsComputation, EqualsFilter,
-        FieldDefinition, FieldValueComputation, Filter, FilterValue, FullView, RawValueComputation,
-        RawValueFilter, SchemaFieldFilter, SimpleFilter, SimpleFilterKind, ViewPathFilter,
+        ComplexFilter,
+        Computation,
+        ComputedFilter,
+        EqualsComputation,
+        EqualsFilter,
+        FieldDefinition,
+        FieldValueComputation,
+        Filter,
+        FilterValue,
+        FullView,
+        RawValueComputation,
+        RawValueFilter,
+        Relation,
+        SchemaFieldFilter,
+        SimpleFilter,
+        SimpleFilterKind,
+        ViewPathFilter,
     },
 };
 use itertools::Itertools;
-use std::collections::{HashMap, HashSet};
-use std::num::NonZeroU8;
-
-use cdl_dto::materialization::Relation;
 use uuid::Uuid;
 
 use super::{UnfinishedRow, UnfinishedRowVariant};
-use crate::sources::{ComputationSource, FieldDefinitionSource, FilterSource, FilterValueSource};
-use crate::{utils::get_base_object, ObjectIdPair};
+use crate::{
+    sources::{ComputationSource, FieldDefinitionSource, FilterSource, FilterValueSource},
+    utils::get_base_object,
+    ObjectIdPair,
+};
 
 #[derive(Debug)]
 pub struct ViewPlanBuilder<'a> {

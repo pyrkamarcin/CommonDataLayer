@@ -1,8 +1,9 @@
+use std::io::Stdout;
+
 use anyhow::Context;
 use pbr::ProgressBar;
 use serde::Serialize;
 use serde_json::Value;
-use std::io::Stdout;
 use tokio::sync::Mutex;
 use uuid::Uuid;
 

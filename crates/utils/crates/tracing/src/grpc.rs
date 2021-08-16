@@ -1,8 +1,6 @@
-use opentelemetry::global;
-use opentelemetry::propagation::Injector;
+use opentelemetry::{global, propagation::Injector};
 use opentelemetry_http::HeaderExtractor;
-use tonic::codegen::http;
-use tonic::{Request, Status};
+use tonic::{codegen::http, Request, Status};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 pub trait InterceptorType = (Fn(Request<()>) -> Result<Request<()>, Status>) + Send + Sync;

@@ -2,8 +2,10 @@ use jsonschema::JSONSchema;
 use serde_json::Value;
 use uuid::Uuid;
 
-use crate::db::SchemaRegistryDb;
-use crate::error::{RegistryError, RegistryResult};
+use crate::{
+    db::SchemaRegistryDb,
+    error::{RegistryError, RegistryResult},
+};
 
 pub async fn build_full_schema(schema: &mut Value, conn: &SchemaRegistryDb) -> RegistryResult<()> {
     if let Some(defs) = schema

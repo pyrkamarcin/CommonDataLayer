@@ -1,8 +1,9 @@
-use crate::full_notification_sender::{FullNotificationSender, FullNotificationSenderBase};
+use std::{marker::PhantomData, sync::Arc};
+
 use cdl_dto::ingestion::OwnMessage;
 use serde::Serialize;
-use std::marker::PhantomData;
-use std::sync::Arc;
+
+use crate::full_notification_sender::{FullNotificationSender, FullNotificationSenderBase};
 
 pub mod full_notification_sender;
 

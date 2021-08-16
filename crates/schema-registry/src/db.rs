@@ -1,20 +1,28 @@
+use futures::future;
+use futures_util::stream::{StreamExt, TryStreamExt};
 use serde_json::Value;
-use sqlx::pool::PoolConnection;
-use sqlx::postgres::{PgConnectOptions, PgListener, PgPool, PgPoolOptions};
-use sqlx::{Acquire, Connection, Postgres};
+use settings_utils::apps::schema_registry::SchemaRegistrySettings;
+use sqlx::{
+    pool::PoolConnection,
+    postgres::{PgConnectOptions, PgListener, PgPool, PgPoolOptions},
+    Acquire,
+    Connection,
+    Postgres,
+};
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver};
 use tracing::{trace, warn};
 use uuid::Uuid;
 
-use crate::error::{RegistryError, RegistryResult};
-use crate::types::schema::{FullSchema, NewSchema, Schema, SchemaUpdate};
-use crate::types::view::FullView;
-use crate::types::view::{NewView, View, ViewUpdate};
-use crate::types::{DbExport, ExportSchema};
-use crate::utils::build_full_schema;
-use futures::future;
-use futures_util::stream::{StreamExt, TryStreamExt};
-use settings_utils::apps::schema_registry::SchemaRegistrySettings;
+use crate::{
+    error::{RegistryError, RegistryResult},
+    types::{
+        schema::{FullSchema, NewSchema, Schema, SchemaUpdate},
+        view::{FullView, NewView, View, ViewUpdate},
+        DbExport,
+        ExportSchema,
+    },
+    utils::build_full_schema,
+};
 
 const SCHEMAS_LISTEN_CHANNEL: &str = "schemas";
 const VIEWS_LISTEN_CHANNEL: &str = "views";

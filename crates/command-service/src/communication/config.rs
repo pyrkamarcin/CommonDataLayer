@@ -1,7 +1,8 @@
 use std::net::{Ipv4Addr, SocketAddrV4};
 
 use communication_utils::{
-    consumer::BasicConsumeOptions, parallel_consumer::ParallelCommonConsumerConfig,
+    consumer::BasicConsumeOptions,
+    parallel_consumer::ParallelCommonConsumerConfig,
 };
 use task_utils::task_limiter::TaskLimiter;
 

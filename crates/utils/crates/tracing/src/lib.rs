@@ -1,10 +1,8 @@
 #![feature(trait_alias)]
 
-use opentelemetry::global;
-use opentelemetry::sdk::propagation::TraceContextPropagator;
+use opentelemetry::{global, sdk::propagation::TraceContextPropagator};
 use tokio::runtime::Handle;
-use tracing_subscriber::prelude::*;
-use tracing_subscriber::EnvFilter;
+use tracing_subscriber::{prelude::*, EnvFilter};
 
 #[cfg(feature = "grpc")]
 pub mod grpc;

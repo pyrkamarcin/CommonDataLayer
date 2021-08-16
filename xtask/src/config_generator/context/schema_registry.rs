@@ -1,10 +1,19 @@
-use crate::config_generator::context::{Communication, Context, FromContext};
-use crate::config_generator::defaults::{DEFAULT_EDGE_REGISTRY_HOST, DEFAULT_SCHEMA_REGISTRY_PORT};
-use settings_utils::apps::schema_registry::{
-    SchemaRegistryAmqpSettings, SchemaRegistryKafkaSettings, SchemaRegistryServicesSettings,
-    SchemaRegistrySettings,
+use settings_utils::apps::{
+    schema_registry::{
+        SchemaRegistryAmqpSettings,
+        SchemaRegistryKafkaSettings,
+        SchemaRegistryServicesSettings,
+        SchemaRegistrySettings,
+    },
+    CommunicationMethod,
+    LogSettings,
+    MonitoringSettings,
 };
-use settings_utils::apps::{CommunicationMethod, LogSettings, MonitoringSettings};
+
+use crate::config_generator::{
+    context::{Communication, Context, FromContext},
+    defaults::{DEFAULT_EDGE_REGISTRY_HOST, DEFAULT_SCHEMA_REGISTRY_PORT},
+};
 
 pub const SCHEMA_REGISTRY_NAMESPACE: &str = "schema_registry";
 

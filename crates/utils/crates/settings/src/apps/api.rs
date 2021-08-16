@@ -1,5 +1,6 @@
-use crate::apps::{CommunicationMethod, LogSettings};
 use serde::{Deserialize, Serialize};
+
+use crate::apps::{CommunicationMethod, LogSettings};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ApiSettings {

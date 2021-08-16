@@ -1,22 +1,23 @@
+use std::{
+    collections::{hash_map::Entry, HashMap, HashSet},
+    time::Duration,
+};
+
 use anyhow::{Context, Result};
 use cdl_dto::materialization::Request;
 use misc_utils::set_aborting_panic_hook;
-use rdkafka::consumer::Consumer;
 use rdkafka::{
-    consumer::{CommitMode, DefaultConsumerContext, StreamConsumer},
+    consumer::{CommitMode, Consumer, DefaultConsumerContext, StreamConsumer},
     message::{BorrowedMessage, OwnedHeaders},
     producer::{FutureProducer, FutureRecord},
-    ClientConfig, Message, Offset, TopicPartitionList,
+    ClientConfig,
+    Message,
+    Offset,
+    TopicPartitionList,
 };
 use rpc::schema_registry::{FullView, Id};
 use serde::Deserialize;
-use settings_utils::apps::partial_update_engine::PartialUpdateEngineSettings;
-use settings_utils::*;
-use std::collections::hash_map::Entry;
-use std::{
-    collections::{HashMap, HashSet},
-    time::Duration,
-};
+use settings_utils::{apps::partial_update_engine::PartialUpdateEngineSettings, *};
 use tokio::time::sleep;
 use tokio_stream::StreamExt;
 use tracing::{trace, Instrument};

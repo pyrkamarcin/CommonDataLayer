@@ -1,12 +1,14 @@
 #![feature(async_closure)]
 
+use std::{process, sync::Arc};
+
 use edge_registry::EdgeRegistryImpl;
 use metrics_utils as metrics;
 use rpc::edge_registry::edge_registry_server::EdgeRegistryServer;
-use settings_utils::apps::edge_registry::EdgeRegistrySettings;
-use settings_utils::{apps::CommunicationMethod, load_settings};
-use std::process;
-use std::sync::Arc;
+use settings_utils::{
+    apps::{edge_registry::EdgeRegistrySettings, CommunicationMethod},
+    load_settings,
+};
 use tonic::transport::Server;
 use tracing::{error, info};
 use utils::status_endpoints;

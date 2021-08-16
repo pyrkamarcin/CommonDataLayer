@@ -1,3 +1,5 @@
+use std::{collections::HashMap, num::NonZeroU8};
+
 use anyhow::Result;
 use cdl_dto::{
     edges::RelationTree,
@@ -6,13 +8,13 @@ use cdl_dto::{
 use itertools::Itertools;
 use serde::Serialize;
 use serde_json::Value;
-use std::{collections::HashMap, num::NonZeroU8};
 use uuid::Uuid;
 
-use crate::sources::{FieldDefinitionSource, FilterSource, RowSource};
-use crate::ObjectIdPair;
-
 use self::builder::ViewPlanBuilder;
+use crate::{
+    sources::{FieldDefinitionSource, FilterSource, RowSource},
+    ObjectIdPair,
+};
 
 mod builder;
 
@@ -125,9 +127,10 @@ impl ViewPlan {
 
 #[cfg(all(test, not(miri)))]
 mod tests {
-    use super::*;
     use anyhow::Result;
     use misc_utils::serde_json::{to_string_sorted, SortSettings};
+
+    use super::*;
 
     #[test]
     fn build_view_plan_test() -> Result<()> {

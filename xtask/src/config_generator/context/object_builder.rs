@@ -1,15 +1,27 @@
-use crate::config_generator::context::{Communication, Context, FromContext};
-use crate::config_generator::defaults::{
-    DEFAULT_CDL_NOTIFICATION_CHANNEL, DEFAULT_EDGE_REGISTRY_HOST, DEFAULT_OBJECT_BUILDER_PORT,
-    DEFAULT_PUE_EGEST_TOPIC, DEFAULT_SCHEMA_REGISTRY_HOST,
-};
 use anyhow::bail;
-use settings_utils::apps::object_builder::{
-    ObjectBuilderAmqpSettings, ObjectBuilderKafkaSettings, ObjectBuilderServicesSettings,
-    ObjectBuilderSettings,
-};
 use settings_utils::apps::{
-    AmqpConsumeOptions, CommunicationMethod, LogSettings, MonitoringSettings, NotificationSettings,
+    object_builder::{
+        ObjectBuilderAmqpSettings,
+        ObjectBuilderKafkaSettings,
+        ObjectBuilderServicesSettings,
+        ObjectBuilderSettings,
+    },
+    AmqpConsumeOptions,
+    CommunicationMethod,
+    LogSettings,
+    MonitoringSettings,
+    NotificationSettings,
+};
+
+use crate::config_generator::{
+    context::{Communication, Context, FromContext},
+    defaults::{
+        DEFAULT_CDL_NOTIFICATION_CHANNEL,
+        DEFAULT_EDGE_REGISTRY_HOST,
+        DEFAULT_OBJECT_BUILDER_PORT,
+        DEFAULT_PUE_EGEST_TOPIC,
+        DEFAULT_SCHEMA_REGISTRY_HOST,
+    },
 };
 
 pub const OBJECT_BUILDER_NAMESPACE: &str = "object_builder";

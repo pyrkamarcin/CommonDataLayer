@@ -1,7 +1,6 @@
 use materializer_ondemand::MaterializerImpl;
 use rpc::materializer_ondemand::on_demand_materializer_server::OnDemandMaterializerServer;
-use settings_utils::apps::materializer_ondemand::MaterializerOndemandSettings;
-use settings_utils::load_settings;
+use settings_utils::{apps::materializer_ondemand::MaterializerOndemandSettings, load_settings};
 use tonic::transport::Server;
 
 #[tokio::main]

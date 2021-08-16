@@ -1,18 +1,29 @@
 mod on_standard_field {
-    use crate::{api::*, *};
+    use std::{collections::HashMap, num::NonZeroU8, time::Duration};
+
     use anyhow::Result;
     use cdl_api::types::view::NewRelation;
     use cdl_dto::materialization::{
-        ComplexFilter, Computation, EqualsFilter, FieldValueComputation, Filter, FilterValue,
-        RawValueFilter, SchemaFieldFilter, SimpleFilter, SimpleFilterKind,
+        ComplexFilter,
+        Computation,
+        ComputedFilter,
+        EqualsFilter,
+        FieldDefinition,
+        FieldType,
+        FieldValueComputation,
+        Filter,
+        FilterValue,
+        RawValueFilter,
+        SchemaFieldFilter,
+        SimpleFilter,
+        SimpleFilterKind,
+        ViewPathFilter,
     };
-    use cdl_dto::materialization::{ComputedFilter, FieldDefinition, FieldType, ViewPathFilter};
     use cdl_rpc::schema_registry::types::{LogicOperator, SearchFor};
-    use std::collections::HashMap;
-    use std::num::NonZeroU8;
-    use std::time::Duration;
     use tokio::time::sleep;
     use uuid::Uuid;
+
+    use crate::{api::*, *};
 
     #[tokio::test]
     async fn should_apply_simple_filter_for_request_with_empty_relations() -> Result<()> {

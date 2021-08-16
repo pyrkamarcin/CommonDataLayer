@@ -1,19 +1,27 @@
-use crate::apps::default_async_task_limit;
-use crate::apps::{
-    AmqpConsumeOptions, CommunicationMethod, LogSettings, MonitoringSettings, NotificationSettings,
-    PostgresSettings,
-};
-use crate::publisher;
+use std::net::SocketAddrV4;
+
 use anyhow::bail;
-use communication_utils::parallel_consumer::{
-    ParallelCommonConsumer, ParallelCommonConsumerConfig,
+use communication_utils::{
+    parallel_consumer::{ParallelCommonConsumer, ParallelCommonConsumerConfig},
+    publisher::CommonPublisher,
 };
-use communication_utils::publisher::CommonPublisher;
 use lapin::options::BasicConsumeOptions;
 use serde::{Deserialize, Serialize};
-use std::net::SocketAddrV4;
 use task_utils::task_limiter::TaskLimiter;
 use url::Url;
+
+use crate::{
+    apps::{
+        default_async_task_limit,
+        AmqpConsumeOptions,
+        CommunicationMethod,
+        LogSettings,
+        MonitoringSettings,
+        NotificationSettings,
+        PostgresSettings,
+    },
+    publisher,
+};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct CommandServiceSettings {

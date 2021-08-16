@@ -11,15 +11,13 @@ macro_rules! default_service {
 }
 
 macro_rules! default_var {
-    (
-        $port:expr, port $var_name:ident
-    ) => {
+    ($port:expr,port $var_name:ident) => {
         pub const $var_name: u16 = $port;
     };
-    ($port:expr, host $var_name:ident) => {
+    ($port:expr,host $var_name:ident) => {
         pub const $var_name: &str = concat!("http://localhost:", stringify!($port));
     };
-    ($port:expr, serve $var_name:ident) => {
+    ($port:expr,serve $var_name:ident) => {
         pub const $var_name: &str = concat!("0.0.0.0:", stringify!($port));
     };
 }

@@ -1,7 +1,9 @@
-use crate::config_generator::defaults::{DEFAULT_KAFKA_BROKERS, DEFAULT_VICTORIA_METRICS_HOST};
+use std::path::PathBuf;
+
 use dialoguer_trait::Dialogue;
 use settings_utils::apps::PostgresSettings;
-use std::path::PathBuf;
+
+use crate::config_generator::defaults::{DEFAULT_KAFKA_BROKERS, DEFAULT_VICTORIA_METRICS_HOST};
 
 pub mod api;
 pub mod command_service;

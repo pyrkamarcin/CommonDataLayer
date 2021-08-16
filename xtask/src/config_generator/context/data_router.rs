@@ -1,13 +1,24 @@
-use crate::config_generator::context::{Communication, Context, FromContext};
-use crate::config_generator::defaults::{
-    DEFAULT_DATA_ROUTER_INGEST_SOURCE, DEFAULT_DATA_ROUTER_LISTEN_URL, DEFAULT_SCHEMA_REGISTRY_HOST,
-};
-use settings_utils::apps::data_router::{
-    DataRouterAmqpSettings, DataRouterConsumerKafkaSettings, DataRouterGRpcSettings,
-    DataRouterServicesSettings, DataRouterSettings,
-};
 use settings_utils::apps::{
-    AmqpConsumeOptions, CommunicationMethod, LogSettings, MonitoringSettings,
+    data_router::{
+        DataRouterAmqpSettings,
+        DataRouterConsumerKafkaSettings,
+        DataRouterGRpcSettings,
+        DataRouterServicesSettings,
+        DataRouterSettings,
+    },
+    AmqpConsumeOptions,
+    CommunicationMethod,
+    LogSettings,
+    MonitoringSettings,
+};
+
+use crate::config_generator::{
+    context::{Communication, Context, FromContext},
+    defaults::{
+        DEFAULT_DATA_ROUTER_INGEST_SOURCE,
+        DEFAULT_DATA_ROUTER_LISTEN_URL,
+        DEFAULT_SCHEMA_REGISTRY_HOST,
+    },
 };
 
 pub const DATA_ROUTER_NAMESPACE: &str = "data_router";

@@ -1,14 +1,27 @@
-use crate::config_generator::context::{Communication, Context, FromContext};
-use crate::config_generator::defaults::{
-    DEFAULT_API_PORT, DEFAULT_CDL_NOTIFICATION_CHANNEL, DEFAULT_DATA_ROUTER_INGEST_SOURCE,
-    DEFAULT_EDGE_REGISTRY_HOST, DEFAULT_ON_DEMAND_MATERIALIZER_HOST, DEFAULT_QUERY_ROUTER_HOST,
-    DEFAULT_SCHEMA_REGISTRY_HOST,
+use settings_utils::apps::{
+    api::{
+        ApiAmqpSettings,
+        ApiKafkaSettings,
+        ApiNotificationConsumerSettings,
+        ApiServiceSettings,
+        ApiSettings,
+    },
+    CommunicationMethod,
+    LogSettings,
 };
-use settings_utils::apps::api::{
-    ApiAmqpSettings, ApiKafkaSettings, ApiNotificationConsumerSettings, ApiServiceSettings,
-    ApiSettings,
+
+use crate::config_generator::{
+    context::{Communication, Context, FromContext},
+    defaults::{
+        DEFAULT_API_PORT,
+        DEFAULT_CDL_NOTIFICATION_CHANNEL,
+        DEFAULT_DATA_ROUTER_INGEST_SOURCE,
+        DEFAULT_EDGE_REGISTRY_HOST,
+        DEFAULT_ON_DEMAND_MATERIALIZER_HOST,
+        DEFAULT_QUERY_ROUTER_HOST,
+        DEFAULT_SCHEMA_REGISTRY_HOST,
+    },
 };
-use settings_utils::apps::{CommunicationMethod, LogSettings};
 
 pub const API_NAMESPACE: &str = "api";
 

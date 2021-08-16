@@ -2,11 +2,10 @@ use std::pin::Pin;
 
 use async_graphql::{Context, FieldError, FieldResult, Subscription};
 use futures::{Stream, TryStreamExt};
+use settings_utils::apps::api::ApiSettings;
 use tracing::Instrument;
 
-use crate::schema::context::MQEvents;
-use crate::types::report::Report;
-use settings_utils::apps::api::ApiSettings;
+use crate::{schema::context::MQEvents, types::report::Report};
 
 type ReportStream = Pin<Box<dyn Stream<Item = FieldResult<Report>> + Send>>;
 

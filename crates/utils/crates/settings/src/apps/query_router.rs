@@ -1,6 +1,8 @@
-use crate::apps::{LogSettings, MonitoringSettings, RepositoryStaticRouting};
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+
+use serde::{Deserialize, Serialize};
+
+use crate::apps::{LogSettings, MonitoringSettings, RepositoryStaticRouting};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct QueryRouterSettings {

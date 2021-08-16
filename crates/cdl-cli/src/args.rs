@@ -1,9 +1,8 @@
 use std::path::PathBuf;
 
 use clap::Clap;
-use uuid::Uuid;
-
 use rpc::schema_registry::types::SchemaType;
+use uuid::Uuid;
 
 /// A tool to interact with services in the Common Data Layer.
 #[derive(Clap)]

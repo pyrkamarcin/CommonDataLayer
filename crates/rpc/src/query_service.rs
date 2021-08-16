@@ -1,11 +1,12 @@
-pub use crate::codegen::query_service::*;
-use crate::error::ClientError;
+use std::pin::Pin;
+
 use futures_util::{Stream, TryStreamExt};
 use query_service_client::QueryServiceClient;
-use std::pin::Pin;
-use tonic::service::interceptor::InterceptedService;
-use tonic::transport::Channel;
+use tonic::{service::interceptor::InterceptedService, transport::Channel};
 use tracing_utils::grpc::InterceptorType;
+
+pub use crate::codegen::query_service::*;
+use crate::error::ClientError;
 
 pub type ObjectStream<Error = ClientError> =
     Pin<Box<dyn Stream<Item = Result<Object, Error>> + Send + Sync + 'static>>;

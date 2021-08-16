@@ -2,11 +2,11 @@ use std::convert::TryInto;
 
 use anyhow::Context;
 use async_graphql::{FieldResult, InputObject, Json, SimpleObject};
+use rpc::schema_registry::types::SchemaType;
 use serde_json::Value;
 use uuid::Uuid;
 
 use crate::types::view::View;
-use rpc::schema_registry::types::SchemaType;
 
 /// Schema is the format in which data is to be sent to the Common Data Layer.
 #[derive(Debug, SimpleObject)]

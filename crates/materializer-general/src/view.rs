@@ -1,6 +1,5 @@
 use cache::{CacheSupplier, DynamicCache};
-use cdl_dto::materialization::FullView;
-use cdl_dto::TryFromRpc;
+use cdl_dto::{materialization::FullView, TryFromRpc};
 use rpc::schema_registry::Id;
 use uuid::Uuid;
 

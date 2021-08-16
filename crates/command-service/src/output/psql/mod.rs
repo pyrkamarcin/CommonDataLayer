@@ -1,17 +1,19 @@
-use crate::communication::resolution::Resolution;
-use crate::output::OutputPlugin;
+use std::time;
+
 use bb8::Pool;
-use bb8_postgres::tokio_postgres::types::Json;
-use bb8_postgres::tokio_postgres::{Config, NoTls};
-use bb8_postgres::PostgresConnectionManager;
+use bb8_postgres::{
+    tokio_postgres::{types::Json, Config, NoTls},
+    PostgresConnectionManager,
+};
 use cdl_dto::ingestion::BorrowedInsertMessage;
 pub use error::Error;
 use metrics_utils::{self as metrics, counter};
 use serde_json::Value;
 use settings_utils::apps::PostgresSettings;
-use std::time;
 use tracing::{error, trace};
 use utils::psql::validate_schema;
+
+use crate::{communication::resolution::Resolution, output::OutputPlugin};
 
 pub mod error;
 

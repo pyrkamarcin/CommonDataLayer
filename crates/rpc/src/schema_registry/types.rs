@@ -4,9 +4,7 @@ use async_graphql::Enum;
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
 
-use super::logic_operator;
-use super::schema_type;
-use super::search_for;
+use super::{logic_operator, schema_type, search_for};
 
 macro_rules! rpc_enum {
     (

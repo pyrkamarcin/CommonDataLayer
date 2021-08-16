@@ -1,14 +1,23 @@
-use crate::config_generator::context::{Communication, Context, FromContext};
-use crate::config_generator::defaults::{
-    DEFAULT_CDL_NOTIFICATION_CHANNEL, DEFAULT_GENERAL_MATERIALIZER_PORT,
-    DEFAULT_SCHEMA_REGISTRY_HOST,
-};
 use anyhow::bail;
-use settings_utils::apps::materializer_general::{
-    MaterializerGeneralKafkaSettings, MaterializerGeneralServicesSettings,
-    MaterializerGeneralSettings,
+use settings_utils::apps::{
+    materializer_general::{
+        MaterializerGeneralKafkaSettings,
+        MaterializerGeneralServicesSettings,
+        MaterializerGeneralSettings,
+    },
+    LogSettings,
+    MonitoringSettings,
+    NotificationSettings,
 };
-use settings_utils::apps::{LogSettings, MonitoringSettings, NotificationSettings};
+
+use crate::config_generator::{
+    context::{Communication, Context, FromContext},
+    defaults::{
+        DEFAULT_CDL_NOTIFICATION_CHANNEL,
+        DEFAULT_GENERAL_MATERIALIZER_PORT,
+        DEFAULT_SCHEMA_REGISTRY_HOST,
+    },
+};
 
 pub const MATERIALIZER_GENERAL_NAMESPACE: &str = "materializer_general";
 
