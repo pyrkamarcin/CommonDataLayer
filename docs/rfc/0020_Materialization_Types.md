@@ -22,7 +22,7 @@ Related:
 * ES - elasticsearch
 * PSQL - PostgreSQL
 * SR - Schema Registry
-* Blob - `any` data, eg. pdf report, ms office spreedsheet, jpeg image, that CDL shouldn't preprocess in any way
+* Blob - `any` data, eg. pdf report, ms office spreedsheet, jpeg image, that CDL shouldn't preprocess when storing it
 * ADT - algebraic data type ([wiki][wiki-adt])
 * ConfS - configuration service, central repository of CDL configuration, currently in rfc phase.
 
@@ -32,31 +32,35 @@ TODO
 
 # Configuration layer
 
-At the moment of writing this rfc, data is stored in cdl in the following format:
+## How is data stored?
 
-#### Documents
+### Documents
 
 JSON objects. They are not indexed by any field and querying for only parts (fields or sub-documents)
-requires fetching whole JSON and then performing operations on it.
+requires fetching whole JSON and then performing operations on it. 
 
-#### Timeseries
+> SIDENOTE:
+> In practice PSQL can query for sub-documents (it's not as performant as querying on indexed fields). It's CDL that doesn't support this feature by default.
 
-Timeseries data is managed by databases, often requires special queries on QSTS side, but most likely can query for
-specific fields.
+### Timeseries
 
-#### Blob
+Timeseries data is managed by databases, often requires special queries on QSTS side. User usually can query for a specified field, however this depends on the database.
 
-Blobs are stored as is. You cannot perform operations on it.
+### Blob
+
+Blobs are stored as is. You cannot perform any operations on it (except for fetch and store of course).
 
 > SIDENOTE:  
 > Other storage types are included for future reference. Currently, materialization is limited to Document Store.  
 > If that was to change, new document would have to be created, exploring the integration.  
-> From this point on we are gonna focus on document storage only.
+> From this point on we are going to focus on document storage only.
 
-JSON has fairly limited type system. We can read more about it in [JSON Schema spec][json-schema-basic-types]. JSON
-schema is relevant there due to it being used in SR.
+## JSON
+
+JSON has fairly limited type system. We can read more about it in [JSON Schema spec][json-schema-basic-types].
+CDL currently requires users to provide JSON Schema when declaring object's schema in SR.
 > SIDENOTE:  
-> While it's used in SR, it's not really "used". It is planned to be incorporated in validation.
+> While it's required in SR, it's not really "used". It is planned to be incorporated in validation, and may be useful with views.
 > [rfc 0019][rfc-0019] talks about simpler format, as a replacement and for the sake of Materialization I will explore expanding it later.
 
 | type name | description |
@@ -70,14 +74,15 @@ schema is relevant there due to it being used in SR.
 
 JSON Schema allows also to construct "one_of" ADTs. This is slightly controversial, as neither PSQL nor ES support that kind of construct for most of their types.
 With one exception. Nullability is often described in json schema with `"one_of": any | null` and both databases house nullability feature.
+This means that CDL may have to be able to recognise this pattern and act accordingly, setting up materialization output with nullability in mind.
 
 # Materialization storage layer
 
 ## Postgresql
 
-Before I start listing postgres data types, there's one big issue to mention - at this time we don't have specified
-version of PSQL that we support. There are minor discrepancies in both behavior and (more importantly to us) type
-system, between 9.6 and 13.
+Before I start listing postgres data types, there's one issue to mention - at this time we don't have specified
+version of PSQL that we support. There are minor discrepancies in both behavior and (what is relevant here) type
+system between 9.6 and 13.
 
 ```diff
 21a22
@@ -91,9 +96,7 @@ system, between 9.6 and 13.
 ```
 
 In the diff excerpt we see, that 13 introduces new types `macaddr8` and `pg_snapshot`, and deprecates `txid_snapshot`. I
-have to mention also, that `pg_snapshot` is not present in PSQL 12, but `macaddr8` is.
-
-That out of the way, we don't really know if we should support all postgres types to begin with.
+have to mention also that `pg_snapshot` is not present in PSQL 12, but `macaddr8` is. This may prove an issue when dealing with non-basic types.
 
 | name | aliases | description |
 |---|---|---|
@@ -142,8 +145,10 @@ That out of the way, we don't really know if we should support all postgres type
 
 Out of this list, we could use mapping `json::string` -> `psql::text` and `json::boolean` -> `psql::boolean`, and that's it.
 Everything else has to be handled per case. Inference can't really work, as `json::number` may map to `real` or `int` or `bigint`.
-Nullability is achieved via additional flag on column: `NOT NULL`.
-Right now as a workaround we use JSON on all columns, but this is a temporary solution. And end user will require better management of database.
+Numbers also aren't capped anywhere in JSON's spec, which means that they may overflow.
+Nullability is achieved via additional flag on column: `NULL`.
+
+Right now we use JSON as type of all columns.
 
 ## Elasticsearch
 
@@ -166,22 +171,24 @@ Right now as a workaround we use JSON on all columns, but this is a temporary so
 | ip |
 | object |
 | nested |
-| types |
 
 This is a list of SQL mapped types, it's not fully exhaustive, more can be found on [ES documentation page][es-basic-data-types].
 As we can see, again there's greater granularity in ES than it is in JSON.
 
-Additionally, ES is able to deduce types based on insertions (first insertion to a given index generates type mapping).
+ES is able to deduce types based on insertions (first insertion to a given index generates type mapping), but it's questionable whether we'd like to make use of this feature.
+Another main difference is that ES allows for storage of documents. While currently our PSQL implementation is flat (or to be more specific, it flattens everything to one table),
+ES can store deeply nested objects. It also keeps an index on every field in a document.
 
 # Proposal
 
 ## Type coverage
-We should aim to initially, as an MVP, support minimal subset of common types.
-Also, as an extension, we should add new types as needed/when necessary in the future.
-For database specific types, eg. `psql::timestamp`, when there's ConfS in place, we should be able to provision CDL with concrete list of supported types.
-Also - it can be user configurable.
+We should aim to, as an MVP, support minimal subset of common types.
+We should plan to add new types as needed/when necessary.
+For some types, eg. `psql::timestamp`, in presence of some central configuration repository we should be able to provision CDL with list of what's supported.
+This is important, as not every materialization database will have same type coverage, and it's better to give users power to configure the available mapping.
 
-I propose to use `String`, `bool`, `i64` and `f64` as base types for first iteration, with addition of nullability, arrays and objects composed of the base.
+I propose to use `String`, `bool`, `i64` and `f64` as base types for first iteration, with addition of nullability and arrays of base types.
+Objects, or complex arrays are much more problematic, and we have to review whether we need them. I'll get to this in a moment.
 
 PSQL mapping in this case:
 ```
@@ -191,7 +198,6 @@ PSQL mapping in this case:
 `f64` -> `psql::float8`
 `null` -> COLUMN IS NULLABLE
 `array` -> type[]
-`object` -> JSON
 ```
 
 ES mapping:
@@ -202,19 +208,42 @@ ES mapping:
 `f64` -> `es::double`
 `null` -> See note below
 `array` -> See note below
-`object` -> supported by default, raises some ES specific problems
 ```
 > SIDENOTE:  
 > Arrays and nullability are treated the same in ES, a field can contain 0 or more entries. [reference][es-arrays]
 
-Also, I propose to disallow mixed type arrays on schema level. If in future a client rises need for those, we may consider `array[JSON]`.
+Also, I propose to disallow mixed type arrays on schema level.
+This is not supported by either of our materialization databases.
+If in future a client rises need for those, we may consider `array[JSON]`.
 
-As for `object` type, there are few options on how to approach this:
+### As for `object` type.
+ES requires that object schema is specified to each leaf. In postgres, we can't really have leaves easily, without introducing multiple tables per view.
+
+there are few options on how to approach this:
 #### ES requires "deep" types. PSQL stays with JSON.
-It means that we have differing implementations between two databases, where one requires "type provider" to declare what is stored within object and the other stores `JSON` as is. You
+It means that we have differing implementations between two databases, where one requires "type provider" to declare what is stored within object and the other stores `JSON` as is.
 
 #### ES requires "deep" types. PSQL uses Record type.
-We change PSQL to use a type that requires user to specify types in deeply nested objects, explicitly in view definition. This will mean ES and PSQL use same strategy.
+We change PSQL to use a type that requires user to specify types in deeply nested objects, explicitly in view definition. This will mean ES and PSQL use same strategy, but records are problematic.
+
+#### ES requires "deep" types. PSQL uses multiple tables.
+We can generate deeply nested relations using postgres tables (duh!). It's not the easiest task, and that may require separate document, but having this,
+we'll be able to store the same data in both ES and PSQL.
+
+Just for the sake of clarity, I mean:
+
+table: main
+
+| id | field_a | obj_b |
+|---|---|---|
+| 0 PRIMARY | "abc" | 1 FOREIGN KEY |
+
+table: obj_b
+
+| id | field_b | field_c |
+|---|---|---|
+| 1 PRIMARY | "cde" | 12.6f64 |
+
 
 #### We disallow for deep objects in both.
 Everything has to be mapped to flat. This is probably impossible for clients to accept.
@@ -223,13 +252,14 @@ Everything has to be mapped to flat. This is probably impossible for clients to 
 This would mean an object is just a blob. We lose ES indexing ability, but we gain similar behavior to PSQL.
 
 #### We allow ES to deduce type on it's own.
-This may be a bit error prone and require extra testing, but in theory we could define everything up to depth = 1, and leave rest to the database.
+This may be a bit error prone and require extra testing, we would only provision PSQL with types and let ES do its own type inference.
 
 #### CDL is not responsible for provisioning types in ES.
 Most controversial one. User provisions ES on their own. Thanks to the API that doesn't require knowledge of types by CDL, we can do that with ES but not with PSQL.
 
 > PROPOSAL:  
-> In my opinion, we should update views to allow users to generate "deep" objects, support it currently only in ES, and with time implement PSQL specific solution.
+> In my opinion, we should update views to require users to specify types on all depth levels, 
+> support it currently only in ES, and with time implement PSQL specific solution, using multiple tables.
 
 ## Type storage
 There are several options where types should be stored. In my opinion it's view responsibility to store types of columns and it's schema responsibility to store type of data.
@@ -269,6 +299,14 @@ Using custom implementation of JSON schema, or, what's mentioned in [rfc 0019][r
 allow us to provide type mapping on the SCHEMA level, thus requiring less explicit view declarations (we'd only have to require casting there).
 This custom schema would allow us to provide more types as a base. 
 
+## Instead of adding notifications to SR, send types with each request
+Personally I don't like this idea. It adds to message payload a redundant piece of data, increasing amount of bytes that have to be sent through network.
+
+## Infer types instead of specifying them
+This comes with a disadvantages. We can infer types on first materialization request. But we'd have to assume everything is nullable.
+(there's no way we can know that from first row). And, if in the message `null` shows anywhere, we have to assign most generic and accepting type in
+materialization db (in PSQL it'd be JSON for example). This is really suboptimal.
+
 > SIDENOTE:  
 > Still, we'd have to find a common subset of types between all our databases, or perform casting on QS layer.
 
@@ -278,33 +316,6 @@ This custom schema would allow us to provide more types as a base.
 
 This rfc aims to provide groundwork for materialization types support, it is mapping output tables to different types
 than only JSON. # todo
-
-### Notes JSON
-
-Where to store type information? . What about mapping then? Should types be sent with each
-materialization message? Should materialization request contain column types? Who does mapping/converting then? Can type
-info be stored in schema? Can type info be stored in view? Do we expect type conversions in views? What about `one_of`
-json schema construct? What about nullability? What about `object` and `array`. What about rust - db bridge? Does user
-need to know what is materialization target?
----
-
-### Notes PSQL
-
-https://www.postgresql.org/docs/9.6/datatype.html
-https://www.postgresql.org/docs/13/datatype.html
-
-Are we interested in all types? Text vs varchar vs char[].
-
-Important - which version of postgres we support? Do we support multiple versions of Postgre? Are there differences
-between supported types? Do we support types that are added by plugins (eg. UUID).
-
----
-
-### Notes ES
-
-https://www.elastic.co/guide/en/elasticsearch/reference/current/sql-data-types.html
-https://www.elastic.co/guide/en/elasticsearch/reference/current/documents-indices.html
-Does ES even support types (yes)? Should we provide mapping? When? ES can infer types.
 
 
 [json-schema-basic-types]: http://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.2.1
