@@ -6,12 +6,11 @@ pub enum Error {
     ClientError(ClientError),
     JsonError(serde_json::Error),
     SingleQueryMissingValue,
-    RawQueryMissingValue,
     WrongValueFormat,
-    InvalidSchemaType(anyhow::Error),
     ExpectedSchemaType(SchemaType),
     InvalidRepository(String),
     SchemaFetchError(anyhow::Error),
+    InvalidSchemaType,
 }
 
 impl Reject for Error {}
@@ -23,8 +22,6 @@ pub fn recover(rejection: Rejection) -> Result<impl warp::Reply, Rejection> {
             Error::JsonError(err) => format!("Unable to serialize JSON: {}", err),
             Error::SingleQueryMissingValue => "Value not returned from query".to_owned(),
             Error::WrongValueFormat => "Value incorrectly formatted".to_owned(),
-            Error::RawQueryMissingValue => "Value not returned from query".to_owned(),
-            Error::InvalidSchemaType(err) => format!("Failed to parse schema type: {}", err),
             Error::ExpectedSchemaType(expected) => {
                 format!("This route expects schema type: {:?}", expected)
             }
@@ -33,16 +30,17 @@ pub fn recover(rejection: Rejection) -> Result<impl warp::Reply, Rejection> {
                 repository_id
             ),
             Error::SchemaFetchError(error) => format!("Failed to fetch schema: {}", error),
+            Error::InvalidSchemaType => "Specified schema doesn't match the query kind".to_string(),
         };
 
         let code = match error {
-            Error::ExpectedSchemaType(_) | Error::InvalidRepository(_) => StatusCode::BAD_REQUEST,
+            Error::ExpectedSchemaType(_)
+            | Error::InvalidRepository(_)
+            | Error::InvalidSchemaType => StatusCode::BAD_REQUEST,
             Error::ClientError(_)
             | Error::JsonError(_)
             | Error::SingleQueryMissingValue
-            | Error::RawQueryMissingValue
             | Error::WrongValueFormat
-            | Error::InvalidSchemaType(_)
             | Error::SchemaFetchError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         };
 
