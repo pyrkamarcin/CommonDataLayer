@@ -5,8 +5,8 @@ Title           : Materialization field types support
 Category        : Feature
 Author(s)       : Łukasz Biel
 Team            : CommonDataLayer
-Created         : 2021-12-08
-Deadline        : 2021-12-08
+Created         : 2021-16-08
+Deadline        : 2021-21-08
 CDL feature ID  : CDLF-00018-00
 ```
 
@@ -19,6 +19,7 @@ Related:
 * TS - timeseries
 * QSTS - `query-service` for timeseries
 * QS - `query-service` for documents
+* OB - object builder
 * ES - elasticsearch
 * PSQL - PostgreSQL
 * SR - Schema Registry
@@ -28,7 +29,77 @@ Related:
 
 # Summary
 
-TODO
+This rfc aims to provide and standardize types in CDL schemas, views and materialization for documents.
+
+# TLDR;
+
+Schemas support:
+```
+number
+string
+boolean
+array
+object
+
++ one_of: any | null
+```
+
+Views support:
+```
+f64
+i64
+string
+boolean
+array[scalar_type]
+object
+
++ nullability as an additional configuration option
+```
+
+PSQL mapping is:
+```
+f64 -> float8
+i64 -> int8
+string -> text
+boolean -> bool
+array[scalar_type] -> array[scalar_type]
+object -> json # with a goal to change into subtable at some point
+
++ nullability as marker on a column `NULL` and `NON NULL`
+```
+
+ES mapping is:
+```
+f64 -> double
+i64 -> long
+string -> text
+boolean -> boolean
+array -> !supported by default
+object -> !supported by default
+
++ nullability always !supported by default
+```
+
+We require users to specify all types within view, including deeply nested objects.
+
+ES initially treats objects differently to PSQL.
+
+We can later expand this type list with per database custom types (and type casting/mapping) but this requires schema language extension or parsing strings in json object.
+
+SR emits a notification when view is added, initiating materialization for it and provisioning the database.
+
+GRPC between OB and Materialization is:
+```
+i64 -> int64
+f64 -> double
+string -> string
+bool -> bool
+array[basic_type] -> `repeated`
+object -> `message` # recursive
+
+nullability: `optional`
+```
+Messages are nested instead of current flat structure.
 
 # Configuration layer
 
@@ -39,7 +110,7 @@ TODO
 JSON objects. They are not indexed by any field and querying for only parts (fields or sub-documents)
 requires fetching whole JSON and then performing operations on it. 
 
-> SIDENOTE:
+> SIDENOTE:  
 > In practice PSQL can query for sub-documents (it's not as performant as querying on indexed fields). It's CDL that doesn't support this feature by default.
 
 ### Timeseries
@@ -182,10 +253,13 @@ ES can store deeply nested objects. It also keeps an index on every field in a d
 # Proposal
 
 ## Type coverage
-We should aim to, as an MVP, support minimal subset of common types.
-We should plan to add new types as needed/when necessary.
-For some types, eg. `psql::timestamp`, in presence of some central configuration repository we should be able to provision CDL with list of what's supported.
-This is important, as not every materialization database will have same type coverage, and it's better to give users power to configure the available mapping.
+We should aim to, as an MVP, support minimal subset of common types in both databases and add new ones if necessary in the later stages of development.
+> SIDENOTE:  
+> For types that are database specific (eg. psql::timestamp) we may add them in the form of an `optional feature`.
+
+> SIDENOTE:
+> JSON Schema is abstract here, however my choice of initial types is based on in and on Rust's `serde_json` ability to discern JSON types.
+> To support more than just base, we will have to either extend JSON Schema or provide homebrew schema solution
 
 I propose to use `String`, `bool`, `i64` and `f64` as base types for first iteration, with addition of nullability and arrays of base types.
 Objects, or complex arrays are much more problematic, and we have to review whether we need them. I'll get to this in a moment.
@@ -212,14 +286,13 @@ ES mapping:
 > SIDENOTE:  
 > Arrays and nullability are treated the same in ES, a field can contain 0 or more entries. [reference][es-arrays]
 
-Also, I propose to disallow mixed type arrays on schema level.
-This is not supported by either of our materialization databases.
-If in future a client rises need for those, we may consider `array[JSON]`.
+I propose to disallow mixed type arrays on schema level. This is not supported by either of our materialization databases.
+If in future a client asks for those, we may consider `array[JSON]`.
 
 ### As for `object` type.
-ES requires that object schema is specified to each leaf. In postgres, we can't really have leaves easily, without introducing multiple tables per view.
+ES requires that object schema is specified to each leaf. In postgres, we can't really have leaves without introducing multiple tables per view.
 
-there are few options on how to approach this:
+There are few options on how to approach this topic:
 #### ES requires "deep" types. PSQL stays with JSON.
 It means that we have differing implementations between two databases, where one requires "type provider" to declare what is stored within object and the other stores `JSON` as is.
 
@@ -261,62 +334,113 @@ Most controversial one. User provisions ES on their own. Thanks to the API that 
 > In my opinion, we should update views to require users to specify types on all depth levels, 
 > support it currently only in ES, and with time implement PSQL specific solution, using multiple tables.
 
+### Validating views on addition
+
+Having types map from schema to view, we can add validation to the process of creating a view.
+
 ## Type storage
-There are several options where types should be stored. In my opinion it's view responsibility to store types of columns and it's schema responsibility to store type of data.
-This means, that we'll keep current schema format, with JSON compatible types (`string`, `number`, `boolean`, `one_of null`, `array`, `object`) and require users to specify type mapping for view.
-In view, we'll support more granular types, that support implicit mapping between them and the originals:
+There are several options where types should be stored. In my opinion it's view responsibility to store types of columns, and it's schema responsibility to store type of data.
+We keep current schema format, with JSON compatible types (`string`, `number`, `boolean`, `one_of null`, `array`, `object`) and require users to specify type mapping for view.
+In view, we'll support more granular types that are implicitly converted from JSON:
 ```
 basic_type:
   f64 <- number
-  i64 <- number
+  i64 <- number # will panic when number is float
   string <- string
   bool <- boolean
 
 complex_type:
-  array[basic_type] <- array
+  array[basic_type] <- array # will panic when array contains mixed types
   object(nested) <- object
   
 nullability:
-  additional field `nullable` in view field definition when schema specifies `one_of: null`
+  additional field `nullable` that maps to `one_of: any | null` # `nullable = false` will have behaviour similar to .unwrap()
 ```
 
-Once added, view will emit a notification that's caught by OB, initiating materialization for it.
+Once added to SR, view will emit a notification that's caught by OB, initiating materialization for it.
 This notification will also be responsible for triggering database provisioning.
 
 Such provisioning will follow mapping mentioned in [Type coverage](#Type-coverage).
 
-This system is open for extension and allows defining custom type casting, if that ever be a requirement.
+Such system is open for extension and allows defining custom type casting, if that ever be a requirement.
 In the future, backed by ConfS, we can introduce database specific mapping, and even support both PSQL 9.6 and PSQL 13 independently.
+
+## on-demand materializer
+
+On demand materializer serves data over grpc, returning materialized rows mapping field name to stringified json at the moment.
+
+We should update mentioned format to return types that resemble view type definition in either a nested grpc message or map where keys are `.` delimited paths.
+> SIDENOTE  
+> '.' delimited paths are borrowed from ES, where this is how columns in internal indexes are stored.
+
+### nested messages
+We should map view types to grpc types via mapping:
+```
+i64 -> int64
+f64 -> double
+string -> string
+bool -> bool
+array[basic_type] -> `repeated`
+object -> `message` # recursive
+
+nullability: `optional`
+```
+This will require us to use `oneof` operator and will result in messages sent from one service to another being nested.
+
+### strings
+We will send all data as string over grpc and fields will be in `path.to.deep.field` format (to ensure everything is flat), eg.:
+```json
+{
+  "f1": {
+    "f1_1": true,
+    "f1_2": {
+      "f1_2_1": "Hello"
+    }
+  }
+}
+```
+Will result in:
+```
+{
+    "object_id": "xyzz",
+    "fields": {
+        "f1.f1_1": { "value": "true", "type": "bool" },
+        "f1.f1_2.f1_2_1": { "value": "Hello", "type": "string" }
+    }
+}
+```
+This however will increase network load of cdl.
+
+> SIDENOTE:  
+> We can skip "type" field and require users to use views to deduce field types.
+
+### Opinion
+We should aim for first option if possible, as it looks cleaner and provides better network performance.
 
 # Other options
 
 ## We can assume everything is nullable
-As in title, CDL may assume that nullability is by default, thus we have less work in case of PSQL materialization (no `NOT NULL` on fields), 
-and we don't have to handle special case of `one_of: null` by simply disallowing the construct in JSON schema.
+As in title, CDL may assume that nullability is by default, thus we have less work in case of PSQL materialization. We still have to be able to parse
+`one_of: any | null` but now that's extraction of type information, rather than special behavior.
 
 ## Use custom schema definitions with custom set of data types
 Using custom implementation of JSON schema, or, what's mentioned in [rfc 0019][rfc-0019], creating custom standard may, in the future,
-allow us to provide type mapping on the SCHEMA level, thus requiring less explicit view declarations (we'd only have to require casting there).
-This custom schema would allow us to provide more types as a base. 
+allow us to provide type mapping on the SCHEMA level, thus requiring less explicit view declarations (we'd only have to require mapping there, no implicit conversions from `number` to `f64`).
+This custom schema would also allow us to provide more types as a base. 
 
 ## Instead of adding notifications to SR, send types with each request
 Personally I don't like this idea. It adds to message payload a redundant piece of data, increasing amount of bytes that have to be sent through network.
 
 ## Infer types instead of specifying them
-This comes with a disadvantages. We can infer types on first materialization request. But we'd have to assume everything is nullable.
-(there's no way we can know that from first row). And, if in the message `null` shows anywhere, we have to assign most generic and accepting type in
-materialization db (in PSQL it'd be JSON for example). This is really suboptimal.
+This comes with a disadvantages. We can infer types on first materialized row (however everything must be nullable).
+If in the field value `null` is present, we have to assign most generic type in materialization db (in PSQL it'd be JSON for example).
 
 > SIDENOTE:  
-> Still, we'd have to find a common subset of types between all our databases, or perform casting on QS layer.
+> For PSQL we'd have to write inference mechanism on our own and any incompatibility would be caught at the moment of insertion.
 
-# Notes
+# Decision
 
-### Notes Summary
-
-This rfc aims to provide groundwork for materialization types support, it is mapping output tables to different types
-than only JSON. # todo
-
+TODO
 
 [json-schema-basic-types]: http://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.2.1
 [rfc-0019]: ./0019_Simplify_Schema_Definitions_01.md
