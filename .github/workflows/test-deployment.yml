@@ -15,6 +15,7 @@ on:
       - ".dockerignore"
       - "rust-toolchain"
       - "CDL.Tests/**"
+      - "**/*.sql"
   pull_request:
     paths:
       - "**/*.rs"
@@ -27,6 +28,7 @@ on:
       - ".dockerignore"
       - "rust-toolchain"
       - "CDL.Tests/**"
+      - "**/*.sql"
 
 env:
   CARGO_TERM_COLOR: always
