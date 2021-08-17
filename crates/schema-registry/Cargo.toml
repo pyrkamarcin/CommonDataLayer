@@ -25,21 +25,21 @@ settings_utils          = { path = "../utils/crates/settings" }
 metrics_utils           = { path = "../utils/crates/metrics" }
 
 # Crates.io
-anyhow      = "1.0.42"
-async-trait = "0.1.50"
-bb8         = "0.7.0"
-futures     = "0.3.15"
-jsonschema  = { version = "0.11.0", default-features = false }
-serde       = { version = "1.0.126", features = ["derive"] }
-serde_json  = "1.0.64"
+anyhow      = "1.0.43"
+async-trait = "0.1.51"
+bb8         = "0.7.1"
+futures     = "0.3.16"
+jsonschema  = { version = "0.12.1", default-features = false }
+serde       = { version = "1.0.127", features = ["derive"] }
+serde_json  = "1.0.66"
 sqlx        = { version = "0.5.5", features = ["runtime-tokio-rustls", "postgres", "sqlite", "macros", "uuid", "json", "offline"] }
 thiserror   = "1.0.26"
-tokio       = { version = "1.8.1", features = ["macros", "rt-multi-thread"] }
-tonic       = "0.5.0"
+tokio       = { version = "1.10.0", features = ["macros", "rt-multi-thread"] }
+tonic       = "0.5.2"
 tracing     = "0.1.26"
 url         = "2.2.2"
 uuid        = { version = "0.8.2", features = ["v4", "serde"] }
-futures-util            = "0.3.15"
+futures-util            = "0.3.16"
 tokio-stream            = "0.1.7"
 tracing-futures         = "0.2.5"
 
