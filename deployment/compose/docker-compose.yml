@@ -42,7 +42,7 @@ services:
       - zookeeper
 
   postgres:
-    image: postgres:latest
+    image: postgres:13
     ports:
       - "5432:5432"
     environment:
@@ -52,7 +52,7 @@ services:
       - ./setup/postgres:/docker-entrypoint-initdb.d
 
   victoria_metrics:
-    image: victoriametrics/victoria-metrics:latest
+    image: victoriametrics/victoria-metrics:v1.63.0
     ports:
       - "8428:8428"
     command: -retentionPeriod 0 -search.latencyOffset 1s -search.maxLookback 50000m
