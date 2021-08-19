@@ -186,7 +186,9 @@ Notes           : Raw routes are already implemented
 <h1><a class="header" href="#description" id="description">Description</a></h1>
 <p>Raw routes in <code>QR</code> and <code>QS</code> allow users to bypass CDL api in places where it's lacking.</p>
 <p>Accessing <code>raw</code> route is done via <code>/raw</code> endpoint in <code>QR</code>:</p>
-<pre><code class="language-yaml">  /raw:
+<pre><code class="language-yaml">              schema:
+                type: object
+  /raw:
     get:
       summary: Execute queries given in body
       operationId: executeRawQuery
@@ -218,8 +220,6 @@ Notes           : Raw routes are already implemented
             JSON containing the results of executed commands
           content:
             application/json:
-              schema:
-                type: object
 </code></pre>
 <p>It's body is a json specific to targeted schema/repository, with schema:</p>
 <pre><code class="language-json">{ &quot;raw_statement&quot;: &quot;$ACTUAL_STATEMENT_WITHIN_JSON_STRING&quot; }
