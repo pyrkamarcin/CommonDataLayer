@@ -42,7 +42,7 @@ async fn main() -> anyhow::Result<()> {
     utils::status_endpoints::mark_as_started();
 
     Server::builder()
-        .trace_fn(tracing_utils::grpc::trace_fn)
+        .layer(tracing_utils::grpc::TraceLayer)
         .add_service(GeneralMaterializerServer::new(materializer))
         .serve(([0, 0, 0, 0], settings.input_port).into())
         .await?;

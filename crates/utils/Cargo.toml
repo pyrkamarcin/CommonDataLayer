@@ -16,7 +16,7 @@ rpc         = { path    = "../rpc" }
 misc_utils  = { path    = "crates/misc" }
 task_utils  = { path    = "crates/task" }
 communication_utils     = { path    = "crates/communication", features = ["kafka", "amqp", "grpc"] }
-tracing_utils           = { path    = "crates/tracing", features = ["kafka", "grpc", "http"] } # TODO: Use these feature flags
+tracing_utils           = { path    = "crates/tracing", features = ["with_kafka", "with_grpc", "with_http"] } # TODO: Use these feature flags
 settings_utils          = { path    = "crates/settings" }
 
 # Crates.io

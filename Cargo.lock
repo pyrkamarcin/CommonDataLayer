@@ -3293,6 +3293,7 @@ dependencies = [
  "sqlx",
  "thiserror",
  "tonic",
+ "tower",
  "tracing",
  "tracing_utils",
 ]
@@ -3397,6 +3398,8 @@ dependencies = [
  "tokio",
  "tokio-stream",
  "tonic",
+ "tower",
+ "tower-http",
  "tracing",
  "tracing-futures",
  "tracing_utils",
@@ -4209,6 +4212,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "tower-http"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b7b56efe69aa0ad2b5da6b942e57ea9f6fe683b7a314d4ff48662e2c8838de1"
+dependencies = [
+ "bytes",
+ "futures-core",
+ "futures-util",
+ "http",
+ "http-body",
+ "pin-project",
+ "tower-layer",
+ "tower-service",
+ "tracing",
+]
+
+[[package]]
 name = "tower-layer"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4328,6 +4348,8 @@ dependencies = [
  "anyhow",
  "async-graphql",
  "futures-util",
+ "http",
+ "http-body",
  "hyper",
  "opentelemetry 0.16.0",
  "opentelemetry-http",
@@ -4336,6 +4358,8 @@ dependencies = [
  "reqwest",
  "tokio",
  "tonic",
+ "tower",
+ "tower-http",
  "tower-service",
  "tracing",
  "tracing-futures",
