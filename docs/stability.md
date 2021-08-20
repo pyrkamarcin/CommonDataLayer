@@ -23,7 +23,7 @@ To prevent bumping MAJOR version every release (or slowing down development by s
 - Execute Raw Query ⛔
 
 ### Data Router ✅
-Data Router uses unified generic consumer and publisher wiht CDL_IM as a message format.
+Data Router uses unified generic consumer and publisher with CDL_IM as a message format.
 
 ### Schema Registry ⚠
 - Add Schema ✅
@@ -46,7 +46,7 @@ Data Router uses unified generic consumer and publisher wiht CDL_IM as a message
 - Query Raw ⛔
 
 ### Command Service Postgres ✅
-Command Service uses unified generic consumer and publisher wiht CDL_IM as a message format.
+Command Service uses unified generic consumer and publisher with CDL_IM as a message format.
 
 ### GraphQL and Management Panel ⛔
 Whole graphQL API is unstable
