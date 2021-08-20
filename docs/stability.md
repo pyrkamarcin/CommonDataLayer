@@ -18,14 +18,14 @@ To prevent bumping MAJOR version every release (or slowing down development by s
 ## Stability
 
 
-### Query Router ⚠️
+### Query Router ⚠
 - Retrieve Single Object ✅
 - Retrieve Multiple Objects ✅
 - Retrieve Schema Objects ✅
 - Execute Raw Query ⛔
 ### Data Router ✅
 Data Router uses unified generic consumer and publisher wiht CDL_IM as a message format.
-### Schema Registry ⚠️
+### Schema Registry ⚠
 - Add Schema ✅
 - Update Schema ✅
 - Get Schema ✅
@@ -39,7 +39,7 @@ Data Router uses unified generic consumer and publisher wiht CDL_IM as a message
 - Get All Views By Relation ⛔
 - Get Base Schema Of View ⛔
 - Validate value ⛔
-### Query Service Document Storage ⚠️
+### Query Service Document Storage ⚠
 - Query Multiple ✅
 - Query By Schema ✅
 - Query Raw ⛔
