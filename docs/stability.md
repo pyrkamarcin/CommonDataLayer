@@ -10,9 +10,9 @@ To prevent bumping MAJOR version every release (or slowing down development by s
 
 
 ## Legend
-⛔ - Experimental API
-⚠ - Partially stable API
-✅ - Stable API
+- ⛔ - Experimental API
+- ⚠ - Partially stable API
+- ✅ - Stable API
 
 ## Stability
 
