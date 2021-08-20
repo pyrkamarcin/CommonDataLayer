@@ -273,7 +273,7 @@ impl ParallelCommonConsumer {
             #[cfg(feature = "grpc")]
             Self::Grpc { addr } => {
                 tonic::transport::Server::builder()
-                    .trace_fn(tracing_utils::grpc::trace_fn)
+                    .layer(tracing_utils::grpc::TraceLayer)
                     .add_service(GenericRpcServer::new(GenericRpcImpl { handler }))
                     .serve(addr.into())
                     .await?;

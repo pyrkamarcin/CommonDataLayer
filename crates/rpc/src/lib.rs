@@ -17,6 +17,7 @@ use error::ClientError;
 pub use tonic;
 use tonic::transport::{Channel, TimeoutExpired};
 
+#[tracing::instrument]
 pub async fn open_channel(
     addr: String,
     service_name: &'static str,
@@ -27,11 +28,7 @@ pub async fn open_channel(
         .timeout(std::time::Duration::from_secs(5));
 
     endpoint.connect().await.map_err(|err| {
-        eprintln!(
-            "Failed to connect to endpoint: {} - {:?}",
-            err,
-            err.source()
-        );
+        tracing::error!(?err, "failed to connect to endpoint `{:?}`", err.source());
 
         if err
             .source()

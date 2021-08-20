@@ -447,6 +447,11 @@ pub struct PostgresMaterializerOptions {
     pub table: String,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ElasticsearchMaterializerOptions {
+    pub index_name: String,
+}
+
 fn create_non_zero_u8(num: u32) -> RequestResult<NonZeroU8> {
     let num: u8 = num.try_into().map_err(|err| {
         RequestError::new(format!(

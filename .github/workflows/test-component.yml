@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Start environment via docker-compose
-        run: docker-compose -f deployment/compose/docker-compose.yml up -d postgres kafka victoria_metrics
+        run: docker-compose -f tests/docker-compose.yml up -d
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
@@ -63,4 +63,4 @@ jobs:
         run: find . -path "./target/debug/deps*" -type f ! -name "*.*" | xargs rm
 
       - name: Stop environment
-        run: docker-compose -f deployment/compose/docker-compose.yml down
+        run: docker-compose -f tests/docker-compose.yml down

@@ -5,10 +5,13 @@ use crate::apps::{LogSettings, MonitoringSettings, NotificationSettings, Postgre
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct MaterializerGeneralSettings {
+    pub materialization_db: MaterializationDb,
+
     pub input_port: u16,
     pub cache_capacity: usize,
 
-    pub postgres: PostgresSettings,
+    pub elasticsearch: Option<MaterializerGeneralElasticsearchSettings>,
+    pub postgres: Option<PostgresSettings>,
     pub kafka: Option<MaterializerGeneralKafkaSettings>,
     #[serde(default)]
     pub notifications: NotificationSettings,
@@ -19,6 +22,18 @@ pub struct MaterializerGeneralSettings {
     pub log: LogSettings,
 
     pub services: MaterializerGeneralServicesSettings,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MaterializationDb {
+    Postgres,
+    Elasticsearch,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct MaterializerGeneralElasticsearchSettings {
+    pub node_url: String,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

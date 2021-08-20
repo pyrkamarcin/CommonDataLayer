@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashMap, VecDeque},
+    collections::VecDeque,
     convert::{TryFrom, TryInto},
 };
 
@@ -22,9 +22,9 @@ use metrics_utils::{self as metrics, counter};
 use rpc::materializer_general::MaterializedView;
 use serde_json::Value;
 use settings_utils::apps::PostgresSettings;
-use uuid::Uuid;
 
 use super::MaterializerPlugin;
+use crate::plugins::models::RowDefinition;
 
 const SCHEMA_COLUMN_PREFIX: &str = "schema_";
 
@@ -39,12 +39,6 @@ pub struct PostgresMaterializer {
 struct PsqlView {
     options: PostgresMaterializerOptions,
     rows: Vec<RowDefinition>,
-}
-
-#[derive(Debug)]
-struct RowDefinition {
-    object_ids: Vec<Uuid>,
-    fields: HashMap<String, Value>,
 }
 
 #[derive(Debug)]
@@ -64,22 +58,7 @@ impl TryFrom<MaterializedView> for PsqlView {
         let rows = view
             .rows
             .into_iter()
-            .map(|row| {
-                let object_ids = row
-                    .objects
-                    .into_iter()
-                    .map(|o| o.object_id.parse())
-                    .collect::<Result<_, _>>()?;
-                let fields = row
-                    .fields
-                    .into_iter()
-                    .map(|(key, field)| {
-                        let field = serde_json::from_str(&field)?;
-                        Ok((key, field))
-                    })
-                    .collect::<anyhow::Result<_>>()?;
-                Ok(RowDefinition { object_ids, fields })
-            })
+            .map(|row| row.try_into())
             .collect::<anyhow::Result<_>>()?;
 
         Ok(PsqlView { options, rows })

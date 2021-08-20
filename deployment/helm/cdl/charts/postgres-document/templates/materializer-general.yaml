@@ -24,6 +24,8 @@ spec:
         imagePullPolicy: {{ .Values.global.imagePullPolicy }}
         command: ["/bin/materializer-general","postgres"]
         env:
+        - name: MATERIALIZER_GENERAL_MATERIALIZATION_DB
+          value: "postgres"
         - name: MATERIALIZER_GENERAL_SERVICES__SCHEMA_REGISTRY_URL
           value: "http://{{ .Release.Name }}-schema-registry:6400"
         - name: MATERIALIZER_GENERAL_POSTGRES__USERNAME

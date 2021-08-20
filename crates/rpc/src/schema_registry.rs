@@ -1,7 +1,7 @@
 use bb8::{Pool, PooledConnection};
 use schema_registry_client::SchemaRegistryClient;
-use tonic::{service::interceptor::InterceptedService, transport::Channel};
-use tracing_utils::grpc::InterceptorType;
+use tower::ServiceBuilder;
+use tracing_utils::grpc::{Trace, TraceLayer};
 
 pub use crate::codegen::schema_registry::*;
 use crate::error::ClientError;
@@ -9,8 +9,7 @@ use crate::error::ClientError;
 pub mod types;
 
 pub type SchemaRegistryPool = Pool<SchemaRegistryConnectionManager>;
-pub type SchemaRegistryConn =
-    SchemaRegistryClient<InterceptedService<Channel, &'static dyn InterceptorType>>;
+pub type SchemaRegistryConn = SchemaRegistryClient<Trace>;
 
 pub struct SchemaRegistryConnectionManager {
     pub address: String,
@@ -18,11 +17,9 @@ pub struct SchemaRegistryConnectionManager {
 
 pub async fn connect(addr: String) -> Result<SchemaRegistryConn, ClientError> {
     let conn = crate::open_channel(addr, "schema registry").await?;
+    let service = ServiceBuilder::new().layer(TraceLayer).service(conn);
 
-    Ok(SchemaRegistryClient::with_interceptor(
-        conn,
-        &tracing_utils::grpc::interceptor,
-    ))
+    Ok(SchemaRegistryClient::new(service))
 }
 
 #[async_trait::async_trait]

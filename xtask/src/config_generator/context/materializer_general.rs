@@ -1,6 +1,7 @@
 use anyhow::bail;
 use settings_utils::apps::{
     materializer_general::{
+        MaterializationDb,
         MaterializerGeneralKafkaSettings,
         MaterializerGeneralServicesSettings,
         MaterializerGeneralSettings,
@@ -24,7 +25,9 @@ pub const MATERIALIZER_GENERAL_NAMESPACE: &str = "materializer_general";
 impl FromContext for MaterializerGeneralSettings {
     fn from_context(context: &Context) -> anyhow::Result<Self> {
         Ok(Self {
-            postgres: context.postgres.clone().into(),
+            materialization_db: MaterializationDb::Postgres,
+            postgres: Some(context.postgres.clone().into()),
+            elasticsearch: None,
             kafka: match context.communication {
                 Communication::Kafka(ref kafka) => Some(MaterializerGeneralKafkaSettings {
                     brokers: kafka.brokers.to_string(),

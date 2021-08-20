@@ -113,10 +113,6 @@ This feature MUST undergo thorough testing:
    * When header contains binary data,
 * Performance tests
 
-# Notes after meeting 19-07-2021
-* This RFC is treated as Spike and R&D and team does not expect further implementation in near future.
-* New issue and another RFC should be created for describing passing metadata field
-
 [gRPC]: https://grpc.io/
 [gRPC-Protocol]: https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md
 [Kafka]: https://kafka.apache.org/

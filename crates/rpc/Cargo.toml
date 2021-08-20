@@ -11,19 +11,20 @@ path = "src/lib.rs"
 
 [dependencies]
 # Workspace
-tracing_utils           = { path    = "../utils/crates/tracing", features = ["grpc"] }
+tracing_utils           = { path    = "../utils/crates/tracing", features = ["with_grpc"] }
 
 # Crates.io
-anyhow      = "1.0.42"
-async-trait = "0.1.50"
-bb8         = "0.7.0"
+anyhow      = "1.0.43"
+async-trait = "0.1.51"
+bb8         = "0.7.1"
 derive_more = "0.99.16"
 http        = "0.2.4"
 prost       = "0.8.0"
-serde       = { version = "1.0.126", features = ["derive"] }
+serde       = { version = "1.0.127", features = ["derive"] }
 sqlx        = { version = "0.5.5", features = ['runtime-tokio-rustls'] }
 thiserror   = "1.0.26"
-tonic       = "0.5.0"
+tonic       = "0.5.2"
+tower       = "0.4.8"
 tracing     = "0.1.26"
-async-graphql           = { version = "2.9.8", features = ["uuid"] }
-futures-util            = "0.3.15"
+async-graphql           = { version = "2.9.10", features = ["uuid"] }
+futures-util            = "0.3.16"

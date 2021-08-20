@@ -1,6 +1,13 @@
 use cdl_dto::materialization::FullView;
+pub use postgres::PostgresMaterializer;
 use rpc::materializer_general::MaterializedView;
 use serde_json::Value;
+
+pub use self::elasticsearch::ElasticsearchMaterializer;
+
+mod elasticsearch;
+mod models;
+mod postgres;
 
 #[async_trait::async_trait]
 pub trait MaterializerPlugin: Send + Sync {
@@ -11,7 +18,3 @@ pub trait MaterializerPlugin: Send + Sync {
         view_definition: FullView,
     ) -> anyhow::Result<()>;
 }
-
-mod postgres;
-
-pub use postgres::PostgresMaterializer;

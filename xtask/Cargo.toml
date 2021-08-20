@@ -10,13 +10,13 @@ license = "Apache-2.0"
 [dependencies]
 settings_utils = { path = "../crates/utils/crates/settings" }
 
-anyhow      = "1.0.42"
+anyhow      = "1.0.43"
 dialoguer   = "0.8.0"
 itertools   = "0.10.1"
 pico-args   = "0.4.2"
 toml        = "0.5.8"
-serde       = { version = "1.0.126", features = ["derive"] }
-tonic-build = { version = "0.5.0", default-features = false, features = ["prost", "transport"] }
+serde       = { version = "1.0.127", features = ["derive"] }
+tonic-build = { version = "0.5.2", default-features = false, features = ["prost", "transport"] }
 xshell      = "0.1.14"
 dialoguer_trait          = "0.2.0"
 erased-serde             = "0.3.16"
