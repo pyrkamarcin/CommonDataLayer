@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use materializer_general::MaterializerImpl;
+use materializer_general::{materializer_plugin, MaterializerImpl};
 use rpc::materializer_general::general_materializer_server::GeneralMaterializerServer;
 use settings_utils::{apps::materializer_general::MaterializerGeneralSettings, load_settings};
 use tonic::transport::Server;
@@ -32,7 +32,7 @@ async fn main() -> anyhow::Result<()> {
         .await?;
 
     let materializer = MaterializerImpl::new(
-        settings.postgres,
+        materializer_plugin(&settings).await?,
         Arc::new(notification_publisher),
         settings.services.schema_registry_url,
         settings.cache_capacity,

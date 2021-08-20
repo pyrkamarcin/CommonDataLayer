@@ -1,5 +1,6 @@
 use std::{collections::HashMap, sync::Arc};
 
+use anyhow::bail;
 use cache::DynamicCache;
 use notification_utils::{IntoSerialize, NotificationPublisher};
 use plugins::{MaterializerPlugin, PostgresMaterializer};
@@ -13,10 +14,10 @@ use rpc::{
     },
 };
 use serde::Serialize;
-use settings_utils::apps::PostgresSettings;
+use settings_utils::apps::materializer_general::{MaterializationDb, MaterializerGeneralSettings};
 use view::ViewSupplier;
 
-use crate::view::ViewCache;
+use crate::{plugins::ElasticsearchMaterializer, view::ViewCache};
 
 mod plugins;
 mod view;
@@ -34,7 +35,7 @@ struct MaterializationRow {
     fields: HashMap<String, String>,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Ord, PartialOrd, Eq, PartialEq)]
 struct Object {
     object_id: String,
     schema_id: String,
@@ -81,13 +82,13 @@ pub struct MaterializerImpl {
 
 impl MaterializerImpl {
     pub async fn new(
-        args: PostgresSettings,
+        materializer: Arc<dyn MaterializerPlugin>,
         notification_publisher: MaterializerNotificationPublisher,
         schema_registry_url: String,
         cache_size: usize,
     ) -> anyhow::Result<Self> {
         Ok(Self {
-            materializer: Arc::new(PostgresMaterializer::new(&args).await?),
+            materializer,
             notification_publisher,
             view_cache: DynamicCache::new(cache_size, ViewSupplier::new(schema_registry_url)),
         })
@@ -164,5 +165,23 @@ impl MaterializerImpl {
             .await?;
 
         Ok(())
+    }
+}
+
+pub async fn materializer_plugin(
+    settings: &MaterializerGeneralSettings,
+) -> anyhow::Result<Arc<dyn MaterializerPlugin>> {
+    match (
+        &settings.materialization_db,
+        &settings.postgres,
+        &settings.elasticsearch,
+    ) {
+        (MaterializationDb::Postgres, Some(postgres), _) => {
+            Ok(Arc::new(PostgresMaterializer::new(postgres).await?))
+        }
+        (MaterializationDb::Elasticsearch, _, Some(elasticsearch)) => Ok(Arc::new(
+            ElasticsearchMaterializer::new(&elasticsearch.node_url)?,
+        )),
+        _ => bail!("settings for materialization_db weren't provided"),
     }
 }
