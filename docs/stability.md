@@ -64,24 +64,24 @@ Whole graphQL API is unstable
 - Resolve Tree ⛔
 
 ### Materializer Postgres ⛔
-Whole materialization is concidered experimental
+Whole materialization is considered experimental
 
 - Validate Options ⛔
 - Upsert View ⛔
 
 ### Materializer Elasticsearch ⛔
-Whole materialization is concidered experimental
+Whole materialization is considered experimental
 
 - Validate Options ⛔
 - Upsert View ⛔
 
 ### Materializer On-Demand ⛔
-Whole materialization is concidered experimental
+Whole materialization is considered experimental
 
 - Materialize ⛔
 
 ### Object Builder ⛔
-Whole materialization is concidered experimental
+Whole materialization is considered experimental
 
 - Materialize ⛔
 
@@ -97,5 +97,5 @@ Time Series database is experimental
 Elasticsearch support is experimental
 
 ### Partial Update Engine ⛔
-Whole materialization is concidered experimental
+Whole materialization is considered experimental
 
