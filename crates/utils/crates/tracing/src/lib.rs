@@ -4,6 +4,8 @@ use opentelemetry::{global, sdk::propagation::TraceContextPropagator};
 use tokio::runtime::Handle;
 use tracing_subscriber::{prelude::*, EnvFilter};
 
+#[cfg(feature = "graphql")]
+pub mod graphql;
 #[cfg(feature = "grpc")]
 pub mod grpc;
 #[cfg(feature = "http")]

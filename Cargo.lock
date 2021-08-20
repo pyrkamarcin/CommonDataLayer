@@ -4151,6 +4151,7 @@ name = "tracing_utils"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-graphql",
  "futures-util",
  "hyper",
  "opentelemetry 0.16.0",

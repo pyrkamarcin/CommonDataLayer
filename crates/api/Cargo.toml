@@ -22,7 +22,7 @@ utils       = { path = "../utils" }
 settings_utils          = { path = "../utils/crates/settings" }
 metrics_utils           = { path = "../utils/crates/metrics" }
 communication_utils     = { path = "../utils/crates/communication" }
-tracing_utils           = { path = "../utils/crates/tracing", features = ["http"] }
+tracing_utils           = { path = "../utils/crates/tracing", features = ["http", "graphql"] }
 
 # Crates.io
 anyhow      = "1.0.43"

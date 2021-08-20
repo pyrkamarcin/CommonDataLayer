@@ -1,4 +1,4 @@
-use async_graphql::{Context, FieldResult, Object};
+use async_graphql::{Context, ErrorExtensions, FieldResult, Object};
 use cdl_dto::{ingestion::OwnedInsertMessage, TryIntoRpc};
 use misc_utils::current_timestamp;
 use rpc::{edge_registry::EdgeRegistryPool, schema_registry::SchemaRegistryPool};
@@ -71,7 +71,8 @@ impl MutationRoot {
                     .collect(),
             })
             .await
-            .map_err(|source| rpc::error::ClientError::QueryError { source })?
+            .map_err(Error::query)
+            .map_err(|e| e.extend())?
             .into_inner()
             .id;
 
@@ -97,7 +98,8 @@ impl MutationRoot {
 
         conn.update_view(update.into_rpc(id)?)
             .await
-            .map_err(|source| rpc::error::ClientError::QueryError { source })?;
+            .map_err(Error::query)
+            .map_err(|e| e.extend())?;
 
         get_view(&mut conn, id).await
     }
@@ -113,7 +115,8 @@ impl MutationRoot {
 
         conn.update_schema(update.into_rpc(id)?)
             .await
-            .map_err(|source| rpc::error::ClientError::QueryError { source })?;
+            .map_err(Error::query)
+            .map_err(|e| e.extend())?;
         get_schema(&mut conn, id).await
     }
 
