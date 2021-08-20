@@ -1,13 +1,11 @@
 use bb8::{Pool, PooledConnection};
 use on_demand_materializer_client::OnDemandMaterializerClient;
-use tonic::{service::interceptor::InterceptedService, transport::Channel};
-use tracing_utils::grpc::InterceptorType;
+use tracing_utils::grpc::{Trace, TraceLayer};
 
 pub use crate::codegen::materializer_ondemand::*;
 use crate::error::ClientError;
 
-pub type OnDemandMaterializerConn =
-    OnDemandMaterializerClient<InterceptedService<Channel, &'static dyn InterceptorType>>;
+pub type OnDemandMaterializerConn = OnDemandMaterializerClient<Trace>;
 pub type OnDemandMaterializerPool = Pool<OnDemandMaterializerConnectionManager>;
 
 pub struct OnDemandMaterializerConnectionManager {
@@ -16,11 +14,9 @@ pub struct OnDemandMaterializerConnectionManager {
 
 pub async fn connect(addr: String) -> Result<OnDemandMaterializerConn, ClientError> {
     let conn = crate::open_channel(addr, "materializer on-demand").await?;
+    let service = tower::ServiceBuilder::new().layer(TraceLayer).service(conn);
 
-    Ok(OnDemandMaterializerClient::with_interceptor(
-        conn,
-        &tracing_utils::grpc::interceptor,
-    ))
+    Ok(OnDemandMaterializerClient::new(service))
 }
 
 #[async_trait::async_trait]

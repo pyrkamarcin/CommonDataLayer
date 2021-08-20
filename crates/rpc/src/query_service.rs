@@ -2,8 +2,7 @@ use std::pin::Pin;
 
 use futures_util::{Stream, TryStreamExt};
 use query_service_client::QueryServiceClient;
-use tonic::{service::interceptor::InterceptedService, transport::Channel};
-use tracing_utils::grpc::InterceptorType;
+use tracing_utils::grpc::{Trace, TraceLayer};
 
 pub use crate::codegen::query_service::*;
 use crate::error::ClientError;
@@ -11,18 +10,11 @@ use crate::error::ClientError;
 pub type ObjectStream<Error = ClientError> =
     Pin<Box<dyn Stream<Item = Result<Object, Error>> + Send + Sync + 'static>>;
 
-pub async fn connect(
-    addr: String,
-) -> Result<
-    QueryServiceClient<InterceptedService<Channel, &'static dyn InterceptorType>>,
-    ClientError,
-> {
+pub async fn connect(addr: String) -> Result<QueryServiceClient<Trace>, ClientError> {
     let conn = crate::open_channel(addr, "query service").await?;
+    let service = tower::ServiceBuilder::new().layer(TraceLayer).service(conn);
 
-    Ok(QueryServiceClient::with_interceptor(
-        conn,
-        &tracing_utils::grpc::interceptor,
-    ))
+    Ok(QueryServiceClient::new(service))
 }
 
 pub async fn query_multiple(

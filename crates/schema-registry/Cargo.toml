@@ -20,7 +20,7 @@ misc_utils  = { path = "../utils/crates/misc" }
 rpc         = { path = "../rpc" }
 utils       = { path = "../utils" }
 communication_utils     = { path = "../utils/crates/communication" }
-tracing_utils           = { path = "../utils/crates/tracing", features = ["grpc"] }
+tracing_utils           = { path = "../utils/crates/tracing", features = ["with_grpc"] }
 settings_utils          = { path = "../utils/crates/settings" }
 metrics_utils           = { path = "../utils/crates/metrics" }
 
@@ -42,6 +42,8 @@ uuid        = { version = "0.8.2", features = ["v4", "serde"] }
 futures-util            = "0.3.16"
 tokio-stream            = "0.1.7"
 tracing-futures         = "0.2.5"
+tower = "0.4.8"
+tower-http = { version = "0.1.1", features = ["trace"] }
 
 [dev-dependencies]
 maplit = "1.0.2"

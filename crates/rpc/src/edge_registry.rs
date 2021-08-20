@@ -1,14 +1,12 @@
 use bb8::{Pool, PooledConnection};
 use edge_registry_client::EdgeRegistryClient;
-use tonic::{service::interceptor::InterceptedService, transport::Channel};
-use tracing_utils::grpc::InterceptorType;
+use tracing_utils::grpc::{Trace, TraceLayer};
 
 pub use crate::codegen::edge_registry::*;
 use crate::error::ClientError;
 
 pub type EdgeRegistryPool = Pool<EdgeRegistryConnectionManager>;
-pub type EdgeRegistryConn =
-    EdgeRegistryClient<InterceptedService<Channel, &'static dyn InterceptorType>>;
+pub type EdgeRegistryConn = EdgeRegistryClient<Trace>;
 
 pub struct EdgeRegistryConnectionManager {
     pub address: String,
@@ -16,11 +14,9 @@ pub struct EdgeRegistryConnectionManager {
 
 pub async fn connect(addr: String) -> Result<EdgeRegistryConn, ClientError> {
     let conn = crate::open_channel(addr, "edge registry").await?;
+    let service = tower::ServiceBuilder::new().layer(TraceLayer).service(conn);
 
-    Ok(EdgeRegistryClient::with_interceptor(
-        conn,
-        &tracing_utils::grpc::interceptor,
-    ))
+    Ok(EdgeRegistryClient::new(service))
 }
 
 #[async_trait::async_trait]
@@ -29,7 +25,7 @@ impl bb8::ManageConnection for EdgeRegistryConnectionManager {
     type Error = ClientError;
 
     async fn connect(&self) -> Result<Self::Connection, Self::Error> {
-        tracing::debug!("Connecting to edge registry");
+        tracing::info!("Connecting to edge registry");
 
         connect(self.address.clone()).await
     }
