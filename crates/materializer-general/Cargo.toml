@@ -10,15 +10,15 @@ license = "Apache-2.0"
 [dependencies]
 # Workspace
 cdl_dto     = { path = "../dto" }
-misc_utils  = { path = "../utils/crates/misc" }
+misc_utils  = { path = "../utils/misc" }
 rpc         = { path = "../rpc" }
-utils       = { path = "../utils" }
-cache       = { path = "../utils/crates/cache" }
-communication_utils     = { path = "../utils/crates/communication" }
-settings_utils          = { path = "../utils/crates/settings" }
-metrics_utils           = { path = "../utils/crates/metrics" }
-tracing_utils           = { path = "../utils/crates/tracing" }
-notification_utils      = { path = "../utils/crates/notifications" }
+cache       = { path = "../utils/cache" }
+communication_utils     = { path = "../utils/communication" }
+settings_utils          = { path = "../utils/settings" }
+metrics_utils           = { path = "../utils/metrics" }
+tracing_utils           = { path = "../utils/tracing" }
+notification_utils      = { path = "../utils/notifications" }
+service_health_utils    = { path = "../utils/service_health" }
 
 # Crates.io
 anyhow      = "1.0.43"

@@ -71,7 +71,7 @@ namespace CDL.Tests.Services
             return await Task.FromResult(_client.UpdateSchemaAsync(newUpdateSchema));
         }
 
-        public Task<Empty> UpdateView(string viewId, string name, bool updateFields, bool updateRelations, IList<Simple> viewFields, IList<Relation> relations, string materializerOptions = "{}")
+        public Task<Empty> UpdateView(string viewId, string name, bool updateFields, bool updateRelations, IDictionary<string, object> viewFields, IList<Relation> relations, string materializerOptions = "{}")
         {
             var view = new ViewUpdate()
             {
@@ -87,7 +87,7 @@ namespace CDL.Tests.Services
             {
                 foreach (var field in viewFields)
                 {
-                    view.Fields.Add(field.simple.field_name, JsonSerializer.Serialize(field));
+                    view.Fields.Add(field.Key, JsonSerializer.Serialize(field.Value));
                 }
             }
 
@@ -102,7 +102,7 @@ namespace CDL.Tests.Services
             return Task.FromResult(_client.UpdateView(view));
         }
 
-        public async Task UpdateViewAsync(string viewId, string name, bool updateFields, bool updateRelations, IList<Simple> viewFields, IList<Relation> relations, string materializerOptions = "{}")
+        public async Task UpdateViewAsync(string viewId, string name, bool updateFields, bool updateRelations, IDictionary<string, object> viewFields, IList<Relation> relations, string materializerOptions = "{}")
         {
             var view = new ViewUpdate()
             {
@@ -118,7 +118,7 @@ namespace CDL.Tests.Services
             {
                 foreach (var field in viewFields)
                 {
-                    view.Fields.Add(field.simple.field_name, JsonSerializer.Serialize(field));
+                    view.Fields.Add(field.Key, JsonSerializer.Serialize(field.Value));
                 }
             }
 
@@ -252,8 +252,9 @@ namespace CDL.Tests.Services
             return Task.FromResult(_client.GetAllFullSchemasAsync(new Empty()));
         }
 
-        public Task<Id> AddViewToSchema(string schemaId, string name, IList<Simple> materializerFields, IList<Relation> relations, string materializerOptions = "{}")
+        public Task<Id> AddViewToSchema(string schemaId, string name, IDictionary<string, object> materializerFields, IList<Relation> relations, string materializerOptions = "{}")
         {
+            
             var view = new NewView()
             {
                 BaseSchemaId = schemaId,
@@ -264,7 +265,7 @@ namespace CDL.Tests.Services
 
             foreach (var field in materializerFields)
             {
-                view.Fields.Add(field.simple.field_name, JsonSerializer.Serialize(field));
+                view.Fields.Add(field.Key, JsonSerializer.Serialize(field.Value));
             }
 
             foreach (var item in relations)

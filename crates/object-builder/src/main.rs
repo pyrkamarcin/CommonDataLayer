@@ -15,7 +15,7 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::debug!(?settings, "application environment");
 
-    utils::status_endpoints::serve(&settings.monitoring);
+    service_health_utils::serve(&settings.monitoring);
     metrics_utils::serve(&settings.monitoring);
 
     let object_builder = ObjectBuilderImpl::new(&settings).await?;
@@ -38,7 +38,7 @@ async fn main() -> anyhow::Result<()> {
         std::process::abort();
     });
 
-    utils::status_endpoints::mark_as_started();
+    service_health_utils::mark_as_started();
 
     Server::builder()
         .layer(tracing_utils::grpc::TraceLayer)

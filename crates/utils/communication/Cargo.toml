@@ -15,7 +15,7 @@ http = ["reqwest", "tracing_utils/with_http"]
 
 [dependencies]
 # Workspace
-rpc         = { path    = "../../../rpc" }
+rpc         = { path    = "../../rpc" }
 misc_utils  = { path    = "../misc" }
 task_utils  = { path    = "../task" }
 tracing_utils           = { path           = "../tracing" }

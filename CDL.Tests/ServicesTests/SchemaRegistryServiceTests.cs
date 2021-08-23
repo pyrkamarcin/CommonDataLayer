@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text.Json;
 using AutoFixture;
 using CDL.Tests.MessageBroker.Kafka;
-using CDL.Tests.ServiceObjects.SchemaService;
 using CDL.Tests.Services;
 using CDL.Tests.TestDataObjects;
 using MassTransit.KafkaIntegration;
@@ -12,6 +11,7 @@ using Xunit;
 using System.Linq;
 using CDL.Tests.Configuration;
 using Microsoft.Extensions.Options;
+using CDL.Tests.ServiceObjects.SchemaService;
 using System.Threading;
 
 namespace CDL.Tests.ServicesTests
@@ -95,8 +95,8 @@ namespace CDL.Tests.ServicesTests
                 name, 
                 _fixture.Create<Person>().ToJSONString(), 
                 SchemaType.Types.Type.DocumentStorage).Result;
-            var viewFields = new List<Simple>();
-            viewFields.Add(new Simple()
+            var viewFields = new Dictionary<string, object>();
+            viewFields.Add("firstName", new SimpleFiled()
                 {
                     simple = new SimpleItem()
                     {
@@ -104,7 +104,7 @@ namespace CDL.Tests.ServicesTests
                         field_type = "String" 
                     }
                 });
-            viewFields.Add(new Simple()
+            viewFields.Add("lastName", new SimpleFiled()
                 {
                     simple = new SimpleItem()
                     {
@@ -147,7 +147,7 @@ namespace CDL.Tests.ServicesTests
             
             try
             {
-                _schemaRegistryService.AddViewToSchema(schema.Id_, name, new List<Simple>(), new List<Relation>(), materializerOptions);
+                _schemaRegistryService.AddViewToSchema(schema.Id_, name, new Dictionary<string, object>(), new List<Relation>(), materializerOptions);
             }
             catch (Exception e)
             {
@@ -237,7 +237,7 @@ namespace CDL.Tests.ServicesTests
                 }
             });
 
-            var view = _schemaRegistryService.AddViewToSchema(schema_a.Id_, _fixture.Create<string>(), new List<Simple>(), relationForView);
+            var view = _schemaRegistryService.AddViewToSchema(schema_a.Id_, _fixture.Create<string>(), new Dictionary<string, object>(), relationForView);
             var allViewByRelations = _schemaRegistryService.GetAllViewsByRelation(relation.RelationId_).Result;
 
             Assert.True(allViewByRelations.Views.Count == 1);
@@ -264,7 +264,7 @@ namespace CDL.Tests.ServicesTests
                 }
             });
 
-            var view = _schemaRegistryService.AddViewToSchema(schema_a.Id_, _fixture.Create<string>(), new List<Simple>(), relationForView);
+            var view = _schemaRegistryService.AddViewToSchema(schema_a.Id_, _fixture.Create<string>(), new Dictionary<string, object>(), relationForView);
             var allViewByRelations = _schemaRegistryService.GetAllViewsOfSchema(schema_a.Id_).Result;
 
             Assert.True(allViewByRelations.Views.Count == 1);
@@ -300,7 +300,7 @@ namespace CDL.Tests.ServicesTests
                 name, 
                 _fixture.Create<GeneralObject>().ToJSONString(), 
                 SchemaType.Types.Type.DocumentStorage).Result;
-            var viewFields = new List<Simple>();
+            var viewFields = new Dictionary<string, object>();
             var relation = _edgeRegistryService.AddRelation(schema_a.Id_, schema_a.Id_).Result;
             var relationForView = new List<Relation>();
             
@@ -312,7 +312,7 @@ namespace CDL.Tests.ServicesTests
                 }
             });
             
-            viewFields.Add(new Simple()
+            viewFields.Add("firstName", new SimpleFiled()
                 {
                     simple = new SimpleItem()
                     {
@@ -320,7 +320,7 @@ namespace CDL.Tests.ServicesTests
                         field_type = "String" 
                     }
                 });
-            viewFields.Add(new Simple()
+            viewFields.Add("lastName", new SimpleFiled()
                 {
                     simple = new SimpleItem()
                     {
@@ -342,8 +342,8 @@ namespace CDL.Tests.ServicesTests
             Thread.Sleep(1000);
             
 
-            var materializedViewBeforeUpdate = _onDemandMaterializerService.Materialize(view.Id_, schema_a.Id_, new List<string>(){
-                objectId_a,
+            var materializedViewBeforeUpdate = _onDemandMaterializerService.Materialize(view.Id_, new List<string>(){
+                schema_a.Id_,
             });
 
             while (await materializedViewBeforeUpdate.ResponseStream.MoveNext(new System.Threading.CancellationToken()))
@@ -353,7 +353,7 @@ namespace CDL.Tests.ServicesTests
                 Assert.Contains(payload_a.LastName, materializedViewBeforeUpdate.ResponseStream.Current.Fields["lastName"]);
             }
 
-            viewFields.Add(new Simple()
+            viewFields.Add("birthday", new SimpleFiled()
                 {
                     simple = new SimpleItem()
                     {
@@ -373,8 +373,8 @@ namespace CDL.Tests.ServicesTests
             
             var viewDetailsAfterUpdate = _schemaRegistryService.GetView(view.Id_).Result;
 
-            var materializedViewAfterUpdate = _onDemandMaterializerService.Materialize(view.Id_, schema_a.Id_, new List<string>(){
-                objectId_a,
+            var materializedViewAfterUpdate = _onDemandMaterializerService.Materialize(view.Id_, new List<string>(){
+                schema_a.Id_
             });
 
             while (await materializedViewAfterUpdate.ResponseStream.MoveNext(new System.Threading.CancellationToken()))
@@ -457,7 +457,7 @@ namespace CDL.Tests.ServicesTests
                 _fixture.Create<string>(), 
                 _fixture.Create<Person>().ToJSONString(), 
                 SchemaType.Types.Type.DocumentStorage).Result;
-            var viewFields = new List<Simple>();
+            var viewFields = new Dictionary<string, object>();
             var relation = _edgeRegistryService.AddRelation(schema_a.Id_, schema_a.Id_).Result;
             var relationForView = new List<Relation>();
             var view = _schemaRegistryService.AddViewToSchema(schema_a.Id_, _fixture.Create<string>(), viewFields, new List<Relation>()).Result;
@@ -472,7 +472,7 @@ namespace CDL.Tests.ServicesTests
                 _fixture.Create<string>(), 
                 _fixture.Create<Person>().ToJSONString(), 
                 SchemaType.Types.Type.DocumentStorage).Result;
-            var viewFields = new List<Simple>();
+            var viewFields = new Dictionary<string, object>();
             var relation = _edgeRegistryService.AddRelation(schema_a.Id_, schema_a.Id_).Result;
             var relationForView = new List<Relation>();
             var view = _schemaRegistryService.AddViewToSchema(schema_a.Id_, _fixture.Create<string>(), viewFields, new List<Relation>()).Result;
@@ -504,8 +504,6 @@ namespace CDL.Tests.ServicesTests
         public void WatchAllSchemaUpdatesAsync()
         {
             throw new NotImplementedException();
-        }
-
-        
+        }        
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using AutoFixture;
 using CDL.Tests.MessageBroker.Kafka;
 using CDL.Tests.Services;
@@ -123,7 +124,7 @@ namespace CDL.Tests.ServicesTests
                     ParentObjectId = objectIdForParentSchema,                  
                 };
             newEdge.ChildObjectIds.Add(objectIdForChildSchema);
-            _edgeRegistryService.AddEdges(newEdge);    
+            _edgeRegistryService.AddEdges(new List<Edge>(){ newEdge });    
             var tree = _edgeRegistryService.ResolveTree(relation.RelationId_).Result;
 
 
@@ -170,7 +171,7 @@ namespace CDL.Tests.ServicesTests
                     ParentObjectId = objectIdForParentSchema,                  
                 };
             newEdge.ChildObjectIds.Add(objectIdForChildSchema);
-            _edgeRegistryService.AddEdges(newEdge);    
+            _edgeRegistryService.AddEdges(new List<Edge>(){ newEdge });    
 
             var edgeFromService = _edgeRegistryService.GetEdge(objectIdForParentSchema, relation.RelationId_).Result;
 

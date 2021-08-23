@@ -8,7 +8,7 @@ license = "Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-settings_utils = { path = "../crates/utils/crates/settings" }
+settings_utils = { path = "../crates/utils/settings" }
 
 anyhow      = "1.0.43"
 dialoguer   = "0.8.0"

@@ -1,6 +1,6 @@
 namespace CDL.Tests.ServiceObjects.SchemaService
 {
-    public class Simple
+    public class SimpleFiled
     {
         public SimpleItem simple { get; set; }
     }

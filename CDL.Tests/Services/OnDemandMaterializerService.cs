@@ -24,19 +24,19 @@ namespace CDL.Tests.Services
             return Task.FromResult(_client.Heartbeat(new Empty()));
         }
 
-        public AsyncServerStreamingCall<Common.RowDefinition> Materialize(string viewId, string schemaId, IList<string> objectsId)
+        public AsyncServerStreamingCall<Common.RowDefinition> Materialize(string viewId, IList<string> schemaIds)
         {
             var request = new OnDemandRequest(){
                 ViewId = viewId
             };
             var schema = new Schema();
 
-            foreach (var item in objectsId)
+            foreach (var item in schemaIds)
             {
-                schema.ObjectIds.Add(item);
+                request.Schemas.Add(item, schema);
             }
 
-            request.Schemas.Add(schemaId, schema);
+            
             
             return _client.Materialize(request);
         }

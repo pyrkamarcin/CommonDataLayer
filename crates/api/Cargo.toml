@@ -16,13 +16,11 @@ path = "src/lib.rs"
 [dependencies]
 # Workspace
 cdl_dto     = { path = "../dto" }
-misc_utils  = { path = "../utils/crates/misc" }
+misc_utils  = { path = "../utils/misc" }
 rpc         = { path = "../rpc" }
-utils       = { path = "../utils" }
-settings_utils          = { path = "../utils/crates/settings" }
-metrics_utils           = { path = "../utils/crates/metrics" }
-communication_utils     = { path = "../utils/crates/communication" }
-tracing_utils           = { path = "../utils/crates/tracing", features = ["with_http", "with_graphql"] }
+settings_utils          = { path = "../utils/settings" }
+communication_utils     = { path = "../utils/communication" }
+tracing_utils           = { path = "../utils/tracing", features = ["with_http", "with_graphql"] }
 
 # Crates.io
 anyhow      = "1.0.43"

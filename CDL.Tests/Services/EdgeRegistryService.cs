@@ -1,6 +1,7 @@
 ﻿using CDL.Tests.Configuration;
 using EdgeRegistry;
 using Microsoft.Extensions.Options;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using static EdgeRegistry.EdgeRegistry;
 
@@ -17,10 +18,14 @@ namespace CDL.Tests.Services
             _client = client;
         }
 
-        public Task<Empty> AddEdges(Edge edgeItem)
+        public Task<Empty> AddEdges(IList<Edge> edgeItems)
         {
             var relation = new ObjectRelations();
-            relation.Relations.Add(edgeItem);
+            foreach (var item in edgeItems)
+            {
+                relation.Relations.Add(item);
+            }
+            
             var response = _client.AddEdges(relation);
             return Task.FromResult(response);
         }
