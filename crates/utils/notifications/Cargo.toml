@@ -8,8 +8,8 @@ license = "Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+cdl_dto     = { path = "../../dto" }
 communication_utils      = { path = "../communication" }
-cdl_dto     = { path = "../../../dto" }
 
 anyhow      = "1.0.43"
 tracing     = "0.1.26"

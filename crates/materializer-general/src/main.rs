@@ -19,7 +19,7 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::debug!(?settings, "application environment");
 
-    utils::status_endpoints::serve(&settings.monitoring);
+    service_health_utils::serve(&settings.monitoring);
     metrics_utils::serve(&settings.monitoring);
 
     let notification_publisher = settings
@@ -39,7 +39,7 @@ async fn main() -> anyhow::Result<()> {
     )
     .await?;
 
-    utils::status_endpoints::mark_as_started();
+    service_health_utils::mark_as_started();
 
     Server::builder()
         .layer(tracing_utils::grpc::TraceLayer)

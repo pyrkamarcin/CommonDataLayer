@@ -16,13 +16,13 @@ path = "src/main.rs"
 [dependencies]
 # Workspace
 cdl_dto     = { path = "../dto" }
-misc_utils  = { path = "../utils/crates/misc" }
+misc_utils  = { path = "../utils/misc" }
 rpc         = { path = "../rpc" }
-utils       = { path = "../utils" }
-communication_utils     = { path = "../utils/crates/communication" }
-tracing_utils           = { path = "../utils/crates/tracing", features = ["with_grpc"] }
-settings_utils          = { path = "../utils/crates/settings" }
-metrics_utils           = { path = "../utils/crates/metrics" }
+communication_utils     = { path = "../utils/communication" }
+tracing_utils           = { path = "../utils/tracing", features = ["with_grpc"] }
+settings_utils          = { path = "../utils/settings" }
+metrics_utils           = { path = "../utils/metrics" }
+service_health_utils    = { path = "../utils/service_health" }
 
 # Crates.io
 anyhow      = "1.0.43"
@@ -32,18 +32,18 @@ futures     = "0.3.16"
 jsonschema  = { version = "0.12.1", default-features = false }
 serde       = { version = "1.0.127", features = ["derive"] }
 serde_json  = "1.0.66"
-sqlx        = { version = "0.5.5", features = ["runtime-tokio-rustls", "postgres", "sqlite", "macros", "uuid", "json", "offline"] }
+sqlx        = { version = "0.5.6", features = ["runtime-tokio-rustls", "postgres", "sqlite", "macros", "uuid", "json", "offline"] }
 thiserror   = "1.0.26"
 tokio       = { version = "1.10.0", features = ["macros", "rt-multi-thread"] }
 tonic       = "0.5.2"
+tower       = "0.4.8"
+tower-http  = { version = "0.1.1", features = ["trace"] }
 tracing     = "0.1.26"
 url         = "2.2.2"
 uuid        = { version = "0.8.2", features = ["v4", "serde"] }
 futures-util            = "0.3.16"
 tokio-stream            = "0.1.7"
 tracing-futures         = "0.2.5"
-tower = "0.4.8"
-tower-http = { version = "0.1.1", features = ["trace"] }
 
 [dev-dependencies]
 maplit = "1.0.2"

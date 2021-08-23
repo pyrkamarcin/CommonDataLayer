@@ -12,6 +12,7 @@ use bb8_postgres::{
 };
 use futures_util::TryStreamExt;
 use metrics_utils::{self as metrics, counter};
+use misc_utils::psql::validate_schema;
 use rpc::query_service::{
     query_service_server::QueryService,
     Object,
@@ -24,7 +25,6 @@ use rpc::query_service::{
 use serde_json::Value;
 use settings_utils::apps::PostgresSettings;
 use tonic::{Request, Response, Status};
-use utils::psql::validate_schema;
 use uuid::Uuid;
 
 pub struct PsqlQuery {

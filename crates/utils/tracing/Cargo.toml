@@ -40,4 +40,4 @@ tonic                   = { version = "0.5.2", optional = true }
 tower-service           = { version = "0.3.1", optional = true }
 tracing-futures         = "0.2.5"
 tracing-opentelemetry   = "0.15.0"
-tracing-subscriber      = "0.2.19"
+tracing-subscriber      = "0.2.20"

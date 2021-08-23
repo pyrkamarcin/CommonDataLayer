@@ -12,15 +12,15 @@ path = "src/main.rs"
 [dependencies]
 # Workspace
 cdl_dto     = { path = "../dto" }
-misc_utils  = { path = "../utils/crates/misc" }
+misc_utils  = { path = "../utils/misc" }
 rpc         = { path = "../rpc" }
-task_utils  = { path = "../utils/crates/task" }
-utils       = { path = "../utils" }
-cache       = { path = "../utils/crates/cache" }
-settings_utils          = { path = "../utils/crates/settings" }
-metrics_utils           = { path = "../utils/crates/metrics" }
-communication_utils     = { path = "../utils/crates/communication" }
-tracing_utils           = { path = "../utils/crates/tracing" }
+task_utils  = { path = "../utils/task" }
+cache       = { path = "../utils/cache" }
+settings_utils          = { path = "../utils/settings" }
+metrics_utils           = { path = "../utils/metrics" }
+communication_utils     = { path = "../utils/communication" }
+tracing_utils           = { path = "../utils/tracing" }
+parallel_task_queue     = { path = "../utils/parallel_task_queue" }
 
 # Crates.io
 anyhow         = "1.0.43"
