@@ -8,10 +8,10 @@ use bb8_postgres::{
 use cdl_dto::ingestion::BorrowedInsertMessage;
 pub use error::Error;
 use metrics_utils::{self as metrics, counter};
+use misc_utils::psql::validate_schema;
 use serde_json::Value;
 use settings_utils::apps::PostgresSettings;
 use tracing::{error, trace};
-use utils::psql::validate_schema;
 
 use crate::{communication::resolution::Resolution, output::OutputPlugin};
 

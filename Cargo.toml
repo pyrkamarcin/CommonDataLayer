@@ -6,8 +6,9 @@ members = [
   "e2e",
   "xtask",
   "crates/*",
-  "crates/utils/crates/*"
+  "crates/utils/*"
 ]
+exclude = ["crates/utils"]
 
 [profile.ci]
 inherits = "dev"

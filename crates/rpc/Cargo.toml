@@ -11,7 +11,7 @@ path = "src/lib.rs"
 
 [dependencies]
 # Workspace
-tracing_utils           = { path    = "../utils/crates/tracing", features = ["with_grpc"] }
+tracing_utils           = { path    = "../utils/tracing", features = ["with_grpc"] }
 
 # Crates.io
 anyhow      = "1.0.43"
@@ -21,7 +21,7 @@ derive_more = "0.99.16"
 http        = "0.2.4"
 prost       = "0.8.0"
 serde       = { version = "1.0.127", features = ["derive"] }
-sqlx        = { version = "0.5.5", features = ['runtime-tokio-rustls'] }
+sqlx        = { version = "0.5.6", features = ['runtime-tokio-rustls'] }
 thiserror   = "1.0.26"
 tonic       = "0.5.2"
 tower       = "0.4.8"

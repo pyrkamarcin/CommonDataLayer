@@ -14,14 +14,14 @@ path = "src/main.rs"
 [dependencies]
 # Workspace
 cdl_dto     = { path = "../dto" }
-misc_utils  = { path = "../utils/crates/misc" }
+misc_utils  = { path = "../utils/misc" }
 rpc         = { path = "../rpc" }
-utils       = { path = "../utils" }
-communication_utils     = { path = "../utils/crates/communication" }
-tracing_utils           = { path = "../utils/crates/tracing" }
-settings_utils          = { path = "../utils/crates/settings" }
-metrics_utils           = { path = "../utils/crates/metrics" }
-notification_utils      = { path = "../utils/crates/notifications"}
+communication_utils     = { path = "../utils/communication" }
+tracing_utils           = { path = "../utils/tracing" }
+settings_utils          = { path = "../utils/settings" }
+metrics_utils           = { path = "../utils/metrics" }
+notification_utils      = { path = "../utils/notifications" }
+service_health_utils    = { path = "../utils/service_health" }
 
 # Crates.io
 anyhow      = "1.0.43"
@@ -43,5 +43,4 @@ tokio-stream            = "0.1.7"
 tracing-futures         = "0.2.5"
 
 [dev-dependencies]
-test-case   = "1.2.0"
 snapshot-runner         = { git = "https://github.com/frondeus/snapshot-runner.git" }

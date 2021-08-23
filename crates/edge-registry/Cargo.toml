@@ -15,14 +15,14 @@ path = "src/lib.rs"
 
 [dependencies]
 # Workspace
-misc_utils  = { path = "../utils/crates/misc" }
+misc_utils  = { path = "../utils/misc" }
 rpc         = { path = "../rpc" }
-utils       = { path = "../utils" }
-settings_utils          = { path = "../utils/crates/settings" }
-metrics_utils           = { path = "../utils/crates/metrics" }
-communication_utils     = { path = "../utils/crates/communication" }
-tracing_utils           = { path = "../utils/crates/tracing" }
-notification_utils      = { path = "../utils/crates/notifications" }
+settings_utils          = { path = "../utils/settings" }
+metrics_utils           = { path = "../utils/metrics" }
+communication_utils     = { path = "../utils/communication" }
+tracing_utils           = { path = "../utils/tracing" }
+notification_utils      = { path = "../utils/notifications" }
+service_health_utils    = { path = "../utils/service_health" }
 
 # Crates.io
 anyhow      = "1.0.43"
