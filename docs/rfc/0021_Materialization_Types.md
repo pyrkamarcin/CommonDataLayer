@@ -30,27 +30,23 @@ CDL feature ID  : CDLF-00018-00
 This rfc aims to provide and standardize types in CDL schemas, views and materialization for documents.
 
 # TLDR
-Schemas support:
+Schemas support
 ```
 number
 string
 boolean
-array
 object
-
-+ one_of: any | null
 ```
 
-Views support
+Any other type used within JSON schema should cause an error when view materialization is requested.
+
+Views support (names are arbitrary, implementor may choose suitable naming)
 ```
 f64
 i64
 string
 boolean
-array[scalar_type]
-object
-
-+ nullability as an additional configuration option
+object - Field::Object
 ```
 
 PSQL mapping is
@@ -59,10 +55,7 @@ f64 -> float8
 i64 -> int8
 string -> text
 boolean -> bool
-array[scalar_type] -> array[scalar_type]
-object -> json # with a goal to change into subtable at some point
-
-+ nullability as marker on a column `NULL` and `NON NULL`
+object -> each value resides in a column with `_` delimited json field path as a name
 ```
 
 ES mapping is
@@ -71,32 +64,15 @@ f64 -> double
 i64 -> long
 string -> text
 boolean -> boolean
-array -> !supported by default
 object -> !supported by default
-
-+ nullability always !supported by default
 ```
 
-We require users to specify all types within the view, including deeply nested objects.
-
-ES initially treats objects differently to PSQL.
+We require users to specify all types within the view, including deeply nested objects. This is supported by materialization.
 
 We can later expand this type list with per database custom types (and type casting/mapping) but this requires schema language extension or parsing strings in JSON object.
 
 SR emits a notification when a view is added, initiating materialization for it and provisioning the database.
 
-GRPC between OB and Materialization is:
-```
-i64 -> int64
-f64 -> double
-string -> string
-bool -> bool
-array[basic_type] -> `repeated`
-object -> `message` # recursive
-
-nullability: `optional`
-```
-Messages are nested instead of current flat structure.
 
 # Configuration layer
 
@@ -244,6 +220,9 @@ ES can store deeply nested objects. It also keeps an index on every field in a d
 # Proposal
 
 ## Type coverage
+> DECISION:
+> Type coverage is defined in TLDR section. We are omitting arrays and nullability for the time being. Objects are supported for both databases.
+
 We should aim to, as an MVP, support a minimal subset of common types in both databases and add new ones if necessary in the later stages of development.
 > SIDENOTE:  
 > For types that are database specific (eg. psql::timestamp) we may add them in the form of an `optional feature`.
@@ -328,6 +307,10 @@ Most controversial one. User provisions ES on their own. Thanks to the API that 
 Having types map from schema to view, we can add validation to the process of creating a view.
 
 ## Type Storage
+> DECISION:
+> TLDR section refers to currently supported subset of json schema. In basics, we can store number, boolean, string and object (composed of 3 previously mentioned base types).
+> Other types in json schema are supported by CDL but not materialization.
+
 There are several options where types should be stored. In my opinion, it's view responsibility to store types of columns, and it's schema responsibility to store type of data.
 We keep current schema format, with JSON compatible types (`string`, `number`, `boolean`, `one_of null`, `array`, `object`) and require users to specify type mapping for view.
 In view, we'll support more granular types that are implicitly converted from JSON:
@@ -355,6 +338,11 @@ Such system is open for extension and allows defining custom type casting, if th
 In the future, backed by ConfS, we can introduce database-specific mapping, and even support both PSQL 9.6 and PSQL 13 independently.
 
 ## On-Demand Materializer
+
+> DECISION:
+> Materializer stays as is, map<string, string> in reality is map<string, json>, which, however imperfect, solves our issues.
+> view - schema (and thus json) conversion is a surjection
+
 On-demand materializer serves data over grpc, returning materialized rows mapping field name to stringified json at the moment.
 
 We should update the mentioned format to return types that resemble view type definition in either a nested grpc message or map where keys are `.` delimited paths.
@@ -427,7 +415,19 @@ If in the field value `null` is present, we have to assign most generic type in 
 > For PSQL we'd have to write inference mechanism on our own and any incompatibility would be caught at the moment of insertion.
 
 # Decision
-TODO
+
+Document was changed to reflect decisions made during a meeting (23.08.2021) (mostly TLDR section).
+We are providing support for basic numeric types, strings and booleans. We support nesting these values in objects.
+
+We have moved arrays to later phase of development, their support requires additional RFC.
+Same goes for nullability, everything, at this moment is non-nullable, and changing this requires separate document.
+From discussion arisen type casting problem, when users would like to store numeric values as strings, for better precision handling.
+This also requires separate document and discussion.
+All 3 of these "type" tackle what is defined "extension type" in this rfc.
+
+We have to remember to emit errors on invalid casting from "json::number" to "view::i64/f64" and (if these values aren't checked earlier), to respective `ES` and `PSQL` types.
+
+Within this rfc is mentioned topic of provisioning database on view insertion. This is moved to new, separate issue.
 
 [json-schema-basic-types]: http://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.2.1
 [rfc-0019]: ./0019_Simplify_Schema_Definitions_01.md
