@@ -420,17 +420,17 @@ If in the field value `null` is present, we have to assign most generic type in 
 # Decision
 
 Document was changed to reflect decisions made during a meeting (23.08.2021) (mostly TLDR section).
-We are providing support for basic numeric types, strings and booleans. We support nesting these values in objects.
+We are providing support for basic numeric types, strings and boolean. We support nesting these values in objects.
 
 We have moved arrays to later phase of development, their support requires additional RFC.
-Same goes for nullability, everything, at this moment is non-nullable, and changing this requires separate document.
-From discussion arisen type casting problem, when users would like to store numeric values as strings, for better precision handling.
-This also requires separate document and discussion.
+The same goes for nullability, everything, at this moment, is non-nullable, and changing this requires a separate document.
+From the discussion arisen type casting problem, when users would like to store numeric values as strings, for better precision handling.
+This also requires a separate document and discussion.
 All 3 of these "type" tackle what is defined "extension type" in this rfc.
 
 We have to remember to emit errors on invalid casting from "json::number" to "view::i64/f64" and (if these values aren't checked earlier), to respective `ES` and `PSQL` types.
 
-Within this rfc is mentioned topic of provisioning database on view insertion. This is moved to new, separate issue.
+Within this rfc is mentioned topic of provisioning database on view insertion. This is moved to a new, separate issue.
 
 [json-schema-basic-types]: http://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.2.1
 [rfc-0019]: ./0019_Simplify_Schema_Definitions_01.md
