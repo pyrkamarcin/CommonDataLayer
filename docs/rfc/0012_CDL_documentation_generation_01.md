@@ -1,15 +1,17 @@
 # Front Matter
 
 ```
-Title           : CDL documentation generation
-Author(s)       : Łukasz Biel
-Team            : CommonDataLayer
-Last updated    : 2021-07-01
-Version         : 1.0.0
+    Title           : CDL documentation generation
+    Author(s)       : Łukasz Biel
+    Team            : CommonDataLayer
+    Reviewer        : CommonDataLayer
+    Created         : 2021-02-05
+    Last updated    : 2021-03-19
+    Category        : Research
+    CDL Feature ID  : Not A Feature
 ```
 
 # Glossary
-
 * `CDL` - Common Data Layer
 * `QR` - Query Router
 * `xtask` - cargo job; similar to how you may define run targets in npm, rake, etc.
@@ -17,14 +19,12 @@ Version         : 1.0.0
 * `Swagger` - Swagger is a tool for generating client and server code from OpenAPI specification. It supports most major languages.
 
 # Preface
-
 The necessity of creating this RFC was sparked by amount of manual work needed when documenting API in `QR`.
 Some topics I'm exploring here can be stretched to other parts of CDL documentation, and I'm taking my liberty to include
 these parts as well. Thus, reader should mind, that result of this document may span across larger group of components than
 `QR` alone.
 
 # Current state
-
 `QR` API is documented manually via [OpenApi][OpenApi] spec file. At the moment of writing this rfc it's outdated.  
 `Configuration` is documented manually via [toml][configuration-docs] files compliant with [rust config crate][config-rs].
 Later, it's possible that we'll replace these configs with configuration service.  
@@ -35,14 +35,12 @@ proto files are located in [rpc crate][cdl-rpc-rs].
 `graphQL` provides documentation via its endpoint and it's built into library we use. It may be wort considering to provide static graphQL spec in repository.
 
 # Problem to solve
-
 Maintaining documentation for formats used in communication within or with CDL is cumbersome.
 We need to research options of automating the process and validating its results.
 
 # Possible solutions
 
-## Generate rust code from specification files:
-
+## Generate rust code from specification files
 There are options for generating rust code from proto (already in place) and OpenAPI.
 
 For generating structures needed for our internal and external communication, via Kafka and RabbitMQ, we could use [schemafy crate][schemafy-rs].
@@ -62,13 +60,11 @@ In general - it requires some significant work from team to switch fully to conf
 
 ## Generate configs from rust
 
-### Compiler pass way:
-
+### Compiler pass way
 We can create a binary that walks through our codebase and based on some criteria generates specs based on rust AST. It's doable, although not an easy task.
 More can be read searching for feature `rustc_private`, it allows users to use rustc as a library.
 
-### XTask + Lib way:
-
+### XTask + Lib way
 We can create special traits/methods and use them within custom binaries used only in `xtask` targets. This way compiler should remove unused instances of code in official binaries,
 no extra handling would be visible on production side, but `xtask` target would be able to perform actions based on these traits.
 
@@ -89,17 +85,14 @@ and I'm not sure how much of an effort would it be to replace generated files wi
 Some context may be found in [this issue][tarpc-rs-161], it appears it's possible. For `xtask` this still would mean custom `.protobuf` gen.
 
 ## Mixed solution
-
 It's not a problem to have mixed solution in some places. Important part is nothing has to be done manually in more than one place.
 
 # Author's comment
-
 As generating rust code may be tempting and is quite popular in rest of the industry, I think it may be beneficial to generate specs from rust.
 Rust macro system is quite easy to use and this differentiates it from most of other languages. We will avoid compiling / and possibly reviewing / specs.
 Some initial discussion happened on this topic, and it seems that team, in majority, agrees with that. Next step would be to PoC this.
 
 # Conclusion
-
 We've discussed this topic on 07.07.2021.
 Conclusion:
 * gRPC isn't our priority, and we are happy with current state; with `ar_pe_ce` being worked on, it's possible to revive this topic once it gets plugged into cdl.

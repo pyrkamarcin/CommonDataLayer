@@ -1,21 +1,20 @@
 # Front Matter
 
 ```
-Title           : Schema-Registry-less CDL deployment
-Author(s)       : Wojciech Polak
-Team            : CommonDataLayer
-Reviewer        : CommonDataLayer
-Created         : 2021-06-24
-Last updated    : 2021-06-24
-Version         : 1.0.0
-CDL feature ID  : CDLF-00016-00
+    Title           : Schema-Registry-less CDL deployment
+    Author(s)       : Wojciech Polak
+    Team            : CommonDataLayer
+    Reviewer        : CommonDataLayer
+    Created         : 2021-06-24
+    Last updated    : 2021-06-24
+    Category        : Feature
+    CDL feature ID  : CDLF-00016-00
 ```
 
 
 ## Glossary
 
 ### Terminology
-
 * CDL - Common Data Layer
 * DR - Data Router, a CDL component responsible for routing ingested messages.
 * SR - Schema Registry, a CDL component responsible for keeping information about the type of object conveyed inside the message.
@@ -29,7 +28,6 @@ CDL feature ID  : CDLF-00016-00
 * Routing information - information necessary for DR and QR to successfully deliver the provided message and querying the repository's data.
 
 ## Formats
-
 v1.0 input message format up to this point:
 ```
 {
@@ -65,7 +63,6 @@ SchemaType
 ## Introduction
 
 ### Background
-
 It was requested from the CDL stack to route messages in an environment where SR is not deployed.
 
 Currently, CDL is using SR to decide which insert destination and query address is used during data and query routing.
@@ -84,7 +81,6 @@ After implementing this feature, CDL will insert and query data from proper repo
 
 
 ### Assumptions
-
 * CDL should allow to omit Schema Registry deployment and provide an alternative way of routing data.
 * Considering CIM format, any new fields or configuration must not be a breaking change.
 
@@ -115,7 +111,6 @@ Because there is no SR responsible for registering Schema and assigning it `sche
 In the future, whenever Configuration Service would be introduced, one might think about moving this Static routing into a dynamic environment.
 
 ### Major concerns
-
 The static routing allows new kinds of errors and bugs in the CDL system. The CDL user must consider the possibility of service configuration sync issues because there is no single source of truth or consensus algorithm.
 
 It is crucial to use the same configuration for both ingesting and querying data.
@@ -123,15 +118,12 @@ It is crucial to use the same configuration for both ingesting and querying data
 ## Further Considerations
 
 ### Impact on other teams
-
 This feature does not provide any breaking change. Therefore all other teams can use CDL with Schema Registry without problems.
 
 ### Scalability
-
 No impact. Because static routing is Read-Only, one can scale all services without any extra cost or configuration.
 
 ### Testing
-
 This feature MUST undergo thorough testing (in the best scenario, automatic E2E tests). Test cases MUST include:
 
 * Failure scenarios:

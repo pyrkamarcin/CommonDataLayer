@@ -1,28 +1,27 @@
 # Front Matter
 
 ```
-Title: Alternative communication method to Kafka and RabbitMQ
-Author: Wojciech Polak
-Team: CDL
-Reviewer: CDLTeam
-Created on: 11/02/2021
-Last updated: 11/02/2021
-Tracking issue: https://github.com/epiphany-platform/CommonDataLayer/issues/68
+    Title           : Alternative communication method to Kafka and RabbitMQ
+    Author(s)       : Wojciech Polak
+    Team            : CommonDataLayer
+    Reviewer        : CommonDataLayer
+    Created         : 2021-02-11
+    Last updated    : 2021-02-11
+    Category        : Feature
+    CDL Feature ID  : CDLF-0000C-00
 ```
 
 # Introduction
-## Summary
 
+## Summary
 We should add GRPC communication in all components that are using right now Kafka or `RMQ`. We should introduce a standard interface and separate whatever we are doing with input messages from the transportation layer.
 
 ## Glossary
-
 `RMQ` names any `AMQP` server - most common is`RabbitMq` \
 `MQ` - Message Queue - Kafka or `RMQ` \
 `CS` - command service
 
 ## Background
-
 Right now, most of our communication in CDL ingestion is handled by either Kafka or `RMQ`. While this is acceptable for some clients, there is a case where CDL should not communicate via message queue at all. Therefore we need a replacement protocol, and we could use GRPC for that purpose.
 
 What is more - right now, we have a partially-baked solution in `CS` - this service accepts either `MQ` or `GRPC` as a communication method; however, `DR` can only produce messages to Kafka or `RMQ`. Furthermore, this solution has mixed business logic with the transportation layer, which causes some unnecessary repetitions in the codebase. It makes it harder to maintain than it should be.
@@ -34,8 +33,8 @@ What is more - right now, we have a partially-baked solution in `CS` - this serv
 * Code handling message should not depend directly on any communication method. It should be under an abstraction.
 
 # Solutions
-## Existing solution
 
+## Existing Solution
 We are currently using `GRPC` only for querying data and communication between CLI/GUI/API and schema registry.
 
 `GRPC` support in the ingestion part of CDL is not finished.
@@ -57,9 +56,9 @@ These features, unfortunately, are not common.
 
 Unfortunately, because Kafka uses borrowed messages it requires box leaking, which might be dangerous when left alone. The message is also wrapped into the `Box` to allow dynamic dispatch (to acknowledge either Kafka message or `RMQ` message).
 
-## Proposed solution
+## Proposed Solution
 
-### Async trait
+### Async Trait
 As previously mentioned, the transportation layer should be invisible to the user. To do so, I'd like to introduce a new async trait:
 ```rust
 trait ConsumerHandler {
@@ -79,7 +78,7 @@ Lastly - handler returns `anyhow::Result` - so transportation layer based on tha
 * `GRPC` - return response either OK/Internal Server Error/Bad Request (TBD how to distinguish between last two)
 * `MQ` - use acknowledge, negative acknowledge (in `RMQ`) or only doing nothing and not responding at all to the message broker.
 
-### Internal implementation
+### Internal Implementation
 Internal implementation is quite simple. We keep `enum Consumer`, which accepts in its constructor our instance of `ConsumerHandler` along with configuration parameters (URL address to Kafka broker etc.).
 
 Inside of method `async fn run(self)` we match consumer variant and either run simplest possible `while let Some()` loop for `MQ`, or initiate `GRPC` server.
@@ -89,8 +88,7 @@ To enable better performance we would call this handler inside of `tokio::spawn`
 
 `GRPC` is unordered by design, if client needs an ordering, it needs to send one request at the time - it is it's responsibility, not CDL.
 
-### GRPC protocol schema
-
+### GRPC Protocol Schema
 To unify all internal communication in CDL ingestion, we need to use a common, shared GRPC protocol.
 ```proto
 syntax = "proto2";
@@ -110,8 +108,7 @@ message Empty {}
 ```
 Thanks to that, we can imitate a message just like the one received from `MQ`.
 
-### Notifications & Error reporting
-
+### Notifications & Error Reporting
 No client requires error reporting, and we are already sending logs. Therefore it is not needed and can be removed.
 
 Notifications are a bit more complicated. These are `CS` specific, and therefore, cannot be part of the transportation layer (transparent to the user code).
@@ -123,7 +120,7 @@ One cannot send the report to any `MQ`. One suggested way is to send the callbac
 
 This issue is open for further discussion.
 
-## Alternative solutions
+## Alternative Solutions
 ### REST
 Instead of using GRPC we could use simple HTTP REST requests.
 
@@ -161,28 +158,20 @@ While we shouldn't replace Kafka nor RabbitMQ with zeroMQ, we can consider it fo
 * There are pinpointed problems with ZMQ listed by one of Rust client maintainers: https://github.com/jean-airoldie/libzmq-rs/issues/125#issuecomment-570551319
 
 ## Conclusion
-
 GRPC seems to be easiest way to implement `MQ`-independence, however later we should re-evaluate REST and probably switch to it.
 What is worth noting, after we switch CDL to one, abstracted and unified transportation layer, further change from GRPC to REST should be relatively easier.
 
 # Test Plan
-
 There should be at least one end-to-end test checking if the whole pipeline works in an `MQ`-less environment.
 We should run exactly same tests as we have now but with different env variables. All tests designed for `MQ` environment should pass in `GRPC` environment.
 
-# Futher considerations
+# Futher Considerations
 
-## Schema Registry replication
+## Schema Registry Replication
 Replication featutre for Schema Registry needs major refactor (and probably replacement), therefore it is out of the scope of this change. Replication for `GRPC` should be deactivated.
 
-## Impact on other teams
-
+## Impact on Other Teams
 Teams that are using `MQ` won't feel any difference. This refactor would allow other clients to use CDL.
 
 ## Security
-
 No security risk.
-
-# Tasks and timeline
-
-TBD

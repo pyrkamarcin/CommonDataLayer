@@ -53,12 +53,10 @@ RFC describes only **change** to CDL. The change might be:
 It does not contain information about a single component (its current state, as this is the purpose of `architecture`).
 
 ### RFC Category
-
 Each RFC must contain a category informing whether it describes the feature, process or the research.
 Accepted values: `Feature`/`Process`/`Research`.
 
 ### RFC Deadline
-
 Each RFC must contain a deadline to speed up the process.
 Before the deadline is met, the author should remind all interested parties about it.
 
@@ -71,7 +69,6 @@ Until the deadline, everyone is allowed to comment on the RFC. Participants shou
 There may be exceptions to this rule - for example, when during a deadline meeting, everyone agrees to wait for new information from superiors, etc.
 
 ### RFC ordering number
-
 Each RFC has an assigned ordering number that is an always-increasing integer. In rare situations, there might be gaps between two integers.
 RFC ordering number is encoded by 4 digit (fixed length) decimal integer (values from `0001` to `9999`). In the future it might be extended by prefixing additional zeroes (`9999` becomes `09999`).
 RFC ordering number has to be unique.

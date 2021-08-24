@@ -1,12 +1,14 @@
 # Front Matter
 
 ```
-Title           : Query raw routes
-Author(s)       : Łukasz Biel
-Team            : CommonDataLayer
-Last updated    : 2021-07-06
-Version         : 1.0.0
-Notes           : Raw routes are already implemented
+    Title           : Query raw routes
+    Author(s)       : Łukasz Biel
+    Team            : CommonDataLayer
+    Reviewer        : CommonDataLayer
+    Created         : 2021-07-06
+    Last updated    : 2021-07-06
+    Category        : Feature
+    CDL Feature ID  : CDLF-00015-00
 ```
 
 # Glossary
@@ -30,7 +32,7 @@ It's body is a json specific to targeted schema/repository, with schema:
 
 `QS` and `QS-ts` have respective `gRPC` endpoints.
 
-## Document repositories:
+## Document repositories
 ```protobuf
 {{#include ../../crates/rpc/proto/query_service.proto:7}}
 ```
@@ -41,7 +43,7 @@ It's body is a json specific to targeted schema/repository, with schema:
 > There is no safeguard for insert/delete statements, nor for config changes, however, using these isn't a good practice.
 > User created for QS to access postgres should have those operations disabled.
 
-## Timeseries repositories:
+## Timeseries repositories
 ```protobuf
 {{#include ../../crates/rpc/proto/query_service_ts.proto:7}}
 ```
@@ -61,7 +63,7 @@ It's body is a json specific to targeted schema/repository, with schema:
 ### Druid
 "RawStatement" is a string sent directly to Druid instance as a body, via `POST` method.
 
-# Additional work
+# Additional Work
 We have to hide raw endpoints behind a feature flag. Such feature flag will be accessible from configuration tomls in the form of:
 ```toml
 [features]

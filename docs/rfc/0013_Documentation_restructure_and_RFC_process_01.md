@@ -1,18 +1,20 @@
 # Front Matter
 
 ```
-Title           : Documentation restructure and RFC process
-Category        : Process
-Author(s)       : Wojciech Polak
-Created         : 2021-07-02
+    Title           : Documentation restructure and RFC process
+    Author(s)       : Wojciech Polak
+    Team            : CommonDataLayer
+    Reviewer        : CommonDataLayer
+    Created         : 2021-07-02
+    Last updated    : 2021-07-02
+    Category        : Process
+    CDL Feature ID  : Not A Feature
 ```
 
 # Glossary
-
 RFC - Request for Comments
 
 # Preface
-
 This RFC introduces a new process to keep our documentation clean and up-to-date. Both subjects - documentation restructure, and RFC process are married and cannot be discussed separately.
 
 # Documentation restructure
@@ -20,7 +22,7 @@ This RFC introduces a new process to keep our documentation clean and up-to-date
 ## Goal
 To simplify, clarify documentation structure. What documents should be grouped in what categories. Also, to define what the categories are and what these purposes are.
 
-## What we have now
+## What Do We Have Now
 
 ```
 architecture - information about each component - very brief. Almost 70% of the architecture documentation takes information about configuration and environment variables. This information is outdated.
@@ -52,8 +54,7 @@ schemas_and_views.md - few paragraphs explaining what schema and view is. It is 
 versioning.md - brief information about CDL and SemVer. It also describes our branching or tagging strategy and releases schedule. I will be outdated very quickly.
 ```
 
-## What should we have
-
+## What Should We Have
 Please, keep in mind that an explanation for these changes is written in the next section describing the RFC process.
 
 ```
@@ -95,14 +96,14 @@ Used by: CDL team
 ...
 The rest is not that important for now. CDL team should create an issue to clean and update these, but there is no point in discussing these now.
 ```
-# RFC process
+# RFC Process
 
 ## Goal
 To simplify, clarify our methodology. To explain what should be included in RFC and what steps should be included in the RFC process.
 
-## What we have now
+## What Do We Have Now
 
-### RFC definition
+### RFC Definition
 RFC is describing either the change or current state of the CDL. It might refer to other RFC and the current state of CDL. 
 There is no definition of what RFC is and what it should include.
 
@@ -110,8 +111,7 @@ There is no definition of what RFC is and what it should include.
 We keep all RFCs in the `rfc` directory; however, there is little to no resolution after we close it.
 Description of the components is mixed with RFCs describing features and processes, resulting in a strange mess where NAF-Commit_message...md lives next to `CDLF-000XX-rfc-XX.md`. 
 
-## What should we have
-
+## What Should We Have
 RFC should only describe **change** to CDL. The change might be:
 * New feature
 * Modification of existing feature
@@ -121,12 +121,10 @@ RFC should only describe **change** to CDL. The change might be:
 It should not contain information about a single component (its current state, as this is the purpose of `architecture`).
 
 ### RFC Category
-
 Each RFC must contain a category informing whether it describes the feature or the process.
 Accepted values: `Feature`/`Process`.
 
 ### RFC Deadline
-
 Each RFC must contain a deadline to speed up the process.
 Before the deadline is met, the author should remind all interested parties about it.
 
@@ -138,14 +136,13 @@ Until the deadline, everyone is allowed to comment on the RFC. Participants shou
 
 There may be exceptions to this rule - for example, when during a deadline meeting, everyone agrees to wait for new information from superiors, etc.
 
-### RFC ordering number
-
+### RFC Ordering Number
 Each RFC has an assigned ordering number that is an always-increasing integer. In rare situations, there might be gaps between two integers.
 RFC ordering number has to be unique.
 
 RFC ordering number and feature ID are not the same concepts.
 
-### The process
+### The Process
 
 #### Draft
 The author of the RFC should create a new document in the `rfc` directory. This directory has a flat structure, and each RFC should have a filename in human-readable format with RFC ordering prefix number and version postfix number. For example: `1234_schema_registry_less_CDL_deployment_01.md`.
@@ -199,7 +196,7 @@ Each RFC must result in:
 It also means PRs with implementations should not be accepted and merged before merging documentation.
 Exception: It is allowed to split PR into smaller, by merging the first and then separate PR documentation. However, until the last PR implementation is merged, **tracking issue has to be kept open**.
 
-#### Further changes
+#### Further Changes
 Apart from minor typo fixes, and formatting RFC should be immutable.
 Whenever there is a need to change the feature or the process, one should create another RFC describing new goals and changes.
 
@@ -207,7 +204,6 @@ Whenever there is a need to change the feature or the process, one should create
 RFC should describe **changes** while `features`/`processes`/`architecture` should keep up-to-date information about the current state of CDL.
 
 # Decisions
-
 > Actions are from meeting about RFC that happened on 13.07.2021
 
 * Included default minimal deadline period.

@@ -1,12 +1,14 @@
 # Front Matter
 
 ```
-Title           : Transport headers passthrough
-Category        : Feature
-Author(s)       : Wojciech Polak
-Team            : CommonDataLayer
-Created         : 09-07-2021
-CDL feature ID  : CFLF-0001F-00
+    Title           : Transport headers passthrough
+    Author(s)       : Wojciech Polak
+    Team            : CommonDataLayer
+    Reviewer        : CommonDataLayer
+    Created         : 2021-07-09
+    Last updated    : 2021-07-09
+    Category        : Feature
+    CDL Feature ID  : CDLF-0001F-00
 ```
 
 ## Glossary
@@ -20,7 +22,7 @@ When the user ingests data into CDL, he might want to pass extra metadata linked
 This metadata should not be stripped away (which is the current state) but passed through the ingestion part of the CDL into the Command Service notification.
 
 Thanks to that, the system reacting to those notifications can still operate on metadata.
-## Proposed solution
+## Proposed Solution
 To understand how to implement this feature, one needs to consider all communication methods used to ingest.
 
 Currently, CDL supports:
@@ -70,8 +72,7 @@ However, that means the client has to be created with an attached interceptor, a
 
 The other option for how `MetadataMap` can be used is simply by providing `Request` - `tonic` takes as an argument, not the message itself but `IntoRequest<Message>` where `Message` always implements this trait. `Request<Message>` also implements it; therefore, the client can accept already (manually) injected requests with proper headers. The downside of this approach is that one has to maintain all places where the client should pass headers manually.
 
-## Header conflicts
-
+## Header Conflicts
 Based on the fact that CDL is using headers for Open Telemetry support, and in the future, it might be possible to use more headers for other purposes.
 
 Therefore implementation should either:
@@ -82,7 +83,6 @@ Therefore implementation should either:
 As an outcome of this RFC implementation, one must provide documentation enlisting all headers (including one used for Open Telemetry) used internally in CDL to inform the user what may generate such a conflict.
 
 ## Configurability
-
 Header passthrough, as well as conflict resolution, should be configurable.
 
 Preferably conflict resolution strategy should be configurable on a global (configuration of the service) level or/and in the local schema or object level. This topic could be researched in the future.
@@ -90,21 +90,17 @@ Preferably conflict resolution strategy should be configurable on a global (conf
 Header passthrough should be available under the feature flag, which could be by default disabled to prevent any breaking changes; however, whenever CDL reaches a new MAJOR version, it might be wise to reconsider enabling it by default.
 
 ## Alternatives
-
 One posibility could be to read headers from communication method, but include it in payload as a field of CDL notification. Then Header conflict would be resolved automatically. If the client needs headers be present as actual headers, one might need some kind of Shim transforming notification and resolving header conflicts there.
 
-## Further considerations
+## Further Considerations
 
-### Impact on other teams
-
+### Impact on Other Teams
 This feature does not provide any breaking change in nearby future.
 
 ### Scalability
-
 No impact.
 
 ### Testing
-
 This feature MUST undergo thorough testing:
 * When feature flag is disabled,
 * When feature flag is enabled:

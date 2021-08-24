@@ -1,20 +1,21 @@
 # Front Matter
 
 ```
- Title: CDL Ingestion API versioning
- Author: Łukasz Biel
- Team: CDL
- Reviewer: CDLTeam
- Created on: 5/2/2021
- Last updated: 19/3/2021
- Tracking issue: https://github.com/epiphany-platform/CommonDataLayer/issues/225
- =====================================================
- this rfc is outdated, and kept for archivisation reasons
- following RFCs superseeds it:
- - CDLF-00010-00-rfc-02.md
- =====================================================
+    Title           : CDL Ingestion API versioning
+    Author(s)       : Łukasz Biel
+    Team            : CommonDataLayer
+    Reviewer        : CommonDataLayer
+    Created         : 2021-02-05
+    Last updated    : 2021-03-19
+    CDL Feature ID  : CDLF-00010-00
 ```
 
+```
+    ==========================================================
+    this rfc is outdated, and kept for archivisation reasons.
+    Please find the latest version in the parent directory
+    ==========================================================
+```
 
 # Introduction
 
@@ -113,4 +114,4 @@ during each upgrade or when `DR` changelog explicitly states bump of `MAJOR` num
 
 * 19.03.2021 - Updated RFC with decision
 
-[data-router-readme]: ../architecture/data_router.md
+[data-router-readme]: ../../architecture/data_router.md

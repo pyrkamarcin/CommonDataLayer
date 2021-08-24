@@ -1,15 +1,27 @@
+# Front Matter
 
 ```
-Title           : CI/CD setup - R&D
-Author(s)       : Mateusz 'esavier' Matejuk
-Team            : CommonDataLayer
-Reviewer        : CommonDataLayer
-Created         : 2021-07-13
-Last updated    : 2021-08-06
-Version         : 1.0.0
+    Title           : CI/CD setup - R&D
+    Author(s)       : Mateusz 'esavier' Matejuk
+    Team            : CommonDataLayer
+    Reviewer        : CommonDataLayer
+    Created         : 2021-07-13
+    Last updated    : 2021-08-06
+    Category        : Research
+    CDL Feature ID  : Not A Feature
 ```
 
-## Glossary:
+#### Abstract
+
+```
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+    NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and
+    "OPTIONAL" in this document are to be interpreted as described in
+    RFC 2119.
+```
+[RFC 2119 source][rfc2119]
+
+## Glossary
 - PS - performance stack - the part of the ci that is responsible for hosting the performance part of the tests
 - PT - performance test - tests related to measurements of release or build which was already tested against compliance with specification and developer tests
 - DT - developer test - bulk of tests related to code/specification/project compliance (acceptance tests). Triggered  every commit to tests its viability, also ran on all types of releases. Currently, functionality is provided by GitHub actions.
@@ -17,17 +29,17 @@ Version         : 1.0.0
 - HW - hardware
 - SW - software
 
-## What we want to accomplish by introducing the CI/CD?
+## What Do We Want To accomplish By Introducing The CI/CD?
 a.k.a.  What's the situation, and what are we trying to solve?
 
 Currently, all our tests are being run on the GitHub public cloud. We do have, as an OSS project, a lot of flexibility in this matter, and GitHub provides us almost infinite resources to help with our development. However, being the generic system, we are using VM's and environments that we do not control fully. We cannot guarantee that tests that we want to do will run in the same environment and thus tests are not comparable with each other.
 
-## Scope:
+## Scope
 This document only describes the changes and tooling related to the Performance-bound part of the CI. As described in the paragraph above, CI will be split it two dedicated parts. All the work related to R&D was around planning the CI with focus on performance part, taking only automated one into overall consideration. Reasoning behind it is that automated CI is already working to some degree and only needs quality of life improvements or minor expansions.
 
 Measuring itself is currently free-floating problem that does not have to be immediately solved. To be specific, it's the problem of amount of work and path we will take given setup that we like, but it does not have to, at this point of time, to dictate setup itself.
 
-### Solution:
+### Solution
 We decided that it would be the best idea to follow a hybrid solution for now. That means that we will keep GitHub actions for whatever we are doing right now, i.e. code quality and compliance testing, that can be run multiple times in parallel, and thus unlimited resources GitHub provides would be the best option for it. For performance testing, we will use the playground server stack which is configured, stable and persistent across tests. That also means that each test will be started in the environment as similar to each other as possible.
 
 In addition, we will be able to perform server tuning and advise for best HW and SW configuration for CDL to run on.
@@ -48,8 +60,7 @@ Being a problem-specific solution, CI/CD setup needs to take following aspects h
 -- Performance tests have to be triggered either manually or by a build. Integration with DT  environment is not necessary but welcomed. Measurements taken needs to be recorded and validated against other runs with the same HW/SW configuration, but that does not mean that the tests have to be triggered every release. As such having only manual triggers are entirely acceptable.
 -- Measurements have to be collected and stored for comparison. Additional tooling may be required, since right now, not every part of existing metrics and/or observability systems are able to partake in automated testing (i.e. for example graphana can not be triggered to dump statistics from last n minutes)
 
-## Tooling:
-
+## Tooling
 in terms of availability and usability, the following tools were tested:
 - Jenkins
 - Buildbot
@@ -59,7 +70,7 @@ in terms of availability and usability, the following tools were tested:
 #### Jenkins
 It is a very versatile tool that allows for adjustments and modifications. Community is quite active and there is a lot of plugins for different systems and use cases. However, in our case, there were problems with proper configuration of the service itself. Numerous issues with HTTPS reverse proxy (among others) was noticed and prevented us from, for example, providing or changing configuration and communicating with the agents. Despite that, the setup can be adjusted to take that into account, for example by providing proper vpn connections, switching to plain http and locking the machine itself from the outside world. Another problem is that java errors are not easy to understand nor to fix.
 
-##### Pros:
+##### Pros
 - mature community
 - everybody knows it to some degree
 - low entry point
@@ -67,6 +78,7 @@ It is a very versatile tool that allows for adjustments and modifications. Commu
 - lot of plugins
 - master - slave architecture
 - configuration is separate from jobs
+
 ##### Cons
 - a lot of configuration per job and around it
 - needs reverse proxy
@@ -78,7 +90,7 @@ It is a very versatile tool that allows for adjustments and modifications. Commu
 #### Laminar
 It is by far the simplest, yet most powerful tool yet. Its simplicity does not allow running agents as an entity, but it can be triggered and configured over network. There is notably less security issues that have to be looked after, since it is only serving read only notification panel in unencrypted http endpoint. Each Laminar instance acts as a worker, and each worker can trigger another worker. Jobs can be chained together, or depend on each other. Each job is either script or executable that is launched and maintained by Laminar to perform some sort of action, and as such, number of possibilities are countless and do not require too much effort to implement and maintain. Issues were raised however, over lacking functionality of the UI to display specific values, like throughput etc. It definitively can be done, however exact time to provide UI modification and functionality is unknown.
 
-##### Pros:
+##### Pros
 - dead simple
 - everything is a form of script (binaries are also allowed)
 - very easy configuration
@@ -89,10 +101,12 @@ It is by far the simplest, yet most powerful tool yet. Its simplicity does not a
 - does not need reverse proxy to work while maintaining security
 - pre/post actions allowed, also as scripts
 - configuration is separate from jobs
-##### Neutral:
+
+##### Neutral
 - GUI is read only
 - webhooks need additional tooling (like rust's 'snare')
 - if advanced kind of report display is needed, separate
+
 ##### Cons
 - very simple and limited GUI
 - tests can either pass or not (binary)
@@ -101,36 +115,44 @@ It is by far the simplest, yet most powerful tool yet. Its simplicity does not a
 
 #### BuildBot
 This is a simple yet responsive builder framework written in python. All configurations and build descriptions are also written in python. It allows for master-slave (i.e. build agents), and multi-master configurations, however all of the jobs are defined in the master's configuration file. This poses problems for us, since it means that we will have to adjust most aspects of the builds ourselves, a.k.a. code it in. Since UI is also very simple, the same issues related to it from Laminar stands for BuildBot too. While not overly complicated, to bring it to proper usability, a significant amount of work will be needed.
-##### Pros:
+
+##### Pros
 - master-slave architecture
 - rather simple
 - responsive gui
 - test written in python
-##### Neutral:
+
+##### Neutral
 - its only a framework
 - multi-master configuration, although not trivial to introduce
+
 ##### Cons
 - needs reverse proxy
 - tests are located in master's config file, while those can be separated and its easy to maintain it, it will be hard to test those out, since there is nothing testing the test configuration before it is deployed to the ci (jenkins for example can have not-working tests, while BuildBot will simply refuse to load on error)
 
 #### GoCD
 While giving good impression at first, being fast and responsible, there are multiple issues with configuration and running. There is problem with injecting proper environment variables. More problems were present while interacting with 3rd party plugins, like elastic agents. Their configuration was not trivial and errors were not conveyed properly, so we were unable to fix the problems. Given that, it permits secure transport to the native agents running in different cluster with relative ease.
-##### Pros:
+
+##### Pros
 - nice looking and responsive UI
 - master-slave configuration
 - easy to setup security both master-slave and master-user (gui)
 - configuration is separate from jobs
-##### Neutral:
+
+##### Neutral
 - gui and configuration is not exactly straightforward, while not bad, its also not trivial
 - despite the name, its not in Go...
+
 ##### Cons
 - ... its in java
 - problems are hard to read/understand/fix, logs in java format (stack dumps)
 - needs reverse proxy
 - everything works until it doesn't, same problem as with jenkins. If there is a bug its only visible when you want to use the functionality. To check configuration, you need to literally click over all menu and situations to check if everything works and does not result in stack dump, although problems encountered were not at least related to reverse proxy config.
 
-
-## Finishing touches
+## Finishing Touches
 Currently, it is not required to take any action regarding CI. Performance testing is not scheduled to be done soon, and this priority is low. There is still time to check other tooling options, and in the case it happens, this document will be expanded with results.
 
 I decided that there is no need to explain current DT stack, since it's not the scope of this document, and besides that, it works for now. In case any changes are required to DT, a separate document will be provided linking, this one, hopefully, as a reference material.
+
+## References
+[rfc2119]:https://www.ietf.org/rfc/rfc2119.txt

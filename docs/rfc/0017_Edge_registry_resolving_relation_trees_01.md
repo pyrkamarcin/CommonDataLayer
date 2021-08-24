@@ -1,14 +1,14 @@
+# Front Matter
 
-# Edge registry - Resolving relation trees
-
-## Front Matter
 ```
-Title           : Edge registry - Resolving relation trees
-Category        : Feature
-Author(s)       : kononnable
-Created         : 2021-07-07
-Last updated    : 2021-08-04
-CDL feature ID  : CDLF-0001F-00
+    Title           : Edge registry - Resolving relation trees
+    Author(s)       : kononnable
+    Team            : CommonDataLayer
+    Reviewer        : CommonDataLayer
+    Created         : 2021-07-07
+    Last updated    : 2021-08-04
+    Category        : Feature
+    CDL Feature ID  : CDLF-0001F-00
 ```
 
 ## Glossary
@@ -25,6 +25,7 @@ This document's purpose is to pass on the way behavior can be handled.
 Struct names are treated as implementation detail which may be changed during implementation.
 
 ## Current State
+
 ### TreeQuery Request
 ```rust
 struct TreeQuery {
@@ -55,8 +56,8 @@ struct SchemaRelation {
 ```
 
 ## Proposed Formats
-### TreeQuery Request
 
+### TreeQuery Request
 ```rust
 type Identifier = Option<NonZeroU8>; // id from TreeQuery->Relation, None for base_relation
 ```
@@ -110,7 +111,6 @@ enum RelationSide {
 ```
 
 ### TreeQuery Response
-
 ```rust
 struct TreeQueryResponse {
     resp: Vec<Uuid> // number of rows * (2 + TreeQuery.relations.len())
@@ -123,20 +123,17 @@ The new response format will provide UUIDs in the following order:
 3. array of relation's children's IDs
 
 ### Summary
-
 Change explanation related to previous format:
 - previously Object Builder was using flat form, its first step was to flatten old response format. This is no longer the case, as the response will be in tree format.
 - in old format, information about relations was sent multiple times, containing one edge at the time. Currently, we will send the whole tree as a response, including relations. More info in [Getting relation information](#getting_relation)
 - It might seem that this format introduces duplication(some IDs will be sent multiple times), however that shouldn't be a problem. This is the ideal case for usage of lossless algorithms on protocol level(if needed). Similar solutions(table results) are widely used with RDBMS and I don't recall any performance issues about sending the data.
 
 ### Processing TreeQuery Request
-
 - Resolving relation tree should be handled by using `inner join` strategy. This may be configurable in the future.
 - Filtering based on object_ids should be performed.
 - It might be a good idea to let SQL engine to do almost all the work for us and just generate SQL query and collect the results. Efficient joining and filtering data is one of the main goals of RDBMS, and it doesn't require as much network traffic as doing it on our own. This is just a proposal - implementor is free to choose which way this should be handled.
 
 ### <a name="getting_relation"></a>Getting Relation Information
-
 ```patch
 service EdgeRegistry {
 ...

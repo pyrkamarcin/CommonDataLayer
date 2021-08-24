@@ -1,14 +1,14 @@
-
 # Front Matter
 
 ```
-Title           : Materialization field types support
-Category        : Feature
-Author(s)       : Łukasz Biel
-Team            : CommonDataLayer
-Created         : 2021-16-08
-Deadline        : 2021-21-08
-CDL feature ID  : CDLF-00018-00
+    Title           : Materialization field types support
+    Author(s)       : Łukasz Biel
+    Team            : CommonDataLayer
+    Reviewer        : CommonDataLayer
+    Created         : 2021-16-08
+    Last updated    : 2021-21-08
+    Category        : Feature
+    CDL Feature ID  : CDLF-00018-00
 ```
 
 #### Related

@@ -1,7 +1,6 @@
 # Commit message formalization and enforcement
 
 ## Commit message formalization 
-
 In CDL repository all issues titles, pull request titles and commit messages must have prefixed with a tag.
 
 Currently we allow tags:
@@ -33,5 +32,4 @@ feat: add lazers to CDL
 ```
 
 ## Commit message enforcement
-
 Commit message format is enforced via one of GitHub Actions.

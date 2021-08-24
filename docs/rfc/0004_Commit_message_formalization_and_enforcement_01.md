@@ -1,21 +1,22 @@
 # Front Matter
 
 ```
-Title           : Commit message formalization and enforcement
-Author(s)       : Łukasz Biel
-Team            : CommonDataLayer
-Reviewer        : CommonDataLayer
-Created         : 2021-03-17
-Last updated    : 2021-03-17
-Version         : 1.0.0
+    Title           : Commit message formalization and enforcement
+    Author(s)       : Łukasz Biel
+    Team            : CommonDataLayer
+    Reviewer        : CommonDataLayer
+    Created         : 2021-03-17
+    Last updated    : 2021-03-17
+    Category        : Process
+    CDL Feature ID  : Not A Feature
 ```
 
-# Commit message formalization:
+# Commit message formalization
 
-## Goal:
+## Goal
 To have some standard. It can't be too strict because we are a small team, and this adds extra overhead.
 
-## What we do now:
+## What We Do Now
 We are using vaguely defined `angular commit message spec.` This means our commits have titles with some markings, and that's it.
 
 Tags that are used so far:
@@ -30,7 +31,7 @@ Tags that are used so far:
 
 Some of these overlap, we foregone using the scope of the commit.
 
-## What we should be doing:
+## What We Should Be Doing
 Document the process. Create a set of `tags` that are in use.
 Some tags are duplicates. Thus I propose to use only:
 
@@ -69,7 +70,7 @@ feature: add lazers to CDL
 * docs: document usage of lazers (and how to keep them away from cats)
 ```
 
-# Commit message enforcement
+# Commit Message Enforcement
 This is a tough topic. We cannot enforce anything via default GitHub means. There are two options:
 
 * We enforce a standard on ourselves and take care of it.

@@ -1,29 +1,25 @@
 # Front Matter
 
 ```
-Title           : Simplify Schema Definitions
-Author(s)       : Samuel Mohr
-Team            : CommonDataLayer
-Reviewer        : CommonDataLayer
-Created         : 2021-07-06
-Last updated    : 2021-07-06
-Version         : 1.0.0
-CDL feature ID  : CDLF-00018-00
+    Title           : Simplify Schema Definitions
+    Author(s)       : Samuel Mohr
+    Team            : CommonDataLayer
+    Reviewer        : CommonDataLayer
+    Created         : 2021-07-06
+    Last updated    : 2021-07-06
+    Category        : Feature
+    CDL Feature ID  : CDLF-00020-00
 ```
-
 
 ## Glossary
 
 ### Terminology
-
 * CDL - Common Data Layer
 * SR - Schema Registry, a CDL component responsible for keeping information about the type of object conveyed inside the message.
 * User - user of the CDL.
 * Schema Definition - a schematic representing the expected format for data belonging to a given Schema.
 
-
 ## Formats
-
 Schema:
 ```
 {
@@ -62,11 +58,9 @@ Array {
 }
 ```
 
-
 ## Introduction
 
 ### Background
-
 Schemas, as defined in the SR, are a means to represent discrete types of data to be stored in the CDL.
 Beyond metadata such as the name of the schema and addresses for repository storage and retrieval, they
 also store definitions describing the format of their respective data types. Though the data is not currently
@@ -86,14 +80,11 @@ it will remain infeasible to determine types of individual fields in views for m
 (spatially and temporally).
 
 ### Assumptions
-
 There is not currently a need to provide mutative access to schema definitions, so the re-implementation of schema
 definitions does not need to work with that in mind, though a solution robust to that potential future requirement
 may be preferable.
 
-
 ## Proposed Solution
-
 There does not exist, in the space of the Rust ecosystem, an existing solution for us to use. Therefore, this
 RFC proposes a novel-yet-simple system for defining schema definitions allowing for definition composition and
 representation of all valid JSON data. The proposed new form of schema definitions will be referred to as
@@ -119,14 +110,12 @@ to opt out of the optimizations provided by properly-typed schemas, the `Any` sc
 JSON data.
 
 ### Use in Materialization
-
 With this system, all fields in a schema definition have deterministic types. Given that, any view that references
 fields from an `Object` schema definition can know the field's type. Either the type is a potentially nullable scalar,
 which can be represented by a SQL type, or it is a more complicated type (or an `Any` scalar), and it falls back to
 a JSON type. That way, all materialized data can have its fields stored in its respective types.
 
 ### Schema Composition
-
 There is a desire from CDL users to define data that is related in definition to other schemas, whether that be
 via inheritance or composition. As composition is generally less problematic and simpler to implement than
 inheritance, it could be implemented by slightly modifying the above specification. However, as composition/inheritance
@@ -134,7 +123,6 @@ is not needed at the moment and is a complex enough addition that it will requir
 it will be left out of the initial version here described.
 
 ### SQL Type Mapping
-
 For the most part, materialization will store calculated values in SQL-style databases. For most scalar types, there
 is a well-defined mapping that describes what type to use for any given database (e.g., booleans and strings). There
 are, on the other hand, types that do not have an agreed upon representation.
@@ -142,11 +130,9 @@ are, on the other hand, types that do not have an agreed upon representation.
 Proposed is the suggestion to store for each database materialized data is stored in a list of type mappings. This
 would be in the config service (really, wherever the materialization configuration data is stored).
 
-
 ## Further Considerations
 
 ### Impact on Other Teams/Clients
-
 Though validation is not currently being done on incoming data and therefore schema definitions don't matter
 much at the moment, this will change not only all currently stored schema definitions but also all future schema
 definition insertions. There will potentially need to be a one-time migration if anyone wants to keep their
@@ -156,11 +142,9 @@ However, we plan to explicitly document to our end users that we do not plan to 
 we do not currently have any users relying on this feature and do not want to promise capacity we cannot fill.
 
 ### Scalability
-
 No impact. This simply changes the way that read-only Schemas have some metadata formatted.
 
 ### Testing
-
 This feature should undergo reasonable amounts of testing. Testing should include:
 
 * Unit Tests:
