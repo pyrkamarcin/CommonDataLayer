@@ -1356,6 +1356,12 @@ Messages must follow JSON Schema:</p>
 <p>Each entry in top level array represents one-to-many relation within <code>relation_id</code>. 
 Such <code>relation_id</code> should be added beforehand, via gRPC api, between objects schemas.
 <code>ER</code> at this time does not validate correctness of inserted data, so it's up to user to ensure that <code>edges</code> and <code>relations</code> are configured properly.</p>
+<h2><a class="header" href="#endpoints" id="endpoints">Endpoints</a></h2>
+<h3><a class="header" href="#resolve-tree" id="resolve-tree">Resolve tree</a></h3>
+<p>The endpoint's purpose is to provide information on complex relationships on the object level. In SQL analogy resolve tree is similar to the <code>inner join</code> clause with filtering(based on <code>object_id</code>, <code>schema_id</code> values). You can 'join' multiple relations at once with a single resolve tree query.</p>
+<p>Currently, resolve tree inner implementation generates complex SQL statements based on its arguments. This allows us to utilize complex filtering(support for <code>AND</code>, <code>OR</code> operators) without the need to handle the filtering ourselves.</p>
+<p>For each base object(object_id from queried base schema) we return base object_id followed by related object_ids(order defined in a query) after filtering applied.</p>
+<p>In the future we may consider adding support for <code>outer joins</code>, however, for now only <code>inner join</code> is supported as this is the only join strategy used internally by CDL for the time being.</p>
 <h1><a class="header" href="#ingestion-layer-1" id="ingestion-layer-1">Ingestion Layer</a></h1>
 <p>Services in this layer are responsible for accepting generic messages from external systems via a message queue, validating them and and forwarding the message to correct repository.<br />
 Currently consists only of the <a href="architecture/data_router.html">Data Router</a>. The <a href="architecture/data_router.html">Data Router</a> accepts messages in the following format:</p>
