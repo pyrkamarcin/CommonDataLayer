@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use anyhow::{Context, Result};
 use pico_args::Arguments;
 
+mod check_docs;
 mod codegen;
 mod config_generator;
 
@@ -37,6 +38,9 @@ fn main() -> Result<()> {
             } else {
                 config_generator::from_args(args.finish())?
             }
+        }
+        "check-docs" => {
+            check_docs::check_docs()?;
         }
         _ => eprintln!("cargo xtask codegen|config-generator"),
     }

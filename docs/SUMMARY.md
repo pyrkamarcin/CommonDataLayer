@@ -64,7 +64,7 @@
     - [0019 - Simplify Schema Definitions](./rfc/0019_Simplify_Schema_Definitions_01.md)
     - [0018 - Transport headers passthrough](./rfc/0018_Transport_headers_passthrough_01.md)
     - [0017 - Edge Registry: Resolving relation trees](./rfc/0017_Edge_registry_resolving_relation_trees_01.md)
-    - [0015 - CI/CD setup R&D](./rfc/0015_CI_CD_RnD.md)
+    - [0015 - CI/CD setup R&D](./rfc/0015_CI_CD_RnD_01.md)
     - [0014 - Query raw routes](./rfc/0014_Query_raw_routes_01.md)
     - [0013 - Documentation restructure and RFC process](./rfc/0013_Documentation_restructure_and_RFC_process_01.md)
     - [0012 - CDL Documentation Generation](./rfc/0012_CDL_documentation_generation_01.md)
