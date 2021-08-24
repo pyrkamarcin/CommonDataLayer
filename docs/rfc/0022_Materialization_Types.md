@@ -103,14 +103,14 @@ CDL currently requires users to provide JSON Schema when declaring object's sche
 > While it's required in SR, it's not really "used". It is planned to be incorporated in validation, and may be useful with views.
 > [rfc 0019][rfc-0019] talks about simpler format, as a replacement and for the sake of Materialization I will explore expanding it later.
 
-| type name | description |
-|---|---|
-| number | any number of any precision |
-| string | Unicode string of characters of any length |
-| boolean | "true" or "false" keyword |
-| null | a null value, or, to be precise, lack of thereof |
-| object | a json key-value, unordered, map |
-| array | an ordered collection of records, can hold mixed types |
+| type name | description                                            |
+|:----------|:-------------------------------------------------------|
+| number    | any number of any precision                            |
+| string    | Unicode string of characters of any length             |
+| boolean   | "true" or "false" keyword                              |
+| null      | a null value, or, to be precise, lack of thereof       |
+| object    | a json key-value, unordered, map                       |
+| array     | an ordered collection of records, can hold mixed types |
 
 JSON Schema allows also to construct "one_of" ADTs. This is slightly controversial, as neither PSQL nor ES support that kind of construct for most of their types.
 With one exception. Nullability is often described in json schema with `"one_of": any | null` and both databases house nullability feature.
@@ -137,50 +137,52 @@ system between 9.6 and 13.
 In the diff excerpt we see that 13 introduces new types `macaddr8` and `pg_snapshot`, and deprecates `txid_snapshot`. I
 have to mention also that `pg_snapshot` is not present in PSQL 12, but `macaddr8` is. This may prove an issue when dealing with non-basic types.
 
-| name | aliases | description |
-|---|---|---|
-|bigint|int8|signed eight-byte integer|
-|bigserial|serial8|autoincrementing eight-byte integer|
-|bit [ (n) ]| |fixed-length bit string|
-|bit varying [ (n) ]|varbit [ (n) ]|variable-length bit string|
-|boolean|bool|logical Boolean (true/false)|
-|box| |rectangular box on a plane|
-|bytea| |binary data (“byte array”)|
-|character [ (n) ]|char [ (n) ]|fixed-length character string|
-|character varying [ (n) ]|varchar [ (n) ]|variable-length character string|
-|cidr| |IPv4 or IPv6 network address|
-|circle| |circle on a plane|
-|date| |calendar date (year, month, day)|
-|double precision|float8|double precision floating-point number (8 bytes)|
-|inet| |IPv4 or IPv6 host address|
-|integer|int, int4|signed four-byte integer|
-|interval [ fields ] [ (p) ]| |time span|
-|json| |textual JSON data|
-|jsonb| |binary JSON data, decomposed|
-|line| |infinite line on a plane|
-|lseg| |line segment on a plane|
-|macaddr| |MAC (Media Access Control) address|
-|macaddr8| |MAC (Media Access Control) address (EUI-64 format)|
-|money| |currency amount|
-|numeric [ (p, s) ]|decimal [ (p, s) ]|exact numeric of selectable precision|
-|path| |geometric path on a plane|
-|pg_lsn| |PostgreSQL Log Sequence Number|
-|point| |geometric point on a plane|
-|polygon| |closed geometric path on a plane|
-|real|float4|single precision floating-point number (4 bytes)|
-|smallint|int2|signed two-byte integer|
-|smallserial|serial2|autoincrementing two-byte integer|
-|serial|serial4|autoincrementing four-byte integer|
-|text| |variable-length character string|
-|time [ (p) ] [ without time zone ]| |time of day (no time zone)|
-|time [ (p) ] with time zone|timetz|time of day, including time zone|
-|timestamp [ (p) ] [ without time zone ]| |date and time (no time zone)|
-|timestamp [ (p) ] with time zone|timestamptz|date and time, including time zone|
-|tsquery| |text search query|
-|tsvector| |text search document|
-|txid_snapshot| |user-level transaction ID snapshot|
-|uuid| |universally unique identifier|
-|xml| |XML data|
+```
+| name                                    | aliases            | description                                        |
+|:----------------------------------------|:-------------------|:---------------------------------------------------|
+| bigint                                  | int8               | signed eight-byte integer                          |
+| bigserial                               | serial8            | autoincrementing eight-byte integer                |
+| bit [ (n) ]                             |                    | fixed-length bit string                            |
+| bit varying [ (n) ]                     | varbit [ (n) ]     | variable-length bit string                         |
+| boolean                                 | bool               | logical Boolean (true/false)                       |
+| box                                     |                    | rectangular box on a plane                         |
+| bytea                                   |                    | binary data (“byte array”)                         |
+| character [ (n) ]                       | char [ (n) ]       | fixed-length character string                      |
+| character varying [ (n) ]               | varchar [ (n) ]    | variable-length character string                   |
+| cidr                                    |                    | IPv4 or IPv6 network address                       |
+| circle                                  |                    | circle on a plane                                  |
+| date                                    |                    | calendar date (year, month, day)                   |
+| double precision                        | float8             | double precision floating-point number (8 bytes)   |
+| inet                                    |                    | IPv4 or IPv6 host address                          |
+| integer                                 | int, int4          | signed four-byte integer                           |
+| interval [ fields ] [ (p) ]             |                    | time span                                          |
+| json                                    |                    | textual JSON data                                  |
+| jsonb                                   |                    | binary JSON data, decomposed                       |
+| line                                    |                    | infinite line on a plane                           |
+| lseg                                    |                    | line segment on a plane                            |
+| macaddr                                 |                    | MAC (Media Access Control) address                 |
+| macaddr8                                |                    | MAC (Media Access Control) address (EUI-64 format) |
+| money                                   |                    | currency amount                                    |
+| numeric [ (p, s) ]                      | decimal [ (p, s) ] | exact numeric of selectable precision              |
+| path                                    |                    | geometric path on a plane                          |
+| pg_lsn                                  |                    | PostgreSQL Log Sequence Number                     |
+| point                                   |                    | geometric point on a plane                         |
+| polygon                                 |                    | closed geometric path on a plane                   |
+| real                                    | float4             | single precision floating-point number (4 bytes)   |
+| smallint                                | int2               | signed two-byte integer                            |
+| smallserial                             | serial2            | autoincrementing two-byte integer                  |
+| serial                                  | serial4            | autoincrementing four-byte integer                 |
+| text                                    |                    | variable-length character string                   |
+| time [ (p) ] [ without time zone ]      |                    | time of day (no time zone)                         |
+| time [ (p) ] with time zone             | timetz             | time of day, including time zone                   |
+| timestamp [ (p) ] [ without time zone ] |                    | date and time (no time zone)                       |
+| timestamp [ (p) ] with time zone        | timestamptz        | date and time, including time zone                 |
+| tsquery                                 |                    | text search query                                  |
+| tsvector                                |                    | text search document                               |
+| txid_snapshot                           |                    | user-level transaction ID snapshot                 |
+| uuid                                    |                    | universally unique identifier                      |
+| xml                                     |                    | XML data                                           |
+```
 
 Out of this list, we could use mapping `json::string` -> `psql::text` and `json::boolean` -> `psql::boolean`, and that's it.
 Everything else has to be handled per case. Inference can't really work, as `json::number` may map to `real` or `int` or `bigint`.
@@ -190,25 +192,26 @@ Nullability is achieved via an additional flag on column: `NULL`.
 Right now, we use JSON as type of all columns.
 
 ## Elasticsearch
+
 | Elasticsearch type |
-|---|
-| null |
-| boolean |
-| byte |
-| short |
-| integer |
-| long |
-| double |
-| float |
-| half_float |
-| scaled_float |
-| keyword |
-| text |
-| binary |
-| date |
-| ip |
-| object |
-| nested |
+|:-------------------|
+| null               |
+| boolean            |
+| byte               |
+| short              |
+| integer            |
+| long               |
+| double             |
+| float              |
+| half_float         |
+| scaled_float       |
+| keyword            |
+| text               |
+| binary             |
+| date               |
+| ip                 |
+| object             |
+| nested             |
 
 This is a list of SQL mapped types, it's not fully exhaustive, more can be found on [ES documentation page][es-basic-data-types].
 As we can see, again, there's greater granularity in ES than it is in JSON.
@@ -277,15 +280,15 @@ Just for the sake of clarity, I mean:
 
 table: main
 
-| id | field_a | obj_b |
-|---|---|---|
-| 0 PRIMARY | "abc" | 1 FOREIGN KEY |
+| id        | field_a | obj_b         |
+|:----------|:--------|:--------------|
+| 0 PRIMARY | "abc"   | 1 FOREIGN KEY |
 
 table: obj_b
 
-| id | field_b | field_c |
-|---|---|---|
-| 1 PRIMARY | "cde" | 12.6f64 |
+| id        | field_b | field_c |
+|:----------|:--------|:--------|
+| 1 PRIMARY | "cde"   | 12.6f64 |
 
 #### We Disallow for Deep Objects in Both
 Everything has to be mapped to flat. This is probably impossible for clients to accept.
