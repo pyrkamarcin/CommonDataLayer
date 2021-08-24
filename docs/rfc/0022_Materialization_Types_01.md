@@ -311,7 +311,7 @@ Having types map from schema to view, we can add validation to the process of cr
 
 ## Type Storage
 > DECISION:
-> TLDR section refers to currently supported subset of json schema. In basics, we can store number, boolean, string and object (composed of 3 previously mentioned base types).
+> TLDR section refers to currently supported subset of json schema. In basics, we can store number, booleans, string and object (composed of 3 previously mentioned base types).
 > Other types in json schema are supported by CDL but not materialization.
 
 There are several options where types should be stored. In my opinion, it's view responsibility to store types of columns, and it's schema responsibility to store type of data.
@@ -423,7 +423,7 @@ Document was changed to reflect decisions made during a meeting (23.08.2021) (mo
 We are providing support for basic numeric types, strings and boolean. We support nesting these values in objects.
 
 We have moved arrays to later phase of development, their support requires additional RFC.
-The same goes for nullability, everything, at this moment, is non-nullable, and changing this requires a separate document.
+The same goes for nullability - everything is non-nullable, and changing this requires a separate document.
 From the discussion arisen type casting problem, when users would like to store numeric values as strings, for better precision handling.
 This also requires a separate document and discussion.
 All 3 of these "type" tackle what is defined "extension type" in this rfc.
