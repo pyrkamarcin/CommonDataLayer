@@ -40,7 +40,7 @@
 | CDLF-00014-00 | Materialization - Filters              | Ready      | 1.0.0       | N/A                                                                     |
 | CDLF-00016-00 | Schema-Registry-less CDL deployment    | Ready      | 1.0.0       | [RFC](../rfc/0010_Schema_Registry_less_CDL_deployment_01.md)            |
 | CDLF-00017-00 | Materialization - Computation          | TechSpec   | -----       |                                                                         |
-| CDLF-00018-00 | Materialization - Materialized Types   | TechSpec   | -----       | [RFC](../rfc/0022_Materialization_Types.md)                             |
+| CDLF-00018-00 | Materialization - Materialized Types   | TechSpec   | -----       | [RFC](../rfc/0022_Materialization_Types_01.md)                             |
 | CDLF-00019-00 | Materializer - OnDemand                | Ready      | 1.0.0       | N/A                                                                     |
 | CDLF-0001A-00 | Materializer - General                 | Ready      | 1.0.0       | N/A                                                                     |
 | CDLF-0001B-00 | Materialization - Notifications        | Ready      | 1.0.0       | N/A                                                                     |
