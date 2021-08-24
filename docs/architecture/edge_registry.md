@@ -73,3 +73,12 @@ Each entry in top level array represents one-to-many relation within `relation_i
 Such `relation_id` should be added beforehand, via gRPC api, between objects schemas.
 `ER` at this time does not validate correctness of inserted data, so it's up to user to ensure that `edges` and `relations` are configured properly.
 
+## Endpoints
+### Resolve tree
+The endpoint's purpose is to provide information on complex relationships on the object level. In SQL analogy resolve tree is similar to the `inner join` clause with filtering(based on `object_id`, `schema_id` values). You can 'join' multiple relations at once with a single resolve tree query.
+
+Currently, resolve tree inner implementation generates complex SQL statements based on its arguments. This allows us to utilize complex filtering(support for `AND`, `OR` operators) without the need to handle the filtering ourselves.
+
+For each base object(object_id from queried base schema) we return base object_id followed by related object_ids(order defined in a query) after filtering applied.
+
+In the future we may consider adding support for `outer joins`, however, for now only `inner join` is supported as this is the only join strategy used internally by CDL for the time being.
