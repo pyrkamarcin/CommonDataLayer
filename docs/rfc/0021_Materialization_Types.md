@@ -240,8 +240,8 @@ PSQL mapping in this case:
 `bool` -> `psql::bool`
 `i64` -> `psql::int8`
 `f64` -> `psql::float8`
-`null` -> COLUMN IS NULLABLE
-`array` -> type[]
+`null` -> COLUMN IS NULLABLE # supported later as an extension
+`array` -> type[] # supported later as an extension
 ```
 
 ES mapping:
@@ -250,8 +250,8 @@ ES mapping:
 `bool` -> `es::boolean`
 `i64` -> `es::long`
 `f64` -> `es::double`
-`null` -> See note below
-`array` -> See note below
+`null` -> See note below # supported later as an extension
+`array` -> See note below # supported later as an extension
 ```
 > SIDENOTE:  
 > Arrays and nullability are treated the same in ES, a field can contain 0 or more entries. [reference][es-arrays]
