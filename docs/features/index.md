@@ -1,6 +1,7 @@
 # Features
 
 ## Guidelines
+
 * `name or description` field demonstrates only brief info about the feature itself, to learn more, please follow to the RFC in question.
 * There may be multiple RFCs/documents for each feature, but usually only one will be linked here.
 * Generally, the state of the feature looks should follow these guidelines:
@@ -39,7 +40,7 @@
 | CDLF-00014-00 | Materialization - Filters              | Ready      | 1.0.0       | N/A                                                                     |
 | CDLF-00016-00 | Schema-Registry-less CDL deployment    | Ready      | 1.0.0       | [RFC](../rfc/0010_Schema_Registry_less_CDL_deployment_01.md)            |
 | CDLF-00017-00 | Materialization - Computation          | TechSpec   | -----       |                                                                         |
-| CDLF-00018-00 | Materialization - Materialized Types   | TechSpec   | -----       |                                                                         |
+| CDLF-00018-00 | Materialization - Materialized Types   | TechSpec   | -----       | [RFC](../rfc/0022_Materialization_Types_01.md)                             |
 | CDLF-00019-00 | Materializer - OnDemand                | Ready      | 1.0.0       | N/A                                                                     |
 | CDLF-0001A-00 | Materializer - General                 | Ready      | 1.0.0       | N/A                                                                     |
 | CDLF-0001B-00 | Materialization - Notifications        | Ready      | 1.0.0       | N/A                                                                     |
@@ -51,4 +52,5 @@
 | CDLF-00021-00 | Custom Data Passthrough                | TechSpec   | -----       | [RFC](../rfc/0021_Custom_Data_Passthrough_01.md)                        |
 
 ## References:
+
 [CDL RFC directory](https://github.com/epiphany-platform/CommonDataLayer/tree/develop/docs/rfc)

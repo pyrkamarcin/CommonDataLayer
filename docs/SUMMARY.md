@@ -59,6 +59,7 @@
     - [query-service-ts](configuration/query-service-ts.md)
     - [schema-registry](configuration/schema-registry.md)
 - [RFCs]()
+    - [0022 - Materialization Types](./rfc/0022_Materialization_Types_01.md) 
     - [0021 - Custom Data Passthrough](./rfc/0021_Custom_Data_Passthrough_01.md)
     - [0020 - Configuration service](./rfc/0020_Configuration_Service_01.md)
     - [0019 - Simplify Schema Definitions](./rfc/0019_Simplify_Schema_Definitions_01.md)
