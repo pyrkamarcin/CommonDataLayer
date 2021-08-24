@@ -6,6 +6,7 @@ using CDL.Tests.MessageBroker.Kafka;
 using CDL.Tests.ServiceObjects.SchemaService;
 using CDL.Tests.Services;
 using CDL.Tests.TestDataObjects;
+using Common;
 using EdgeRegistry;
 using Grpc.Core;
 using MassTransit.KafkaIntegration;
@@ -196,8 +197,8 @@ namespace CDL.Tests.ServicesTests
                 responseStreamIsValid = true;
                 var currentRow = res.ResponseStream.Current;
                 Assert.True(currentRow.Fields.Count == 2, $"Rows:{currentRow.Fields}");
-                Assert.Contains(payload_a.FirstName, currentRow.Fields["firstName"]);
-                Assert.Contains(payload_b.FirstName, currentRow.Fields["firstNameFromSchemaB"]);
+                Assert.Contains(payload_b.FirstName, currentRow.Fields["firstName"]);
+                Assert.Contains(payload_a.FirstName, currentRow.Fields["firstNameFromSchemaB"]);
             }
             Assert.True(responseStreamIsValid, "Problem with materialization of view. Response stream is empty or corrupted.");
         }
@@ -370,8 +371,8 @@ namespace CDL.Tests.ServicesTests
                 responseStreamIsValid = true;
                 var currentRow = res.ResponseStream.Current;
                 Assert.True(currentRow.Fields.Count == 2, $"Rows:{currentRow.Fields}");
-                Assert.Contains(payload_a.FirstName, currentRow.Fields["firstName"]);
-                Assert.Contains(payload_b.FirstName, currentRow.Fields["firstNameB"]);
+                Assert.Contains(payload_b.FirstName, currentRow.Fields["firstName"]);
+                Assert.Contains(payload_a.FirstName, currentRow.Fields["firstNameB"]);
             }
             Assert.True(responseStreamIsValid, "Problem with materialization. Response stream is empty or corrupted.");
         }        

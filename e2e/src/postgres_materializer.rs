@@ -87,7 +87,7 @@ mod relations {
     use std::num::NonZeroU8;
 
     use cdl_api::types::view::NewRelation;
-    use cdl_rpc::schema_registry::types::SearchFor;
+    use cdl_rpc::common::types::SearchFor;
 
     use super::*;
 

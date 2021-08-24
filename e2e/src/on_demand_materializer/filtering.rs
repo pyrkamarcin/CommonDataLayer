@@ -19,7 +19,7 @@ mod on_standard_field {
         SimpleFilterKind,
         ViewPathFilter,
     };
-    use cdl_rpc::schema_registry::types::{LogicOperator, SearchFor};
+    use cdl_rpc::common::types::{LogicOperator, SearchFor};
     use tokio::time::sleep;
     use uuid::Uuid;
 

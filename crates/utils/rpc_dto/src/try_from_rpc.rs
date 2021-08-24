@@ -96,7 +96,11 @@ impl Variant {
                 }
             }
             syn::Fields::Named(_) => todo!("Named enum variant"),
-            syn::Fields::Unit => todo!("Unit enum variant"),
+            syn::Fields::Unit => {
+                quote! {
+                    #rpc_name() => Self::#ident()
+                }
+            }
         }
     }
 }

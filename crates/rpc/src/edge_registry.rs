@@ -5,6 +5,8 @@ use tracing_utils::grpc::{Trace, TraceLayer};
 pub use crate::codegen::edge_registry::*;
 use crate::error::ClientError;
 
+pub mod types;
+
 pub type EdgeRegistryPool = Pool<EdgeRegistryConnectionManager>;
 pub type EdgeRegistryConn = EdgeRegistryClient<Trace>;
 

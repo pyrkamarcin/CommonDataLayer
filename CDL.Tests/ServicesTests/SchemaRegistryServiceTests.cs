@@ -11,6 +11,7 @@ using Xunit;
 using System.Linq;
 using CDL.Tests.Configuration;
 using Microsoft.Extensions.Options;
+using Common;
 using CDL.Tests.ServiceObjects.SchemaService;
 using System.Threading;
 

@@ -1,12 +1,12 @@
 syntax = "proto2";
 package edge_registry;
+import "common.proto";
 
 service EdgeRegistry {
   rpc AddRelation(AddSchemaRelation) returns (RelationId);
-  rpc GetRelation(RelationQuery) returns (RelationResponse);
+  rpc GetRelation(RelationQuery) returns (RelationList);
   rpc GetSchemaByRelation(RelationId) returns (SchemaRelation);
   rpc GetSchemaRelations(SchemaId) returns (RelationList);
-  rpc ListRelations(Empty) returns (RelationList);
   rpc ValidateRelation(ValidateRelationQuery) returns (Empty);
 
   rpc AddEdges(ObjectRelations) returns (Empty);
@@ -15,25 +15,46 @@ service EdgeRegistry {
 
   rpc Heartbeat (Empty) returns (Empty);
 
-  rpc ResolveTree (TreeQuery) returns (RelationTree);
+  rpc ResolveTree (TreeQuery) returns (RelationTreeResponse);
 }
 
 message TreeQuery {
-  required string relation_id = 1;
-  repeated TreeQuery relations = 2;
-  repeated string filter_ids = 3;
+  optional Filter filters = 1;
+  repeated common.Relation relations = 2;
 }
 
-message RelationTree {
-  repeated TreeObject objects = 1;
+message Filter {
+    oneof filter_kind {
+        SimpleFilter simple = 1;
+        ComplexFilter complex = 2;
+    }
 }
 
-message TreeObject {
-  required string object_id = 1;
-  required string relation_id = 2;
-  required SchemaRelation relation = 5;
-  repeated string children = 3;
-  repeated RelationTree subtrees = 4;
+message SimpleFilterSide {
+    enum Side {
+        InParentObjIds = 1;
+        InChildObjIds = 2;
+    }
+    required Side side = 1;
+}
+message SimpleFilter {
+    required SimpleFilterSide side = 1;
+    required uint32 relation = 2;
+    repeated string ids = 3; 
+}
+
+message ComplexFilter {
+    required common.LogicOperator operator = 1;
+    repeated Filter operands = 2;
+}
+
+message RelationTreeResponse {
+  repeated RelationTreeRow rows = 1;
+}
+
+message RelationTreeRow {
+  required string base_object_id = 1;
+  repeated string relation_object_ids = 2;
 }
 
 message AddSchemaRelation {
@@ -52,16 +73,11 @@ message RelationId {
 }
 
 message RelationQuery {
-  required string relation_id = 1;
-  required string parent_schema_id = 2;
+  repeated string relation_id = 1;
 }
 
 message ValidateRelationQuery {
   required string relation_id = 1;
-}
-
-message RelationResponse {
-  optional string child_schema_id = 1;
 }
 
 message SchemaId {

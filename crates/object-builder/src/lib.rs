@@ -6,7 +6,12 @@ use std::{
 
 use async_trait::async_trait;
 use bb8::Pool;
-use cdl_dto::{edges::RelationTree, materialization};
+use cdl_dto::{
+    edges::{ComplexFilter, Filter, RelationTree, SimpleFilter},
+    materialization,
+    materialization::{FullView, Schema},
+    TryIntoRpc,
+};
 use communication_utils::{consumer::ConsumerHandler, message::CommunicationMessage};
 use futures::{future::ready, Stream, StreamExt, TryStreamExt};
 use itertools::Itertools;
@@ -15,8 +20,17 @@ use notification_utils::NotificationPublisher;
 use object_id_pair::ObjectIdPair;
 use row_builder::RowBuilder;
 use rpc::{
-    common::{Object, RowDefinition as RpcRowDefinition},
-    edge_registry::{EdgeRegistryConnectionManager, EdgeRegistryPool},
+    common::{
+        types::{LogicOperator, SearchFor},
+        Object,
+        RowDefinition as RpcRowDefinition,
+    },
+    edge_registry::{
+        types::SimpleFilterSide,
+        EdgeRegistryConnectionManager,
+        EdgeRegistryPool,
+        RelationQuery,
+    },
     materializer_general::{MaterializedView as RpcMaterializedView, Options},
     object_builder::{object_builder_server::ObjectBuilder, Empty, View},
     schema_registry::{types::SchemaType, SchemaRegistryConnectionManager, SchemaRegistryPool},
@@ -27,7 +41,7 @@ use settings_utils::apps::object_builder::ObjectBuilderSettings;
 use tracing_futures::Instrument;
 use uuid::Uuid;
 
-use crate::{buffer_stream::ObjectBufferedStream, view_plan::ViewPlan};
+use crate::{buffer_stream::ObjectBufferedStream, utils::flat_relation, view_plan::ViewPlan};
 
 mod utils;
 
@@ -104,6 +118,44 @@ impl ObjectBuilderImpl {
             report_sender,
             chunk_capacity: settings.chunk_capacity,
         })
+    }
+    #[tracing::instrument(skip(self))]
+    pub(crate) async fn get_relation_map(
+        &self,
+        view: &FullView,
+    ) -> anyhow::Result<HashMap<Uuid, (Uuid, Uuid)>> {
+        if view.relations.is_empty() {
+            return Ok(Default::default());
+        }
+
+        let relation_ids = view
+            .relations
+            .iter()
+            .flat_map(|rel| flat_relation(rel))
+            .map(|rel| rel.global_id.to_string())
+            .collect();
+
+        let request = RelationQuery {
+            relation_id: relation_ids,
+        };
+        let response = self
+            .er_pool
+            .get()
+            .await?
+            .get_relation(request)
+            .await?
+            .into_inner();
+
+        response
+            .items
+            .into_iter()
+            .map(|r| {
+                Ok((
+                    r.relation_id.parse()?,
+                    (r.parent_schema_id.parse()?, r.child_schema_id.parse()?),
+                ))
+            })
+            .collect()
     }
 }
 
@@ -286,13 +338,16 @@ impl ObjectBuilderImpl {
         let view = self.get_view(view_id).await?;
         tracing::debug!(?view, "View");
 
-        let object_filters = create_object_filters(&schemas);
-        let edges = self.resolve_tree(&view, &object_filters).await?;
-
-        let view_plan = ViewPlan::try_new(view, &edges)?;
+        let tree_response = if view.relations.is_empty() {
+            RelationTree::default()
+        } else {
+            self.resolve_tree(&view, schemas).await?
+        };
+        let relation_map = self.get_relation_map(&view).await?;
+        let view_plan = ViewPlan::try_new(view.clone(), tree_response, relation_map)?;
 
         let filter = view_plan.objects_filter();
-        let objects = self.get_objects(view_id, filter).await?;
+        let objects = self.get_objects(&view, filter).await?;
 
         let buffered_objects = ObjectBufferedStream::new(objects, view_plan);
         let row_builder = RowBuilder::new();
@@ -306,13 +361,11 @@ impl ObjectBuilderImpl {
     #[tracing::instrument(skip(self))]
     async fn get_objects(
         &self,
-        view_id: Uuid,
+        view: &FullView,
         mut schemas: HashMap<Uuid, materialization::Schema>,
     ) -> anyhow::Result<SchemaObjectStream> {
-        if schemas.is_empty() {
-            let base_schema = self.get_base_schema_for_view(view_id).await?;
-            let base_schema_id: Uuid = base_schema.id.parse()?;
-            schemas.insert(base_schema_id, Default::default());
+        if schemas.is_empty() && view.relations.is_empty() {
+            schemas.insert(view.base_schema_id, Default::default());
         }
 
         let mut streams = vec![];
@@ -333,22 +386,6 @@ impl ObjectBuilderImpl {
         }
         let stream = futures::stream::select_all(streams);
         Ok(Box::pin(stream) as SchemaObjectStream)
-    }
-
-    async fn get_base_schema_for_view(
-        &self,
-        view_id: Uuid,
-    ) -> anyhow::Result<rpc::schema_registry::Schema> {
-        let schema = self
-            .sr_pool
-            .get()
-            .await?
-            .get_base_schema_of_view(rpc::schema_registry::Id {
-                id: view_id.to_string(),
-            })
-            .await?
-            .into_inner();
-        Ok(schema)
     }
 
     #[tracing::instrument(skip(self))]
@@ -426,45 +463,77 @@ impl ObjectBuilderImpl {
     async fn resolve_tree(
         &self,
         view: &cdl_dto::materialization::FullView,
-        object_filters: &[Uuid],
-    ) -> anyhow::Result<Vec<RelationTree>> {
-        let mut relations = Vec::default();
-        for relation in view.relations.iter() {
-            let request = into_resolve_tree_request(relation, object_filters);
-            let tree = self
-                .er_pool
-                .get()
-                .await?
-                .resolve_tree(request)
-                .await?
-                .into_inner();
+        object_filters: HashMap<Uuid, Schema>,
+    ) -> anyhow::Result<RelationTree> {
+        let request = into_resolve_tree_request(view, object_filters);
+        let tree = self
+            .er_pool
+            .get()
+            .await?
+            .resolve_tree(request)
+            .await?
+            .into_inner();
 
-            let tree = RelationTree::from_rpc(tree)?;
-            relations.push(tree);
-        }
-        Ok(relations)
+        Ok(RelationTree::from_rpc(tree)?)
     }
 }
 
 fn into_resolve_tree_request(
-    relation: &cdl_dto::materialization::Relation,
-    object_filters: &[Uuid],
+    view: &cdl_dto::materialization::FullView,
+    object_filters: HashMap<Uuid, Schema>,
 ) -> rpc::edge_registry::TreeQuery {
+    let filters = if object_filters.iter().all(|f| f.1.object_ids.is_empty()) {
+        None
+    } else {
+        Some(Filter::ComplexFilter(ComplexFilter {
+            operator: LogicOperator::Or,
+            operands: object_filters
+                .into_iter()
+                .flat_map(|filter| {
+                    let mut relations = vec![];
+                    if view.base_schema_id == filter.0 {
+                        let first_relation = view.relations.first().unwrap();
+                        let side = match first_relation.search_for {
+                            SearchFor::Parents => SimpleFilterSide::InChildObjIds,
+                            SearchFor::Children => SimpleFilterSide::InParentObjIds,
+                        };
+
+                        relations.push((first_relation.local_id.into(), side));
+                    }
+                    for relation in &view.relations {
+                        if relation.global_id == filter.0 {
+                            let side = match view.relations.first().unwrap().search_for {
+                                SearchFor::Parents => SimpleFilterSide::InParentObjIds,
+                                SearchFor::Children => SimpleFilterSide::InChildObjIds,
+                            };
+                            relations.push((relation.local_id.into(), side));
+                        }
+                    }
+
+                    relations
+                        .into_iter()
+                        .filter_map(|relation| {
+                            if filter.1.object_ids.is_empty() {
+                                return None;
+                            }
+                            Some(Filter::SimpleFilter(SimpleFilter {
+                                side: relation.1,
+                                relation: relation.0,
+                                ids: filter.1.object_ids.iter().copied().collect(),
+                            }))
+                        })
+                        .collect::<Vec<_>>()
+                })
+                .collect(),
+        }))
+    };
+
     rpc::edge_registry::TreeQuery {
-        relation_id: relation.global_id.to_string(),
-        relations: relation
+        filters: filters.map(|f| f.try_into_rpc().unwrap()),
+        relations: view
             .relations
             .iter()
-            .map(|r| into_resolve_tree_request(r, object_filters))
+            .map(|relation| relation.clone().into_rpc())
             .collect(),
-        filter_ids: object_filters.iter().map(|o| o.to_string()).collect(),
     }
-}
-
-fn create_object_filters(schemas: &HashMap<Uuid, materialization::Schema>) -> Vec<Uuid> {
-    schemas
-        .values()
-        .map(|s| s.object_ids.iter().copied())
-        .flatten()
-        .collect()
 }

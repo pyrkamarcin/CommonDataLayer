@@ -10,3 +10,26 @@ message Object {
   required string object_id = 1;
   required string schema_id = 2;
 }
+
+message Relation {
+    required string global_id = 1;
+    required uint32 local_id = 2;
+    required SearchFor search_for = 3;
+    repeated Relation relations = 4;
+}
+
+message LogicOperator {
+    enum Operator {
+        And = 0;
+        Or = 1;
+    }
+    required Operator operator = 1;
+}
+
+message SearchFor {
+    enum Direction {
+        Parents = 0;
+        Children = 1;
+    }
+    required Direction search_for = 1;
+}

@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CDL.Tests.Configuration;
 using CDL.Tests.ServiceObjects.SchemaService;
+using Common;
 using Google.Protobuf;
 using Grpc.Core;
 using Microsoft.Extensions.Options;

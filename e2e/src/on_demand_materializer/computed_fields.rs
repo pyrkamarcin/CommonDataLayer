@@ -10,7 +10,7 @@ use cdl_dto::materialization::{
     FieldValueComputation,
     RawValueComputation,
 };
-use cdl_rpc::schema_registry::types::SearchFor;
+use cdl_rpc::common::types::SearchFor;
 use tokio::time::sleep;
 use uuid::Uuid;
 

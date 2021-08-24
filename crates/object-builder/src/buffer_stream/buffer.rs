@@ -1,4 +1,5 @@
 use anyhow::Result;
+use maplit::hashmap;
 use serde_json::Value;
 
 use crate::{sources::RowSource, view_plan::ViewPlan, ObjectIdPair};
@@ -38,7 +39,7 @@ impl ObjectBuffer {
                     unfinished_row.objects.insert(pair, value.clone());
                     if unfinished_row.missing == 0 {
                         let row = std::mem::take(unfinished_row_opt)?; // Cant remove it because it would invalidate indices
-                        result.push(row.into_join());
+                        result.push(row.into());
                     }
                 }
                 if result.is_empty() {
@@ -47,10 +48,14 @@ impl ObjectBuffer {
                     Some(Ok(result))
                 }
             }
-            None if self.plan.single_mode => {
+            None if self.plan.missing.is_empty() => {
                 let row = self.plan.builder().build_single_row(pair);
 
-                Some(row.map(|row| vec![row.into_single(value.clone())]))
+                Some(row.map(|mut row| {
+                    row.relation_order = vec![row.root_object];
+                    row.objects = hashmap! { row.root_object => value.clone()};
+                    vec![row.into()]
+                }))
             }
             None => None,
         }

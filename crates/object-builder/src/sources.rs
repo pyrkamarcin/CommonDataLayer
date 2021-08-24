@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use cdl_dto::materialization::FieldType;
-use rpc::schema_registry::types::LogicOperator;
+use rpc::common::types::LogicOperator;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -41,20 +41,12 @@ pub enum ComputationSource {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum RowSource {
-    Join {
-        objects: HashMap<ObjectIdPair, Value>,
-        root_object: ObjectIdPair,
-        fields: HashMap<String, FieldDefinitionSource>,
-        filters: Option<FilterSource>,
-        relation_order: Vec<ObjectIdPair>,
-    },
-    Single {
-        root_object: ObjectIdPair,
-        value: Value,
-        fields: HashMap<String, FieldDefinitionSource>,
-        filters: Option<FilterSource>,
-    },
+pub struct RowSource {
+    pub objects: HashMap<ObjectIdPair, Value>,
+    pub root_object: ObjectIdPair,
+    pub fields: HashMap<String, FieldDefinitionSource>,
+    pub filters: Option<FilterSource>,
+    pub relation_order: Vec<ObjectIdPair>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Clone)]

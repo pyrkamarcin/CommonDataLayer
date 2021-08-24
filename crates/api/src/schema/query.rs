@@ -163,18 +163,17 @@ impl QueryRoot {
         &self,
         context: &Context<'_>,
         relation_id: Uuid,
-        parent_schema_id: Uuid,
     ) -> FieldResult<Option<Uuid>> {
         let mut conn = context.data_unchecked::<EdgeRegistryPool>().get().await?;
         Ok(conn
             .get_relation(rpc::edge_registry::RelationQuery {
-                relation_id: relation_id.to_string(),
-                parent_schema_id: parent_schema_id.to_string(),
+                relation_id: vec![relation_id.to_string()],
             })
             .await?
             .into_inner()
-            .child_schema_id
-            .map(|s| s.parse())
+            .items
+            .first()
+            .map(|s| s.child_schema_id.parse())
             .transpose()?)
     }
 
@@ -207,19 +206,22 @@ impl QueryRoot {
     #[tracing::instrument(skip(self, context))]
     async fn all_relations(&self, context: &Context<'_>) -> FieldResult<Vec<SchemaRelation>> {
         let mut conn = context.data_unchecked::<EdgeRegistryPool>().get().await?;
-        conn.list_relations(rpc::edge_registry::Empty {})
-            .await?
-            .into_inner()
-            .items
-            .into_iter()
-            .map(|entry| {
-                Ok(SchemaRelation {
-                    relation_id: entry.relation_id.parse()?,
-                    parent_schema_id: entry.parent_schema_id.parse()?,
-                    child_schema_id: entry.child_schema_id.parse()?,
-                })
+
+        conn.get_relation(rpc::edge_registry::RelationQuery {
+            relation_id: vec![],
+        })
+        .await?
+        .into_inner()
+        .items
+        .into_iter()
+        .map(|entry| {
+            Ok(SchemaRelation {
+                relation_id: entry.relation_id.parse()?,
+                parent_schema_id: entry.parent_schema_id.parse()?,
+                child_schema_id: entry.child_schema_id.parse()?,
             })
-            .collect::<Result<Vec<_>, async_graphql::Error>>()
+        })
+        .collect::<Result<Vec<_>, async_graphql::Error>>()
     }
 
     /// Return all objects that `parent` object is in `relation_id` relation with

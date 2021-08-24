@@ -1,6 +1,8 @@
-use std::{cmp::min, convert::TryInto, fmt, str::FromStr, sync::Arc, time};
+#![feature(trait_alias)]
 
-use anyhow::{Context, Error};
+use std::{convert::TryInto, fmt, str::FromStr, sync::Arc, time};
+
+use anyhow::Context;
 use bb8_postgres::{
     bb8,
     bb8::{Pool, PooledConnection},
@@ -8,10 +10,10 @@ use bb8_postgres::{
     PostgresConnectionManager,
 };
 use communication_utils::{consumer::ConsumerHandler, message::CommunicationMessage};
-use futures::{future::BoxFuture, FutureExt};
 use itertools::Itertools;
 use metrics_utils::{self as metrics, counter};
 use notification_utils::NotificationPublisher;
+use resolve_tree::resolve_tree_impl;
 use rpc::edge_registry::{
     edge_registry_server::EdgeRegistry,
     AddSchemaRelation,
@@ -24,11 +26,9 @@ use rpc::edge_registry::{
     RelationIdQuery,
     RelationList,
     RelationQuery,
-    RelationResponse,
-    RelationTree,
+    RelationTreeResponse,
     SchemaId,
     SchemaRelation,
-    TreeObject,
     TreeQuery,
     ValidateRelationQuery,
 };
@@ -38,6 +38,8 @@ use thiserror::Error;
 use tonic::{Request, Response, Status};
 use tracing::{debug, error, trace};
 use uuid::Uuid;
+
+mod resolve_tree;
 
 #[derive(Debug, Error)]
 pub enum ValidationError {
@@ -146,22 +148,35 @@ impl EdgeRegistryImpl {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn get_relation_impl(
-        &self,
-        relation_id: &Uuid,
-        parent_schema_id: &Uuid,
-    ) -> anyhow::Result<Option<Uuid>> {
+    async fn get_relation_impl(&self, relation_ids: Vec<Uuid>) -> anyhow::Result<RelationList> {
         counter!("cdl.edge-registry.get-relation", 1);
 
+        let filter_ids = relation_ids
+            .into_iter()
+            .map(|f| format!("'{}'", f))
+            .join(",");
+
+        let mut query = "SELECT id, parent_schema_id, child_schema_id FROM relations".to_owned();
+        if !filter_ids.is_empty() {
+            query.push_str(&format!(" WHERE id IN ({})", filter_ids));
+        }
+
+        tracing::trace!(?query, "Get relation query");
+
         let conn = self.connect().await?;
-        Ok(conn
-            .query(
-                "SELECT child_schema_id FROM relations WHERE id = $1 AND parent_schema_id = $2",
-                &[&relation_id, &parent_schema_id],
-            )
+        let items = conn
+            .query(query.as_str(), &[])
             .await?
-            .first()
-            .map(|row| row.get::<_, Uuid>(0)))
+            .into_iter()
+            .map(|row| RelationDetails {
+                child_schema_id: row.get::<_, Uuid>(2).to_string(),
+                parent_schema_id: row.get::<_, Uuid>(1).to_string(),
+                relation_id: row.get::<_, Uuid>(0).to_string(),
+            })
+            .collect::<Vec<RelationDetails>>();
+        tracing::trace!(?items, "Get relation results");
+
+        Ok(RelationList { items })
     }
 
     async fn get_schema_by_relation_impl(
@@ -324,133 +339,6 @@ impl EdgeRegistryImpl {
                 child_object_ids: children.map(|child| child.1.to_string()).collect(),
             }).collect())
     }
-
-    fn resolve_tree_recursive<'a, F, S, R>(
-        &'a self,
-        conn: &'a PooledConnection<PostgresConnectionManager<NoTls>>,
-        relation_id: R,
-        filter_ids: F,
-        relations: &'a [TreeQuery],
-    ) -> BoxFuture<'_, anyhow::Result<RelationTree>>
-    where
-        F: IntoIterator<Item = S> + Send + Sync + 'a,
-        <F as IntoIterator>::IntoIter: Send + Sync,
-        S: AsRef<str> + Send + Sync,
-        R: AsRef<str> + Send + Sync + 'a,
-    {
-        async move {
-            let relation_id = relation_id.as_ref();
-
-            let mut filter_ids = filter_ids.into_iter().peekable();
-
-            if filter_ids.peek().is_none() {
-                self.resolve_tree_for_ids(
-                    conn,
-                    relation_id,
-                    relations,
-                    conn.query(
-                        "SELECT DISTINCT parent_object_id FROM edges WHERE relation_id = $1",
-                        &[&relation_id.parse::<Uuid>()?],
-                    )
-                    .await?
-                    .into_iter()
-                    .map(|row| row.get::<_, Uuid>(0).to_string()),
-                )
-                .await
-            } else {
-                self.resolve_tree_for_ids(conn, relation_id, relations, filter_ids)
-                    .await
-            }
-        }
-        .boxed()
-    }
-
-    fn resolve_tree_for_ids<'a, F, S, R>(
-        &'a self,
-        conn: &'a PooledConnection<'_, PostgresConnectionManager<NoTls>>,
-        relation_id: R,
-        relations: &'a [TreeQuery],
-        filter_ids: F,
-    ) -> BoxFuture<'_, anyhow::Result<RelationTree, Error>>
-    where
-        F: IntoIterator<Item = S> + Send + Sync + 'a,
-        <F as IntoIterator>::IntoIter: Send + Sync,
-        S: AsRef<str> + Send + Sync,
-        R: AsRef<str> + Send + Sync + 'a,
-    {
-        async move {
-            let mut objects = Vec::new();
-            let relation = self
-                .get_schema_by_relation_conn(conn, relation_id.as_ref().parse()?)
-                .await?
-                .with_context(|| format!("Relation {} does not exist", relation_id.as_ref()))?;
-            for object_id in filter_ids {
-                let children = self
-                    .get_edge_with_conn(
-                        conn,
-                        relation_id.as_ref().parse()?,
-                        object_id.as_ref().parse()?,
-                    )
-                    .await?
-                    .map(|uuid| uuid.to_string())
-                    .collect::<Vec<_>>();
-
-                if !children.is_empty() {
-                    let mut subtrees = Vec::with_capacity(relations.len());
-                    for relation in relations.iter() {
-                        let subtree = if relation.filter_ids.is_empty() {
-                            self.resolve_tree_recursive(
-                                conn,
-                                &relation.relation_id,
-                                &children,
-                                &relation.relations,
-                            )
-                            .await?
-                        } else {
-                            let object_ids = intersect(&children, &relation.filter_ids);
-                            if !object_ids.is_empty() {
-                                self.resolve_tree_recursive(
-                                    conn,
-                                    &relation.relation_id,
-                                    object_ids.iter(),
-                                    &relation.relations,
-                                )
-                                .await?
-                            } else {
-                                RelationTree { objects: vec![] }
-                            }
-                        };
-                        subtrees.push(subtree);
-                    }
-                    objects.push(TreeObject {
-                        object_id: object_id.as_ref().to_string(),
-                        relation_id: relation_id.as_ref().to_string(),
-                        children,
-                        subtrees,
-                        relation: SchemaRelation {
-                            parent_schema_id: relation.0.to_string(),
-                            child_schema_id: relation.1.to_string(),
-                        },
-                    });
-                }
-            }
-
-            Ok(RelationTree { objects })
-        }
-        .boxed()
-    }
-}
-
-fn intersect<T: PartialEq + Clone>(left: &[T], right: &[T]) -> Vec<T> {
-    let mut result = Vec::with_capacity(min(left.len(), right.len()));
-
-    for item in left {
-        if right.contains(item) {
-            result.push(item.clone())
-        }
-    }
-
-    result
 }
 
 #[tonic::async_trait]
@@ -490,31 +378,30 @@ impl EdgeRegistry for EdgeRegistryImpl {
         }))
     }
 
+    #[tracing::instrument(skip(self))]
     async fn get_relation(
         &self,
         request: Request<RelationQuery>,
-    ) -> Result<Response<RelationResponse>, Status> {
+    ) -> Result<Response<RelationList>, Status> {
         let request = request.into_inner();
-
         trace!(
-            "Received `get_relation` message with relation_id `{}` and parent_id `{}`",
+            "Received `get_relation` message with relation_id `{:?}`",
             request.relation_id,
-            request.parent_schema_id
         );
 
-        let relation_id = Uuid::from_str(&request.relation_id)
+        let relation_ids = request
+            .relation_id
+            .into_iter()
+            .map(|x| x.parse())
+            .collect::<Result<Vec<Uuid>, _>>()
             .map_err(|_| Status::invalid_argument("relation_id"))?;
-        let parent_schema_id = Uuid::from_str(&request.parent_schema_id)
-            .map_err(|_| Status::invalid_argument("parent_schema_id"))?;
 
-        let child_schema_id = self
-            .get_relation_impl(&relation_id, &parent_schema_id)
+        let response = self
+            .get_relation_impl(relation_ids)
             .await
             .map_err(|err| db_communication_error("get_relation", err))?;
 
-        Ok(Response::new(RelationResponse {
-            child_schema_id: child_schema_id.map(|id| id.to_string()),
-        }))
+        Ok(Response::new(response))
     }
 
     async fn get_schema_by_relation(
@@ -590,27 +477,6 @@ impl EdgeRegistry for EdgeRegistryImpl {
                     parent_schema_id: request.schema_id.clone(),
                     child_schema_id: child_schema_id.to_string(),
                 })
-                .collect(),
-        }))
-    }
-
-    async fn list_relations(&self, _: Request<Empty>) -> Result<Response<RelationList>, Status> {
-        trace!("Received `list_relations` message");
-
-        let rows = self
-            .list_relations_impl()
-            .await
-            .map_err(|err| db_communication_error("list_relations", err))?;
-
-        Ok(Response::new(RelationList {
-            items: rows
-                .map(
-                    |(relation_id, parent_schema_id, child_schema_id)| RelationDetails {
-                        relation_id: relation_id.to_string(),
-                        parent_schema_id: parent_schema_id.to_string(),
-                        child_schema_id: child_schema_id.to_string(),
-                    },
-                )
                 .collect(),
         }))
     }
@@ -724,24 +590,14 @@ impl EdgeRegistry for EdgeRegistryImpl {
     async fn resolve_tree(
         &self,
         request: Request<TreeQuery>,
-    ) -> Result<Response<RelationTree>, Status> {
+    ) -> Result<Response<RelationTreeResponse>, Status> {
         let request = request.into_inner();
 
-        trace!(
-            "Received `resolve_tree` message with root `{}`",
-            request.relation_id
-        );
-
-        let result = self
-            .resolve_tree_recursive(
-                &self
-                    .connect()
-                    .await
-                    .map_err(|err| db_communication_error("resolve_tree", err))?,
-                request.relation_id,
-                request.filter_ids.iter(),
-                &request.relations,
-            )
+        let conn = self
+            .connect()
+            .await
+            .map_err(|err| db_communication_error("resolve_tree", err))?;
+        let result = resolve_tree_impl(conn, request)
             .await
             .map_err(|err| db_communication_error("resolve_tree", err))?;
 

@@ -5,7 +5,7 @@ use std::{
 
 use anyhow::{Context, Result};
 use cdl_dto::{
-    edges::{RelationTree, TreeObject},
+    edges::RelationTree,
     materialization::{
         ComplexFilter,
         Computation,
@@ -19,7 +19,6 @@ use cdl_dto::{
         FullView,
         RawValueComputation,
         RawValueFilter,
-        Relation,
         SchemaFieldFilter,
         SimpleFilter,
         SimpleFilterKind,
@@ -29,10 +28,11 @@ use cdl_dto::{
 use itertools::Itertools;
 use uuid::Uuid;
 
-use super::{UnfinishedRow, UnfinishedRowVariant};
+use super::UnfinishedRow;
 use crate::{
     sources::{ComputationSource, FieldDefinitionSource, FilterSource, FilterValueSource},
-    utils::get_base_object,
+    utils::flat_relation,
+    view_plan::UnfinishedRowVariant,
     ObjectIdPair,
 };
 
@@ -40,13 +40,18 @@ use crate::{
 pub struct ViewPlanBuilder<'a> {
     pub view: &'a FullView,
     pub relations: HashMap<Uuid, NonZeroU8>,
+    pub relation_map: HashMap<Uuid, (Uuid, Uuid)>,
 }
 
 impl<'a> ViewPlanBuilder<'a> {
-    pub fn new(view: &'a FullView) -> Self {
+    pub fn new(view: &'a FullView, relation_map: HashMap<Uuid, (Uuid, Uuid)>) -> Self {
         let relations = Self::relations(view);
 
-        Self { view, relations }
+        Self {
+            view,
+            relations,
+            relation_map,
+        }
     }
 
     pub fn build_single_row(&self, root_object: ObjectIdPair) -> Result<UnfinishedRow> {
@@ -75,11 +80,13 @@ impl<'a> ViewPlanBuilder<'a> {
 
     pub fn build_rows(
         &self,
-        relation_trees: &[RelationTree],
+        relation_tree: RelationTree,
     ) -> Result<Vec<(UnfinishedRow, HashSet<ObjectIdPair>)>> {
-        self.build_variants(relation_trees)
+        relation_tree
+            .rows
             .into_iter()
-            .map(|variant| {
+            .map(|row| {
+                let variant = UnfinishedRowVariant::form_row(row, self.view, &self.relation_map);
                 let fields = self.build_fields(&variant, &self.view.fields)?;
                 let filters = self
                     .view
@@ -190,75 +197,7 @@ impl<'a> ViewPlanBuilder<'a> {
             .collect::<Result<HashMap<_, _>>>()
     }
 
-    fn build_variants(&self, relation_trees: &[RelationTree]) -> Vec<UnfinishedRowVariant> {
-        relation_trees
-            .iter()
-            .flat_map(|tree_response| tree_response.objects.iter())
-            .flat_map(|tree_obj| {
-                let variant = UnfinishedRowVariant {
-                    root_object: get_base_object(tree_obj),
-                    objects: Default::default(),
-                };
-
-                self.find_variants(variant, tree_obj)
-            })
-            .collect()
-    }
-
-    fn find_variants(
-        &self,
-        variant: UnfinishedRowVariant,
-        tree_object: &TreeObject,
-    ) -> Vec<UnfinishedRowVariant> {
-        let local_id = match self.relations.get(&tree_object.relation_id) {
-            None => {
-                tracing::warn!(
-                    "Got relation {} that was not requested in view definition. Skipping it.",
-                    tree_object.relation_id
-                );
-                return vec![variant];
-            }
-            Some(l) => l,
-        };
-
-        tree_object
-            .children
-            .iter()
-            .map(|child| {
-                let mut variant = variant.clone();
-                let object_id = ObjectIdPair {
-                    schema_id: tree_object.relation.child_schema_id,
-                    object_id: *child,
-                };
-                variant.objects.insert(*local_id, object_id);
-                variant
-            })
-            .flat_map(|variant| {
-                if tree_object.subtrees.is_empty() {
-                    vec![variant]
-                } else {
-                    tree_object
-                        .subtrees
-                        .iter()
-                        .flat_map(|subtree| subtree.objects.iter())
-                        .flat_map(move |subtree| {
-                            let variant = variant.clone();
-                            self.find_variants(variant, subtree)
-                        })
-                        .collect()
-                }
-            })
-            .collect()
-    }
-
     fn relations(view: &'a FullView) -> HashMap<Uuid, NonZeroU8> {
-        fn flat_relation(rel: &Relation) -> Vec<&Relation> {
-            Some(rel)
-                .into_iter()
-                .chain(rel.relations.iter().flat_map(flat_relation))
-                .collect()
-        }
-
         view.relations
             .iter()
             .flat_map(|rel| flat_relation(rel))

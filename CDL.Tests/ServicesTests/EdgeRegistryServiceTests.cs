@@ -4,10 +4,13 @@ using AutoFixture;
 using CDL.Tests.MessageBroker.Kafka;
 using CDL.Tests.Services;
 using CDL.Tests.TestDataObjects;
+using Common;
 using EdgeRegistry;
 using MassTransit.KafkaIntegration;
 using SchemaRegistry;
 using Xunit;
+using static EdgeRegistry.Filter;
+using static EdgeRegistry.SimpleFilterSide.Types;
 using Empty = EdgeRegistry.Empty;
 
 namespace CDL.Tests.ServicesTests
@@ -47,9 +50,9 @@ namespace CDL.Tests.ServicesTests
         }
 
         [Fact]
-        public void ListRelations()
+        public void GetRelation_ListRelations()
         {     
-            var relationListBefore = _edgeRegistryService.ListRelations().Result;
+            var relationListBefore = _edgeRegistryService.GetRelation(new List<string>()).Result;
             var parentSchema = _schemaRegistryService.AddSchema(
                 _fixture.Create<string>(), 
                 _fixture.Create<Person>().ToJSONString(), 
@@ -59,11 +62,13 @@ namespace CDL.Tests.ServicesTests
                 _fixture.Create<Car>().ToJSONString(), 
                 SchemaType.Types.Type.DocumentStorage).Result;
             var relation = _edgeRegistryService.AddRelation(childSchema.Id_, parentSchema.Id_).Result;
-            var relationListAfter = _edgeRegistryService.ListRelations().Result;
+            var relationListAfter = _edgeRegistryService.GetRelation(new List<string>()).Result;
 
             Assert.True(relationListBefore.Items.Count < relationListAfter.Items.Count);
             
-            var item = relationListAfter.Items[relationListAfter.Items.Count - 1];            
+            var relations = new List<RelationDetails>(relationListAfter.Items);
+            var item = relations.Find( z => z.RelationId == relation.RelationId_);
+            Assert.NotNull(item);
             Assert.Equal(parentSchema.Id_, item.ParentSchemaId);
             Assert.True(item.HasChildSchemaId);
             Assert.Equal(childSchema.Id_, item.ChildSchemaId);                   
@@ -117,7 +122,7 @@ namespace CDL.Tests.ServicesTests
                 data = _fixture.Create<Car>(),
             });       
 
-            var relation = _edgeRegistryService.AddRelation(objectIdForChildSchema, objectIdForParentSchema).Result;
+            var relation = _edgeRegistryService.AddRelation(childSchema.Id_, parentSchema.Id_).Result;
             var newEdge = new Edge()
                 {
                     RelationId = relation.RelationId_,
@@ -125,17 +130,648 @@ namespace CDL.Tests.ServicesTests
                 };
             newEdge.ChildObjectIds.Add(objectIdForChildSchema);
             _edgeRegistryService.AddEdges(new List<Edge>(){ newEdge });    
-            var tree = _edgeRegistryService.ResolveTree(relation.RelationId_).Result;
+            var relations = new List<Relation>();
+            relations.Add(new Relation(){
+                GlobalId = relation.RelationId_,
+                LocalId = 1,
+                SearchFor = new SearchFor(){
+                    SearchFor_ = SearchFor.Types.Direction.Children
+                },
+            });
+            var tree = _edgeRegistryService.ResolveTree(relations).Result;
 
-
-            Assert.True(tree.Objects.Count == 1);
-            var treeObject = tree.Objects[0];
-            Assert.True(treeObject.HasObjectId);
-            Assert.True(treeObject.RelationId.Equals(relation.RelationId_));
-            Assert.True(treeObject.Relation.ParentSchemaId.Equals(objectIdForParentSchema));
-            Assert.True(treeObject.Relation.ChildSchemaId.Equals(objectIdForChildSchema));
+            Assert.True(tree.Rows.Count == 1);
+            var treeObject = tree.Rows[0];
+            Assert.True(treeObject.HasBaseObjectId);
+            Assert.True(treeObject.BaseObjectId.Equals(objectIdForParentSchema));
+            Assert.True(treeObject.RelationObjectIds.Count.Equals(1));
+            Assert.True(treeObject.RelationObjectIds[0].Equals(objectIdForChildSchema));
         }
 
+
+
+        [Fact]
+        public void ResolveTree_FilteringByParent()
+        {
+            var parentObjectId= Guid.NewGuid().ToString(); 
+            var parent2ObjectId= Guid.NewGuid().ToString(); 
+            var childObjectId = Guid.NewGuid().ToString();                
+            var parentSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Person>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var childSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Car>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var relation = _edgeRegistryService.AddRelation(childSchema.Id_, parentSchema.Id_).Result;
+                        
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = parentSchema.Id_,
+                objectId = parentObjectId,
+                data = _fixture.Create<Person>(),
+            });            
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = parentSchema.Id_,
+                objectId = parent2ObjectId,
+                data = _fixture.Create<Person>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = childSchema.Id_,
+                objectId = childObjectId,
+                data = _fixture.Create<Car>(),
+            });       
+
+            var newEdge = new Edge()
+                {
+                    RelationId = relation.RelationId_,
+                    ParentObjectId = parentObjectId,                  
+                };
+            newEdge.ChildObjectIds.Add(childObjectId);
+            _edgeRegistryService.AddEdges(new List<Edge>(){ newEdge });    
+
+            var newEdge2 = new Edge()
+                {
+                    RelationId = relation.RelationId_,
+                    ParentObjectId = parent2ObjectId,                  
+                };
+            newEdge2.ChildObjectIds.Add(childObjectId);
+            _edgeRegistryService.AddEdges(new List<Edge>(){ newEdge2 });     
+
+            var relations = new List<Relation>();
+            relations.Add(new Relation(){
+                GlobalId = relation.RelationId_,
+                LocalId = 1,
+                SearchFor = new SearchFor(){
+                    SearchFor_ = SearchFor.Types.Direction.Children
+                },
+            });
+            var simpleFilter = new EdgeRegistry.SimpleFilter{
+                  Relation = 1,
+                  Side =  new SimpleFilterSide(){Side = Side.InParentObjIds}
+                };
+            simpleFilter.Ids.Add(parentObjectId);
+            var filter = new EdgeRegistry.Filter{
+                Simple = simpleFilter
+            };
+            var tree = _edgeRegistryService.ResolveTree(relations, filter).Result;
+
+            Assert.Equal(1,tree.Rows.Count);
+            var treeObject = tree.Rows[0];
+            Assert.True(treeObject.HasBaseObjectId);
+            Assert.True(treeObject.BaseObjectId.Equals(parentObjectId));
+            Assert.True(treeObject.RelationObjectIds.Count.Equals(1));
+            Assert.True(treeObject.RelationObjectIds[0].Equals(childObjectId));
+
+        }
+        [Fact]
+        public void ResolveTree_FilteringByChild()
+        {
+            var parentObjectId= Guid.NewGuid().ToString(); 
+            var childObjectId = Guid.NewGuid().ToString();                
+            var child2ObjectId = Guid.NewGuid().ToString();                
+            var parentSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Person>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var childSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Car>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var relation = _edgeRegistryService.AddRelation(childSchema.Id_, parentSchema.Id_).Result;
+                        
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = parentSchema.Id_,
+                objectId = parentObjectId,
+                data = _fixture.Create<Person>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = childSchema.Id_,
+                objectId = childObjectId,
+                data = _fixture.Create<Car>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = childSchema.Id_,
+                objectId = child2ObjectId,
+                data = _fixture.Create<Car>(),
+            });       
+
+            var newEdge = new Edge()
+                {
+                    RelationId = relation.RelationId_,
+                    ParentObjectId = parentObjectId,                  
+                };
+            newEdge.ChildObjectIds.Add(childObjectId);
+            newEdge.ChildObjectIds.Add(child2ObjectId);
+            _edgeRegistryService.AddEdges(new List<Edge>(){ newEdge });    
+
+            var relations = new List<Relation>();
+            relations.Add(new Relation(){
+                GlobalId = relation.RelationId_,
+                LocalId = 1,
+                SearchFor = new SearchFor(){
+                    SearchFor_ = SearchFor.Types.Direction.Children
+                },
+            });
+            var simpleFilter = new EdgeRegistry.SimpleFilter{
+                  Relation = 1,
+                  Side =  new SimpleFilterSide(){Side = Side.InChildObjIds}
+                };
+            simpleFilter.Ids.Add(childObjectId);
+            var filter = new EdgeRegistry.Filter{
+                Simple = simpleFilter
+            };
+            var tree = _edgeRegistryService.ResolveTree(relations, filter).Result;
+
+            Assert.Equal(1,tree.Rows.Count);
+            var treeObject = tree.Rows[0];
+            Assert.True(treeObject.HasBaseObjectId);
+            Assert.True(treeObject.BaseObjectId.Equals(parentObjectId));
+            Assert.True(treeObject.RelationObjectIds.Count.Equals(1));
+            Assert.True(treeObject.RelationObjectIds[0].Equals(childObjectId));
+        }
+        [Fact]
+        public void ResolveTree_ComplexFilterAND()
+        {
+            var parentObjectId= Guid.NewGuid().ToString(); 
+            var parent2ObjectId= Guid.NewGuid().ToString(); 
+            var childObjectId = Guid.NewGuid().ToString();                
+            var child2ObjectId = Guid.NewGuid().ToString();                
+            var parentSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Person>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var childSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Car>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var relation = _edgeRegistryService.AddRelation(childSchema.Id_, parentSchema.Id_).Result;
+                        
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = parentSchema.Id_,
+                objectId = parentObjectId,
+                data = _fixture.Create<Person>(),
+            });            
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = parentSchema.Id_,
+                objectId = parent2ObjectId,
+                data = _fixture.Create<Person>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = childSchema.Id_,
+                objectId = childObjectId,
+                data = _fixture.Create<Car>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = childSchema.Id_,
+                objectId = child2ObjectId,
+                data = _fixture.Create<Car>(),
+            });         
+
+            var newEdge = new Edge()
+                {
+                    RelationId = relation.RelationId_,
+                    ParentObjectId = parentObjectId,                  
+                };
+            newEdge.ChildObjectIds.Add(childObjectId);
+            newEdge.ChildObjectIds.Add(child2ObjectId);
+            _edgeRegistryService.AddEdges(new List<Edge>(){ newEdge });    
+
+            var newEdge2 = new Edge()
+                {
+                    RelationId = relation.RelationId_,
+                    ParentObjectId = parent2ObjectId,                  
+                };
+            newEdge2.ChildObjectIds.Add(childObjectId);
+            newEdge2.ChildObjectIds.Add(child2ObjectId);
+            _edgeRegistryService.AddEdges(new List<Edge>(){ newEdge2 });    
+
+            var relations = new List<Relation>();
+            relations.Add(new Relation(){
+                GlobalId = relation.RelationId_,
+                LocalId = 1,
+                SearchFor = new SearchFor(){
+                    SearchFor_ = SearchFor.Types.Direction.Children
+                },
+            });
+            var simpleFilterA = new EdgeRegistry.SimpleFilter{
+                  Relation = 1,
+                  Side =  new SimpleFilterSide(){Side = Side.InParentObjIds}
+                };
+            simpleFilterA.Ids.Add(parentObjectId);
+            var filterA = new EdgeRegistry.Filter{
+                Simple = simpleFilterA
+            };
+
+            var simpleFilterB = new EdgeRegistry.SimpleFilter{
+                  Relation = 1,
+                  Side =  new SimpleFilterSide(){Side = Side.InChildObjIds}
+                };
+            simpleFilterB.Ids.Add(childObjectId);
+            var filterB = new EdgeRegistry.Filter{
+                Simple = simpleFilterB
+            };
+
+            var complexFilter = new EdgeRegistry.ComplexFilter{
+                Operator = new LogicOperator(){
+                    Operator = LogicOperator.Types.Operator.And
+                }
+            };
+            complexFilter.Operands.Add(filterA);
+            complexFilter.Operands.Add(filterB);
+            var filter = new EdgeRegistry.Filter{
+                Complex = complexFilter
+            };
+            var tree = _edgeRegistryService.ResolveTree(relations, filter).Result;
+
+            Assert.Equal(1,tree.Rows.Count);
+            var treeObject = tree.Rows[0];
+            Assert.True(treeObject.HasBaseObjectId);
+            Assert.True(treeObject.BaseObjectId.Equals(parentObjectId));
+            Assert.True(treeObject.RelationObjectIds.Count.Equals(1));
+            Assert.True(treeObject.RelationObjectIds[0].Equals(childObjectId));
+
+        }
+        [Fact]
+        public void ResolveTree_ComplexFilterOR()
+        {
+            var parentObjectId= Guid.NewGuid().ToString(); 
+            var childObjectId = Guid.NewGuid().ToString();                
+            var child2ObjectId = Guid.NewGuid().ToString();                
+            var child3ObjectId = Guid.NewGuid().ToString();                
+            var parentSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Person>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var childSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Car>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var relation = _edgeRegistryService.AddRelation(childSchema.Id_, parentSchema.Id_).Result;
+                        
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = parentSchema.Id_,
+                objectId = parentObjectId,
+                data = _fixture.Create<Person>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = childSchema.Id_,
+                objectId = childObjectId,
+                data = _fixture.Create<Car>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = childSchema.Id_,
+                objectId = child2ObjectId,
+                data = _fixture.Create<Car>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = childSchema.Id_,
+                objectId = child3ObjectId,
+                data = _fixture.Create<Car>(),
+            });         
+
+            var newEdge = new Edge()
+                {
+                    RelationId = relation.RelationId_,
+                    ParentObjectId = parentObjectId,                  
+                };
+            newEdge.ChildObjectIds.Add(childObjectId);
+            newEdge.ChildObjectIds.Add(child2ObjectId);
+            newEdge.ChildObjectIds.Add(child3ObjectId);
+            _edgeRegistryService.AddEdges(new List<Edge>(){ newEdge });    
+
+            var relations = new List<Relation>();
+            relations.Add(new Relation(){
+                GlobalId = relation.RelationId_,
+                LocalId = 1,
+                SearchFor = new SearchFor(){
+                    SearchFor_ = SearchFor.Types.Direction.Children
+                },
+            });
+            var simpleFilterA = new EdgeRegistry.SimpleFilter{
+                  Relation = 1,
+                  Side =  new SimpleFilterSide(){Side = Side.InChildObjIds}
+                };
+            simpleFilterA.Ids.Add(childObjectId);
+            var filterA = new EdgeRegistry.Filter{
+                Simple = simpleFilterA
+            };
+
+            var simpleFilterB = new EdgeRegistry.SimpleFilter{
+                  Relation = 1,
+                  Side =  new SimpleFilterSide(){Side = Side.InChildObjIds}
+                };
+            simpleFilterB.Ids.Add(child2ObjectId);
+            var filterB = new EdgeRegistry.Filter{
+                Simple = simpleFilterB
+            };
+
+            var complexFilter = new EdgeRegistry.ComplexFilter{
+                Operator = new LogicOperator(){
+                    Operator = LogicOperator.Types.Operator.Or
+                }
+            };
+            complexFilter.Operands.Add(filterA);
+            complexFilter.Operands.Add(filterB);
+            var filter = new EdgeRegistry.Filter{
+                Complex = complexFilter
+            };
+            var tree = _edgeRegistryService.ResolveTree(relations, filter).Result;
+
+            Assert.Equal(2,tree.Rows.Count);
+            var rows =  new List<RelationTreeRow>(tree.Rows);
+            var first = rows.Find((x)=>x.RelationObjectIds[0]==childObjectId);
+            Assert.NotNull(first);
+            Assert.True(first.HasBaseObjectId);
+            Assert.True(first.BaseObjectId.Equals(parentObjectId));
+            Assert.True(first.RelationObjectIds.Count.Equals(1));
+            Assert.True(first.RelationObjectIds[0].Equals(childObjectId));
+            var second = rows.Find((x)=>x.RelationObjectIds[0]==child2ObjectId);
+            Assert.NotNull(first);
+            Assert.True(second.HasBaseObjectId);
+            Assert.True(second.BaseObjectId.Equals(parentObjectId));
+            Assert.True(second.RelationObjectIds.Count.Equals(1));
+            Assert.True(second.RelationObjectIds[0].Equals(child2ObjectId));
+        }
+        [Fact]
+        public void ResolveTree_ComplexFiltering_AND_OR()
+        {
+            var parentObjectId= Guid.NewGuid().ToString(); 
+            var parent2ObjectId= Guid.NewGuid().ToString(); 
+            var childObjectId = Guid.NewGuid().ToString();                
+            var child2ObjectId = Guid.NewGuid().ToString();                
+            var child3ObjectId = Guid.NewGuid().ToString();                
+            var parentSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Person>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var childSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Car>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var relation = _edgeRegistryService.AddRelation(childSchema.Id_, parentSchema.Id_).Result;
+                        
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = parentSchema.Id_,
+                objectId = parentObjectId,
+                data = _fixture.Create<Person>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = parentSchema.Id_,
+                objectId = parent2ObjectId,
+                data = _fixture.Create<Person>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = childSchema.Id_,
+                objectId = childObjectId,
+                data = _fixture.Create<Car>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = childSchema.Id_,
+                objectId = child2ObjectId,
+                data = _fixture.Create<Car>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = childSchema.Id_,
+                objectId = child3ObjectId,
+                data = _fixture.Create<Car>(),
+            });         
+
+            var newEdge = new Edge()
+                {
+                    RelationId = relation.RelationId_,
+                    ParentObjectId = parentObjectId,                  
+                };
+            newEdge.ChildObjectIds.Add(childObjectId);
+            newEdge.ChildObjectIds.Add(child2ObjectId);
+            newEdge.ChildObjectIds.Add(child3ObjectId);
+            _edgeRegistryService.AddEdges(new List<Edge>(){ newEdge });    
+
+            var newEdge2 = new Edge()
+                {
+                    RelationId = relation.RelationId_,
+                    ParentObjectId = parent2ObjectId,                  
+                };
+            newEdge2.ChildObjectIds.Add(childObjectId);
+            newEdge2.ChildObjectIds.Add(child2ObjectId);
+            newEdge2.ChildObjectIds.Add(child3ObjectId);
+            _edgeRegistryService.AddEdges(new List<Edge>(){ newEdge2 });    
+
+            var relations = new List<Relation>();
+            relations.Add(new Relation(){
+                GlobalId = relation.RelationId_,
+                LocalId = 1,
+                SearchFor = new SearchFor(){
+                    SearchFor_ = SearchFor.Types.Direction.Children
+                },
+            });
+
+            var simpleFilterAParent = new EdgeRegistry.SimpleFilter{
+                  Relation = 1,
+                  Side =  new SimpleFilterSide(){Side = Side.InParentObjIds}
+                };
+            simpleFilterAParent.Ids.Add(parentObjectId);
+            var filterAParent = new EdgeRegistry.Filter{
+                Simple = simpleFilterAParent
+            };
+
+            var simpleFilterAChild = new EdgeRegistry.SimpleFilter{
+                  Relation = 1,
+                  Side =  new SimpleFilterSide(){Side = Side.InChildObjIds}
+                };
+            simpleFilterAChild.Ids.Add(childObjectId);
+            var filterAChild = new EdgeRegistry.Filter{
+                Simple = simpleFilterAChild
+            };
+            var complexFilterA = new EdgeRegistry.ComplexFilter{
+                Operator = new LogicOperator(){
+                    Operator = LogicOperator.Types.Operator.And
+                }
+            };
+            complexFilterA.Operands.Add(filterAParent);
+            complexFilterA.Operands.Add(filterAChild);
+
+            var simpleFilterBParent = new EdgeRegistry.SimpleFilter{
+                  Relation = 1,
+                  Side =  new SimpleFilterSide(){Side = Side.InParentObjIds}
+                };
+            simpleFilterBParent.Ids.Add(parent2ObjectId);
+            var filterBParent = new EdgeRegistry.Filter{
+                Simple = simpleFilterBParent
+            };
+
+            var simpleFilterBChild = new EdgeRegistry.SimpleFilter{
+                  Relation = 1,
+                  Side =  new SimpleFilterSide(){Side = Side.InChildObjIds}
+                };
+            simpleFilterBChild.Ids.Add(child2ObjectId);
+            var filterBChild = new EdgeRegistry.Filter{
+                Simple = simpleFilterBChild
+            };
+            var complexFilterB = new EdgeRegistry.ComplexFilter{
+                Operator = new LogicOperator(){
+                    Operator = LogicOperator.Types.Operator.And
+                }
+            };
+            complexFilterB.Operands.Add(filterBParent);
+            complexFilterB.Operands.Add(filterBChild);
+
+
+            var complexFilter = new EdgeRegistry.ComplexFilter{
+                Operator = new LogicOperator(){
+                    Operator = LogicOperator.Types.Operator.Or
+                }
+            };
+            complexFilter.Operands.Add(new EdgeRegistry.Filter{
+                Complex = complexFilterA
+            });
+            complexFilter.Operands.Add(new EdgeRegistry.Filter{
+                Complex = complexFilterB
+            });
+
+            var filter = new EdgeRegistry.Filter{
+                Complex = complexFilter
+            };
+            var tree = _edgeRegistryService.ResolveTree(relations, filter).Result;
+
+            Assert.Equal(2,tree.Rows.Count);
+            var rows =  new List<RelationTreeRow>(tree.Rows);
+            var first = rows.Find((x)=>x.RelationObjectIds[0]==childObjectId);
+            Assert.NotNull(first);
+            Assert.True(first.HasBaseObjectId);
+            Assert.True(first.BaseObjectId.Equals(parentObjectId));
+            Assert.True(first.RelationObjectIds.Count.Equals(1));
+            Assert.True(first.RelationObjectIds[0].Equals(childObjectId));
+            var second = rows.Find((x)=>x.RelationObjectIds[0]==child2ObjectId);
+            Assert.NotNull(second);
+            Assert.True(second.HasBaseObjectId);
+            Assert.True(second.BaseObjectId.Equals(parent2ObjectId));
+            Assert.True(second.RelationObjectIds.Count.Equals(1));
+            Assert.True(second.RelationObjectIds[0].Equals(child2ObjectId));
+        }
+
+        [Fact]
+        public void ResolveTree_FiltersOnSubrelations()
+        {
+
+            var ownerObjectId= Guid.NewGuid().ToString(); 
+            var carObjectId= Guid.NewGuid().ToString(); 
+            var tenantObjectId = Guid.NewGuid().ToString();                
+            var tenant2ObjectId = Guid.NewGuid().ToString();                
+            var ownerSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Person>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var carSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Car>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;                
+            var tenantSchema = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Person>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var relationOwner = _edgeRegistryService.AddRelation(carSchema.Id_, ownerSchema.Id_).Result;
+            var relationTenant = _edgeRegistryService.AddRelation(tenantSchema.Id_, carSchema.Id_).Result;
+                        
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = ownerSchema.Id_,
+                objectId = ownerObjectId,
+                data = _fixture.Create<Person>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = carSchema.Id_,
+                objectId = carObjectId,
+                data = _fixture.Create<Car>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = tenantSchema.Id_,
+                objectId = tenantObjectId,
+                data = _fixture.Create<Person>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = tenantSchema.Id_,
+                objectId = tenant2ObjectId,
+                data = _fixture.Create<Person>(),
+            });
+
+
+            var newEdgeOwner = new Edge()
+                {
+                    RelationId = relationOwner.RelationId_,
+                    ParentObjectId = ownerObjectId,                  
+                };
+            newEdgeOwner.ChildObjectIds.Add(carObjectId);
+            _edgeRegistryService.AddEdges(new List<Edge>(){ newEdgeOwner });    
+
+            var newEdgeTenant = new Edge()
+                {
+                    RelationId = relationTenant.RelationId_,
+                    ParentObjectId = carObjectId,                  
+                };
+            newEdgeTenant.ChildObjectIds.Add(tenantObjectId);
+            newEdgeTenant.ChildObjectIds.Add(tenant2ObjectId);
+            _edgeRegistryService.AddEdges(new List<Edge>(){ newEdgeTenant });    
+
+            var relations = new List<Relation>();
+            var ownerRelation = new Relation(){
+                GlobalId = relationOwner.RelationId_,
+                LocalId = 1,
+                SearchFor = new SearchFor(){
+                    SearchFor_ = SearchFor.Types.Direction.Children
+                },
+            };
+            ownerRelation.Relations.Add(new Relation(){
+                GlobalId = relationTenant.RelationId_,
+                LocalId = 2,
+                SearchFor = new SearchFor(){
+                    SearchFor_ = SearchFor.Types.Direction.Children
+                }
+
+            });
+            relations.Add(ownerRelation);
+            
+            var simpleFilter = new EdgeRegistry.SimpleFilter{
+                  Relation = 2,
+                  Side =  new SimpleFilterSide(){Side = Side.InChildObjIds}
+                };
+            simpleFilter.Ids.Add(tenantObjectId);
+            var filter = new EdgeRegistry.Filter{
+                Simple = simpleFilter
+            };
+
+            var tree = _edgeRegistryService.ResolveTree(relations,filter).Result;
+
+            Assert.Equal(1,tree.Rows.Count);
+            var treeObject = tree.Rows[0];
+            Assert.True(treeObject.HasBaseObjectId);
+            Assert.Equal(ownerObjectId,treeObject.BaseObjectId);
+            Assert.Equal(2,treeObject.RelationObjectIds.Count);
+            Assert.Equal(carObjectId, treeObject.RelationObjectIds[0]);
+            Assert.Equal(tenantObjectId,treeObject.RelationObjectIds[1]);
+        }
         [Fact]
         public void GetEdge(){
             var objectIdForParentSchema= Guid.NewGuid().ToString(); 
@@ -164,7 +800,7 @@ namespace CDL.Tests.ServicesTests
                 data = _fixture.Create<Car>(),
             });       
 
-            var relation = _edgeRegistryService.AddRelation(objectIdForChildSchema, objectIdForParentSchema).Result;
+            var relation = _edgeRegistryService.AddRelation(childSchema.Id_, parentSchema.Id_).Result;
             var newEdge = new Edge()
                 {
                     RelationId = relation.RelationId_,
@@ -213,5 +849,6 @@ namespace CDL.Tests.ServicesTests
             var results = _edgeRegistryService.Heartbeat().Result;
             Assert.IsType<Empty>(results);
         }
+
     }
 }

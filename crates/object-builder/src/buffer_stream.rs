@@ -122,7 +122,6 @@ mod tests {
             unfinished_rows: Default::default(),
             missing: Default::default(),
             view: any_view(obj.0),
-            single_mode: true,
         };
 
         let (tx, stream) = act(plan);
@@ -134,9 +133,10 @@ mod tests {
 
         assert_eq!(
             stream.next().now_or_never().unwrap().unwrap().unwrap(),
-            RowSource::Single {
+            RowSource {
                 root_object: obj.0,
-                value: obj.1,
+                relation_order: vec![obj.0],
+                objects: hashmap! { obj.0 => obj.1},
                 filters: None,
                 fields: hashmap! {
                     "foo".into() => FieldDefinitionSource::Simple {
@@ -205,7 +205,6 @@ mod tests {
                 c_id => vec![1]
             },
             view: any_view(a_id),
-            single_mode: false,
         };
 
         let (tx, stream) = act(plan);
@@ -291,7 +290,6 @@ mod tests {
                 c_id => vec![1]
             },
             view: any_view(a_id),
-            single_mode: false,
         };
 
         let (tx, stream) = act(plan);
@@ -315,7 +313,7 @@ mod tests {
         // Stream takes an reversed order from plan.missing.a_id because it uses pop()
         assert_eq!(
             stream.next().now_or_never().unwrap().unwrap().unwrap(),
-            RowSource::Join {
+            RowSource {
                 objects: second_row_objects.into_iter().collect(),
                 root_object: a_id,
                 filters: None,
@@ -335,7 +333,7 @@ mod tests {
 
         assert_eq!(
             stream.next().now_or_never().unwrap().unwrap().unwrap(),
-            RowSource::Join {
+            RowSource {
                 objects: first_row_objects.into_iter().collect(),
                 root_object: a_id,
                 filters: None,

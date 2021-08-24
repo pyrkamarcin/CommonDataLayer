@@ -1,6 +1,7 @@
 syntax = "proto2";
 
 package schema_registry;
+import "common.proto";
 
 service SchemaRegistry {
     rpc AddSchema (NewSchema) returns (Id);
@@ -63,7 +64,7 @@ message View {
     required string materializer_options = 4;
     map<string, string> fields = 5;
     optional Filter filters = 6;
-    repeated Relation relations = 7;
+    repeated common.Relation relations = 7;
 }
 
 message Filter {
@@ -85,16 +86,8 @@ message EqualsFilter {
 }
 
 message ComplexFilter {
-    required LogicOperator operator = 1;
+    required common.LogicOperator operator = 1;
     repeated Filter operands = 2;
-}
-
-message LogicOperator {
-    enum Operator {
-        And = 0;
-        Or = 1;
-    }
-    required Operator operator = 1;
 }
 
 message FilterOperator {
@@ -160,7 +153,7 @@ message FullView {
     required string materializer_options = 5;
     map<string, string> fields = 6;
     optional Filter filters = 7;
-    repeated Relation relations = 8;
+    repeated common.Relation relations = 8;
 }
 
 message NewView {
@@ -171,22 +164,7 @@ message NewView {
     required string materializer_options = 5;
     map<string, string> fields = 6;
     optional Filter filters = 7;
-    repeated Relation relations = 8;
-}
-
-message Relation {
-    required string global_id = 1;
-    required uint32 local_id = 2;
-    required SearchFor search_for = 3;
-    repeated Relation relations = 4;
-}
-
-message SearchFor {
-    enum Direction {
-        Parents = 0;
-        Children = 1;
-    }
-    required Direction search_for = 1;
+    repeated common.Relation relations = 8;
 }
 
 message ViewUpdate {
@@ -197,7 +175,7 @@ message ViewUpdate {
     map<string, string> fields = 5;
     required bool update_fields = 6;
     optional Filter filters = 7;
-    repeated Relation relations = 8;
+    repeated common.Relation relations = 8;
     required bool update_filters = 9;
     required bool update_relations = 10;
 }

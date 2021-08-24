@@ -41,7 +41,7 @@ def test_add_relation(prepare):
     resp = prepare.AddRelation(
         AddSchemaRelation(parent_schema_id=parent_schema_id,
                        child_schema_id=child_schema_id))
-    relations = prepare.ListRelations(Empty())
+    relations = prepare.GetRelation(Empty())
 
     result = relations.items[0]
 
@@ -59,8 +59,7 @@ def test_get_relation(prepare):
                        child_schema_id=child_schema_id)).relation_id
 
     result = prepare.GetRelation(
-        RelationQuery(relation_id=relation_id,
-                      parent_schema_id=parent_schema_id)).child_schema_id
+        RelationQuery(relation_id=[relation_id])).items[0].child_schema_id
 
     assert child_schema_id == result
 

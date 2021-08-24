@@ -5,7 +5,7 @@ use cdl_dto::{
     materialization::{Filter, Relation},
     TryIntoRpc,
 };
-use rpc::schema_registry::types::SearchFor;
+use rpc::common::types::SearchFor;
 use serde_json::Value;
 use uuid::Uuid;
 
@@ -56,13 +56,13 @@ impl IntoQueried for NewRelation {
 }
 
 impl NewRelation {
-    pub fn into_rpc(self) -> rpc::schema_registry::Relation {
+    pub fn into_rpc(self) -> rpc::common::Relation {
         let local_id: u8 = self.local_id.into();
 
-        rpc::schema_registry::Relation {
+        rpc::common::Relation {
             global_id: self.global_id.to_string(),
             local_id: local_id as u32,
-            search_for: rpc::schema_registry::SearchFor {
+            search_for: rpc::common::SearchFor {
                 search_for: self.search_for.into(),
             },
             relations: self.relations.into_iter().map(|r| r.into_rpc()).collect(),

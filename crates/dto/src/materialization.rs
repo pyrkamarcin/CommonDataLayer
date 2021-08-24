@@ -6,7 +6,7 @@ use std::{
     num::NonZeroU8,
 };
 
-use rpc::schema_registry::types::SearchFor;
+use rpc::common::types::SearchFor;
 use serde::{de::Visitor, Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
@@ -14,7 +14,7 @@ use uuid::Uuid;
 pub type LocalId = u8; // ID from Relation->local_id. 0 for base_schema_id.
 
 use async_graphql::{Json, SimpleObject, Union};
-use rpc::schema_registry::types::LogicOperator;
+use rpc::common::types::LogicOperator;
 
 use crate::{RequestError, RequestResult, ResponseResult, TryFromRpc, TryIntoRpc};
 
@@ -271,8 +271,8 @@ pub struct Relation {
     pub relations: Vec<Relation>,
 }
 
-impl TryFromRpc<rpc::schema_registry::Relation> for Relation {
-    fn try_from_rpc(rpc: rpc::schema_registry::Relation) -> RequestResult<Self> {
+impl TryFromRpc<rpc::common::Relation> for Relation {
+    fn try_from_rpc(rpc: rpc::common::Relation) -> RequestResult<Self> {
         Ok(Self {
             global_id: Uuid::parse_str(&rpc.global_id)?,
             local_id: create_non_zero_u8(rpc.local_id)?,
@@ -287,9 +287,9 @@ impl TryFromRpc<rpc::schema_registry::Relation> for Relation {
 }
 
 impl Relation {
-    pub fn into_rpc(self) -> rpc::schema_registry::Relation {
+    pub fn into_rpc(self) -> rpc::common::Relation {
         let local_id: u8 = self.local_id.into();
-        rpc::schema_registry::Relation {
+        rpc::common::Relation {
             global_id: self.global_id.to_string(),
             local_id: local_id as u32,
             search_for: self.search_for.into(),

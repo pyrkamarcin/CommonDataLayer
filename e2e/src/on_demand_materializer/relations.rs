@@ -15,7 +15,7 @@ use cdl_dto::materialization::{
     SimpleFilter,
     SimpleFilterKind,
 };
-use cdl_rpc::schema_registry::types::SearchFor;
+use cdl_rpc::common::types::SearchFor;
 use tokio::time::sleep;
 use uuid::Uuid;
 
@@ -128,7 +128,6 @@ async fn should_apply_inner_join_strategy() -> Result<()> {
 }
 
 #[tokio::test]
-#[ignore = "todo"]
 async fn should_join_objects_from_parent_side() -> Result<()> {
     let schema_a = add_schema("test", POSTGRES_QUERY_ADDR, POSTGRES_INSERT_DESTINATION).await?;
     let relation_id = add_relation(schema_a, schema_a).await?;
@@ -182,7 +181,7 @@ async fn should_join_objects_from_parent_side() -> Result<()> {
     let object_id_b = Uuid::new_v4();
     insert_message(object_id_a, schema_a, r#"{"FieldA":1}"#).await?;
     insert_message(object_id_b, schema_a, r#"{"FieldA":2}"#).await?;
-    add_edges(relation_id, object_id_a, &[object_id_a]).await?;
+    add_edges(relation_id, object_id_a, &[object_id_b]).await?;
 
     sleep(Duration::from_secs(1)).await; // async insert
 
@@ -199,7 +198,6 @@ async fn should_join_objects_from_parent_side() -> Result<()> {
 }
 
 #[tokio::test]
-#[ignore = "todo"]
 async fn should_join_objects_from_child_side() -> Result<()> {
     let schema_a = add_schema("test", POSTGRES_QUERY_ADDR, POSTGRES_INSERT_DESTINATION).await?;
     let relation_id = add_relation(schema_a, schema_a).await?;
@@ -253,7 +251,7 @@ async fn should_join_objects_from_child_side() -> Result<()> {
     let object_id_b = Uuid::new_v4();
     insert_message(object_id_a, schema_a, r#"{"FieldA":1}"#).await?;
     insert_message(object_id_b, schema_a, r#"{"FieldA":2}"#).await?;
-    add_edges(relation_id, object_id_a, &[object_id_a]).await?;
+    add_edges(relation_id, object_id_a, &[object_id_b]).await?;
 
     sleep(Duration::from_secs(1)).await; // async insert
 

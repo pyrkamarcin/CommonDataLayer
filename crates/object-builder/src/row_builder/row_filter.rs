@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::{Context, Result};
-use rpc::schema_registry::types::LogicOperator;
+use rpc::common::types::LogicOperator;
 use serde_json::Value;
 
 use super::field_builder::ComputationEngine;

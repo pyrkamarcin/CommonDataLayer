@@ -1,4 +1,5 @@
 ﻿using CDL.Tests.Configuration;
+using Common;
 using EdgeRegistry;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
@@ -100,24 +101,24 @@ namespace CDL.Tests.Services
             return Task.FromResult(response).Result;
         }
 
-        public Task<RelationResponse> GetRelation(string parentSchemaId, string relationId)
+        public Task<RelationList> GetRelation(IList<string> relationIds)
         {
-            var relationQuery = new RelationQuery()
+            var relationQuery = new RelationQuery(){};
+            foreach (var item in relationIds)
             {
-                ParentSchemaId = parentSchemaId,
-                RelationId = relationId
-            };
+                relationQuery.RelationId.Add(item);
+            }   
             var response = _client.GetRelation(relationQuery);
             return Task.FromResult(response);
         }
 
-        public async Task<RelationResponse> GetRelationAsync(string parentSchemaId, string relationId)
+        public async Task<RelationList> GetRelationAsync(IList<string> relationIds)
         {
-            var relationQuery = new RelationQuery()
+            var relationQuery = new RelationQuery(){};
+            foreach (var item in relationIds)
             {
-                ParentSchemaId = parentSchemaId,
-                RelationId = relationId
-            };
+                relationQuery.RelationId.Add(item);
+            } 
             var response = await _client.GetRelationAsync(relationQuery);
             return Task.FromResult(response).Result;
         }
@@ -164,34 +165,31 @@ namespace CDL.Tests.Services
             return Task.FromResult(response).Result;
         }
 
-        public Task<RelationList> ListRelations()
+        public Task<RelationTreeResponse> ResolveTree(IList<Relation> relations, Filter filter = null)
         {
-            var response = _client.ListRelations(new Empty());
-            return Task.FromResult(response);
-        }
+            var treeQuery = new TreeQuery() {};
 
-        public async Task<RelationList> ListRelationsAsync()
-        {
-            var response = await _client.ListRelationsAsync(new Empty());
-            return Task.FromResult(response).Result;
-        }
-
-        public Task<RelationTree> ResolveTree(string relationId)
-        {
-            var treeQuery = new TreeQuery()
+            foreach (var item in relations)
             {
-                RelationId = relationId
-            };
+                treeQuery.Relations.Add(item);
+            }
+
+            if (filter!=null){
+                treeQuery.Filters=filter;
+            }
+
             var response = _client.ResolveTree(treeQuery);
             return Task.FromResult(response);
         }
 
-        public async Task<RelationTree> ResolveTreeAsync(string relationId)
+        public async Task<RelationTreeResponse> ResolveTreeAsync(IList<Relation> relations)
         {
-            var treeQuery = new TreeQuery()
+            var treeQuery = new TreeQuery() {};
+
+            foreach (var item in relations)
             {
-                RelationId = relationId
-            };
+                treeQuery.Relations.Add(item);
+            }  
             var response = await _client.ResolveTreeAsync(treeQuery);
             return Task.FromResult(response).Result;
         }
