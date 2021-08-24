@@ -19,20 +19,20 @@ This document describes state after release 1.1.0
 ## Stability
 
 ### Query Router ⚠
-- Retrieve Single Object ✅
-- Retrieve Multiple Objects ✅
-- Retrieve Schema Objects ✅
+- Retrieve Single Object ⛔
+- Retrieve Multiple Objects ⛔
+- Retrieve Schema Objects ⛔
 - Execute Raw Query ⛔
 
 ### Data Router ✅
 Data Router uses unified generic consumer and publisher with CDL_IM as a message format.
 
 ### Schema Registry ⚠
-- Add Schema ✅
-- Update Schema ✅
-- Get Schema ✅
-- Get All Schemas ✅
-- Watch All Schema Updates ✅
+- Add Schema ⛔
+- Update Schema ⛔
+- Get Schema ⛔
+- Get All Schemas ⛔
+- Watch All Schema Updates ⛔
 - Add View To Schema ⛔
 - Get Full Schema ⛔
 - Get View ⛔
@@ -43,11 +43,11 @@ Data Router uses unified generic consumer and publisher with CDL_IM as a message
 - Validate value ⛔
 
 ### Query Service Document Storage ⚠
-- Query Multiple ✅
-- Query By Schema ✅
+- Query Multiple ⛔
+- Query By Schema ⛔
 - Query Raw ⛔
 
-### Command Service Postgres ✅
+### Command Service Postgres ⛔
 Command Service uses unified generic consumer and publisher with CDL_IM as a message format.
 
 ### GraphQL and Management Panel ⛔
