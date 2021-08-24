@@ -10,8 +10,8 @@ use communication_utils::{
 };
 use futures::future::try_join_all;
 use metrics_utils::{self as metrics, counter};
+use parallel_task_queue::ParallelTaskQueue;
 use tracing::{error, trace};
-use utils::parallel_task_queue::ParallelTaskQueue;
 
 use crate::{communication::MessageRouter, input::Error, output::OutputPlugin};
 

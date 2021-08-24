@@ -11,7 +11,6 @@ use settings_utils::{
 };
 use tonic::transport::Server;
 use tracing::{error, info};
-use utils::status_endpoints;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -25,7 +24,7 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::debug!(?settings, "application environment");
 
-    status_endpoints::serve(&settings.monitoring);
+    service_health_utils::serve(&settings.monitoring);
     metrics::serve(&settings.monitoring);
 
     let notification_publisher = settings
@@ -66,10 +65,10 @@ async fn main() -> anyhow::Result<()> {
         });
     }
 
-    status_endpoints::mark_as_started();
+    service_health_utils::mark_as_started();
     info!("Starting a grpc server");
     Server::builder()
-        .trace_fn(tracing_utils::grpc::trace_fn)
+        .layer(tracing_utils::grpc::TraceLayer)
         .add_service(EdgeRegistryServer::new(registry))
         .serve(([0, 0, 0, 0], settings.input_port).into())
         .await?;

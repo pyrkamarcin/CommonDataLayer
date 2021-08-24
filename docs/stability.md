@@ -25,7 +25,7 @@ This document describes state after release 1.1.0
 - Execute Raw Query ⛔
 
 ### Data Router ✅
-Data Router uses unified generic consumer and publisher wiht CDL_IM as a message format.
+Data Router uses unified generic consumer and publisher with CDL_IM as a message format.
 
 ### Schema Registry ⚠
 - Add Schema ✅
@@ -48,7 +48,7 @@ Data Router uses unified generic consumer and publisher wiht CDL_IM as a message
 - Query Raw ⛔
 
 ### Command Service Postgres ✅
-Command Service uses unified generic consumer and publisher wiht CDL_IM as a message format.
+Command Service uses unified generic consumer and publisher with CDL_IM as a message format.
 
 ### GraphQL and Management Panel ⛔
 Whole graphQL API is unstable
@@ -66,24 +66,24 @@ Whole graphQL API is unstable
 - Resolve Tree ⛔
 
 ### Materializer Postgres ⛔
-Whole materialization is concidered experimental
+Whole materialization is considered experimental
 
 - Validate Options ⛔
 - Upsert View ⛔
 
 ### Materializer Elasticsearch ⛔
-Whole materialization is concidered experimental
+Whole materialization is considered experimental
 
 - Validate Options ⛔
 - Upsert View ⛔
 
 ### Materializer On-Demand ⛔
-Whole materialization is concidered experimental
+Whole materialization is considered experimental
 
 - Materialize ⛔
 
 ### Object Builder ⛔
-Whole materialization is concidered experimental
+Whole materialization is considered experimental
 
 - Materialize ⛔
 
@@ -99,5 +99,5 @@ Time Series database is experimental
 Elasticsearch support is experimental
 
 ### Partial Update Engine ⛔
-Whole materialization is concidered experimental
+Whole materialization is considered experimental
 

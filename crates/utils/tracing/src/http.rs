@@ -1,12 +1,10 @@
 use std::convert::Infallible;
 
 use futures_util::TryFuture;
-use hyper::{Body, Request};
+use hyper::Request;
 use opentelemetry::global;
-use opentelemetry_http::{HeaderExtractor, HeaderInjector};
+use opentelemetry_http::HeaderInjector;
 use reqwest::RequestBuilder;
-use tower_service::Service;
-use tracing::Instrument;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Wrapper for `warp::serve` used to set Span ID propagated to HTTP Request to every defined route.
@@ -18,22 +16,13 @@ where
     let service = warp::service(routes);
 
     let make_svc = hyper::service::make_service_fn(move |_| {
-        let warp_svc = service.clone();
+        let service = service.clone();
         async move {
-            let svc = hyper::service::service_fn(move |req: Request<Body>| {
-                let mut warp_svc = warp_svc.clone();
-                let span = tracing::info_span!("handle request", ?req);
-                async move {
-                    let parent_cx = global::get_text_map_propagator(|prop| {
-                        prop.extract(&HeaderExtractor(req.headers()))
-                    });
-                    tracing::Span::current().set_parent(parent_cx);
-                    let resp = warp_svc.call(req).await;
-                    resp
-                }
-                .instrument(span)
-            });
-            Ok::<_, Infallible>(svc)
+            let service = tower::ServiceBuilder::new()
+                .layer(crate::tower::TraceLayer)
+                .service(service);
+
+            Ok::<_, Infallible>(service)
         }
     });
 

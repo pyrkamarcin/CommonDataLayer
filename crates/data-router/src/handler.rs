@@ -12,10 +12,10 @@ use communication_utils::{
 use lenient_semver::Version;
 use metrics_utils::{self as metrics, counter};
 use misc_utils::current_timestamp;
+use parallel_task_queue::ParallelTaskQueue;
 use serde_json::Value;
 use settings_utils::apps::RepositoryStaticRouting;
 use tracing::{error, trace};
-use utils::parallel_task_queue::ParallelTaskQueue;
 
 use crate::schema::SchemaCache;
 

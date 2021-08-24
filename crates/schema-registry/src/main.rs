@@ -11,7 +11,6 @@ use schema_registry::rpc::SchemaRegistryImpl;
 use settings_utils::{apps::schema_registry::SchemaRegistrySettings, load_settings};
 use tokio::time::{sleep, Duration};
 use tonic::transport::Server;
-use utils::status_endpoints;
 
 #[tokio::main]
 pub async fn main() -> anyhow::Result<()> {
@@ -27,7 +26,7 @@ pub async fn main() -> anyhow::Result<()> {
 
     sleep(Duration::from_millis(500)).await;
 
-    status_endpoints::serve(&settings.monitoring);
+    service_health_utils::serve(&settings.monitoring);
     metrics::serve(&settings.monitoring);
 
     let registry = SchemaRegistryImpl::new(&settings).await?;
@@ -58,9 +57,9 @@ pub async fn main() -> anyhow::Result<()> {
     }
 
     let addr = SocketAddrV4::new(Ipv4Addr::new(0, 0, 0, 0), settings.input_port);
-    status_endpoints::mark_as_started();
+    service_health_utils::mark_as_started();
     Server::builder()
-        .trace_fn(tracing_utils::grpc::trace_fn)
+        .layer(tracing_utils::grpc::TraceLayer)
         .add_service(SchemaRegistryServer::new(registry))
         .serve(addr.into())
         .await

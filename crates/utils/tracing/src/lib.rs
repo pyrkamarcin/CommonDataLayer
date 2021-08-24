@@ -4,14 +4,16 @@ use opentelemetry::{global, sdk::propagation::TraceContextPropagator};
 use tokio::runtime::Handle;
 use tracing_subscriber::{prelude::*, EnvFilter};
 
-#[cfg(feature = "graphql")]
+#[cfg(feature = "with_graphql")]
 pub mod graphql;
-#[cfg(feature = "grpc")]
+#[cfg(feature = "with_grpc")]
 pub mod grpc;
-#[cfg(feature = "http")]
+#[cfg(feature = "with_http")]
 pub mod http;
-#[cfg(feature = "kafka")]
+#[cfg(feature = "with_kafka")]
 pub mod kafka;
+#[cfg(feature = "with_tower")]
+pub mod tower;
 
 pub fn init<'a>(
     rust_log: impl Into<Option<&'a str>>,

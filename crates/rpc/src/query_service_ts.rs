@@ -1,22 +1,14 @@
 use query_service_ts_client::QueryServiceTsClient;
-use tonic::{service::interceptor::InterceptedService, transport::Channel};
-use tracing_utils::grpc::InterceptorType;
+use tracing_utils::grpc::{Trace, TraceLayer};
 
 pub use crate::codegen::query_service_ts::*;
 use crate::error::ClientError;
 
-pub async fn connect(
-    addr: String,
-) -> Result<
-    QueryServiceTsClient<InterceptedService<Channel, &'static dyn InterceptorType>>,
-    ClientError,
-> {
+pub async fn connect(addr: String) -> Result<QueryServiceTsClient<Trace>, ClientError> {
     let conn = crate::open_channel(addr, "query service (timeseries)").await?;
+    let service = tower::ServiceBuilder::new().layer(TraceLayer).service(conn);
 
-    Ok(QueryServiceTsClient::with_interceptor(
-        conn,
-        &tracing_utils::grpc::interceptor,
-    ))
+    Ok(QueryServiceTsClient::new(service))
 }
 
 pub async fn query_by_range(

@@ -4,8 +4,8 @@ use std::sync::Arc;
 
 use cache::DynamicCache;
 use metrics_utils as metrics;
+use parallel_task_queue::ParallelTaskQueue;
 use settings_utils::{apps::data_router::DataRouterSettings, load_settings};
-use utils::parallel_task_queue::ParallelTaskQueue;
 
 use crate::{handler::Handler, schema::SchemaMetadataSupplier};
 

@@ -15,15 +15,15 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::debug!(?settings, "application environment");
 
-    utils::status_endpoints::serve(&settings.monitoring);
+    service_health_utils::serve(&settings.monitoring);
     metrics_utils::serve(&settings.monitoring);
 
     let materializer = MaterializerImpl::new(&settings.services.object_builder_url).await?;
 
-    utils::status_endpoints::mark_as_started();
+    service_health_utils::mark_as_started();
 
     Server::builder()
-        .trace_fn(tracing_utils::grpc::trace_fn)
+        .layer(tracing_utils::grpc::TraceLayer)
         .add_service(OnDemandMaterializerServer::new(materializer))
         .serve(([0, 0, 0, 0], settings.input_port).into())
         .await?;

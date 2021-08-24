@@ -61,7 +61,7 @@
     - [schema-registry](configuration/schema-registry.md)
 - [RFCs]()
     - [0021 - Development process]()
-    - [0020 - Configuration service]()
+    - [0020 - Configuration service](./rfc/0020_Configuration_Service_01.md)
     - [0019 - Simplify Schema Definitions](./rfc/0019_Simplify_Schema_Definitions_01.md)
     - [0018 - Transport headers passthrough](./rfc/0018_Transport_headers_passthrough_01.md)
     - [0017 - Edge Registry: Resolving relation trees](./rfc/0017_Edge_registry_resolving_relation_trees_01.md)

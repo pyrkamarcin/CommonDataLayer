@@ -8,14 +8,14 @@ license = "Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-kafka = ["rdkafka", "tracing_utils/kafka"]
+kafka = ["rdkafka", "tracing_utils/with_kafka"]
 amqp = ["tokio-amqp", "lapin"]
-grpc = ["tonic", "tracing_utils/grpc"]
-http = ["reqwest", "tracing_utils/http"]
+grpc = ["tonic", "tracing_utils/with_grpc"]
+http = ["reqwest", "tracing_utils/with_http"]
 
 [dependencies]
 # Workspace
-rpc         = { path    = "../../../rpc" }
+rpc         = { path    = "../../rpc" }
 misc_utils  = { path    = "../misc" }
 task_utils  = { path    = "../task" }
 tracing_utils           = { path           = "../tracing" }

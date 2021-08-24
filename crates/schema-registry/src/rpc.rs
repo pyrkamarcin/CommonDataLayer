@@ -20,6 +20,7 @@ use settings_utils::apps::schema_registry::SchemaRegistrySettings;
 use sqlx::types::Json;
 use tokio_stream::{Stream, StreamExt};
 use tonic::{Request, Response, Status};
+use tracing_futures::Instrument;
 use uuid::Uuid;
 
 use crate::{
@@ -582,20 +583,25 @@ impl SchemaRegistryImpl {
     ) -> BoxFuture<'a, Result<(), Status>> {
         async move {
             for relation in relations {
-                let relation_id = relation.global_id;
-                self.edge_registry
+                let mut er = self
+                    .edge_registry
                     .get()
                     .await
-                    .map_err(|err| tonic::Status::internal(format!("{}", err)))?
-                    .validate_relation(ValidateRelationQuery {
-                        relation_id: relation_id.to_string(),
-                    })
-                    .await
-                    .map_err(|err| tonic::Status::invalid_argument(err.message()))?;
+                    .map_err(|err| tonic::Status::internal(format!("{}", err)))?;
+
+                let relation_id = relation.global_id;
+
+                er.validate_relation(ValidateRelationQuery {
+                    relation_id: relation_id.to_string(),
+                })
+                .await
+                .map_err(|err| tonic::Status::invalid_argument(err.message()))?;
+
                 self.validate_relations(&relation.relations).await?;
             }
             Ok(())
         }
+        .instrument(tracing::info_span!("Validate relations"))
         .boxed()
     }
 }
