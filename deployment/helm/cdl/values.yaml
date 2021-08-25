@@ -1,10 +1,10 @@
 global:
-  imageRepositoryPath: epiphanyplatform/
-  imageVersion: master
+  imageRepositoryPath: epiphanyservices.azurecr.io/
+  imageVersion: develop
   imagePullPolicy: Always
   communicationMethod: "kafka"
-  kafkaBrokers: 10.1.5.4:9092
-  amqpConnectionString: "amqp://rabbitmq:rabbitmq@10.1.1.4:5672/%2f"
+  kafkaBrokers: 10.1.1.9:9092
+#  amqpConnectionString: "amqp://rabbitmq:rabbitmq@10.1.1.4:5672/%2f"
   cdlImagePullSecrets: services
   reportDestination: cdl.errors
   objectBuilderInput: cdl.materialize
@@ -22,16 +22,17 @@ schemaRegistry:
   port: 30150
   postgresUsername: postgres
   postgresPassword: postgres
-  postgresHost: 10.1.1.5
+  postgresHost: 10.1.1.14
   postgresPort: 5432
-  postgresDbname: cdldb
+  postgresDbname: cdl
+  postgresSchema: public
 
 edgeRegistry:
   postgresUsername: postgres
   postgresPassword: postgres
-  postgresHost: 10.1.1.5
+  postgresHost: 10.1.1.14
   postgresPort: 5432
-  postgresDbname: cdldb
+  postgresDbname: cdl
   postgresSchema: public
   rpcPort: 50110
   consumerTag: edge-registry
@@ -49,9 +50,9 @@ postgres-document:
   materializerGeneralReplicaCount: 1
   postgresUsername: postgres
   postgresPassword: postgres
-  postgresHost: 10.1.1.5
+  postgresHost: 10.1.1.14
   postgresPort: 5432
-  postgresDbname: cdldb
+  postgresDbname: cdl
   postgresSchema: public
   inputSource: cdl.document.data
 
