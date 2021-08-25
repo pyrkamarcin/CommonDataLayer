@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NEST" Version="7.14.1" />
     <PackageReference Include="Polly" Version="7.2.2" />
     <PackageReference Include="RestSharp" Version="106.12.0" />
     <PackageReference Include="AutoFixture" Version="4.17.0" />

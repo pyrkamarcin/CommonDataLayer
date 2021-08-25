@@ -1,0 +1,238 @@
+syntax = "proto2";
+
+package schema_registry;
+
+service SchemaRegistry {
+    rpc AddSchema (NewSchema) returns (Id);
+    rpc UpdateSchema (SchemaUpdate) returns (Empty);
+    rpc AddViewToSchema (NewView) returns (Id);
+    rpc UpdateView (ViewUpdate) returns (Empty);
+    rpc GetSchema (Id) returns (Schema);
+    rpc GetFullSchema (Id) returns (FullSchema);
+    rpc GetView (Id) returns (FullView);
+    rpc GetAllSchemas (Empty) returns (Schemas);
+    rpc GetAllFullSchemas (Empty) returns (FullSchemas);
+    rpc GetAllViewsOfSchema (Id) returns (SchemaViews);
+    rpc GetAllViewsByRelation (Id) returns (SchemaViews);
+    rpc GetBaseSchemaOfView (Id) returns (Schema);
+    rpc ValidateValue (ValueToValidate) returns (Errors);
+    rpc WatchAllSchemaUpdates (Empty) returns (stream Schema);
+    rpc Heartbeat (Empty) returns (Empty);
+}
+
+message NewSchema {
+    required string name = 1;
+    required string insert_destination = 2;
+    required string query_address = 3;
+    required SchemaType schema_type = 4;
+    required bytes definition = 5;
+}
+
+message Schema {
+    required string id = 1;
+    required string name = 2;
+    required string insert_destination = 3;
+    required string query_address = 4;
+    required SchemaType schema_type = 5;
+    required bytes definition = 6;
+}
+
+message FullSchema {
+    required string id = 1;
+    required string name = 2;
+    required string insert_destination = 3;
+    required string query_address = 4;
+    required SchemaType schema_type = 5;
+    required bytes definition = 6;
+    repeated View views = 7;
+}
+
+message SchemaUpdate {
+    required string id = 1;
+    optional string name = 2;
+    optional string insert_destination = 3;
+    optional string query_address = 4;
+    optional SchemaType schema_type = 5;
+    optional bytes definition = 6;
+}
+
+message View {
+    required string id = 1;
+    required string name = 2;
+    required string materializer_address = 3;
+    required string materializer_options = 4;
+    map<string, string> fields = 5;
+    optional Filter filters = 6;
+    repeated Relation relations = 7;
+}
+
+message Filter {
+    oneof filter_kind {
+        SimpleFilter simple = 1;
+        ComplexFilter complex = 2;
+    }
+}
+
+message SimpleFilter {
+    oneof simple_filter {
+        EqualsFilter equals = 1;
+    }
+}
+
+message EqualsFilter {
+    required FilterValue lhs = 1;
+    required FilterValue rhs = 2;
+}
+
+message ComplexFilter {
+    required LogicOperator operator = 1;
+    repeated Filter operands = 2;
+}
+
+message LogicOperator {
+    enum Operator {
+        And = 0;
+        Or = 1;
+    }
+    required Operator operator = 1;
+}
+
+message FilterOperator {
+    enum Operator {
+        EqualsOp = 0;
+    }
+    required Operator operator = 1;
+}
+
+message FilterValue {
+    oneof filter_value {
+        SchemaFieldFilter schema_field = 1;
+        ViewPathFilter view_path = 2;
+        RawValueFilter raw_value = 3;
+        ComputedFilter computed = 4;
+    }
+}
+
+message SchemaFieldFilter {
+    required uint32 schema_id = 1;
+    required string field_path = 2;
+}
+
+message ViewPathFilter {
+    required string field_path = 1;
+}
+
+message RawValueFilter {
+    required string value = 1;
+}
+
+message ComputedFilter {
+    required Computation computation = 1;
+}
+
+message Computation {
+    oneof computation {
+        RawValueComputation raw_value = 1;
+        FieldValueComputation field_value = 2;
+        EqualsComputation equals_computation = 3;
+    }
+}
+
+message RawValueComputation {
+    required string value = 1;
+}
+
+message FieldValueComputation {
+    optional uint32 schema_id = 1;
+    required string field_path = 2;
+}
+
+message EqualsComputation {
+    required Computation lhs = 2;
+    required Computation rhs = 3;
+}
+
+message FullView {
+    required string id = 1;
+    required string base_schema_id = 2;
+    required string name = 3;
+    required string materializer_address = 4;
+    required string materializer_options = 5;
+    map<string, string> fields = 6;
+    optional Filter filters = 7;
+    repeated Relation relations = 8;
+}
+
+message NewView {
+    optional string view_id = 1;
+    required string base_schema_id = 2;
+    required string name = 3;
+    required string materializer_address = 4;
+    required string materializer_options = 5;
+    map<string, string> fields = 6;
+    optional Filter filters = 7;
+    repeated Relation relations = 8;
+}
+
+message Relation {
+    required string global_id = 1;
+    required uint32 local_id = 2;
+    required SearchFor search_for = 3;
+    repeated Relation relations = 4;
+}
+
+message SearchFor {
+    enum Direction {
+        Parents = 0;
+        Children = 1;
+    }
+    required Direction search_for = 1;
+}
+
+message ViewUpdate {
+    required string id = 1;
+    optional string name = 2;
+    optional string materializer_address = 3;
+    required string materializer_options = 4;
+    map<string, string> fields = 5;
+    required bool update_fields = 6;
+    optional Filter filters = 7;
+    repeated Relation relations = 8;
+    required bool update_filters = 9;
+    required bool update_relations = 10;
+}
+
+message Id {
+    required string id = 1;
+}
+
+message Schemas {
+    repeated Schema schemas = 1;
+}
+
+message FullSchemas {
+    repeated FullSchema schemas = 1;
+}
+
+message SchemaViews {
+    repeated FullView views = 1;
+}
+
+message ValueToValidate {
+    required string schema_id = 1;
+    required bytes value = 2;
+}
+
+message Errors {
+    repeated string errors = 1;
+}
+
+message SchemaType {
+    enum Type {
+        DocumentStorage = 0;
+        Timeseries = 1;
+    }
+    required Type schema_type = 1;
+}
+
+message Empty {}

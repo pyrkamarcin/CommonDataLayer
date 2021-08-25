@@ -68,3 +68,11 @@ victoria-metrics-timeseries:
   queryServiceReplicaCount: 0
   inputSource: cdl.timeseries2.data
   outputURL: http://infrastructure-victoria-metrics-single-server:8428/
+
+postgres-materializer-general:
+  postgresUsername: postgres
+  postgresPassword: postgres
+  postgresHost: 10.1.1.5
+  postgresPort: 5432
+  postgresDbname: cdldb
+  postgresSchema: public

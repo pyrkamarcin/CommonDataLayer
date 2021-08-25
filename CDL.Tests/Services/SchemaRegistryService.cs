@@ -1,8 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using CDL.Tests.Configuration;
-using CDL.Tests.ServiceObjects.SchemaService;
 using Google.Protobuf;
 using Grpc.Core;
 using Microsoft.Extensions.Options;
@@ -11,6 +11,25 @@ using static SchemaRegistry.SchemaRegistry;
 
 namespace CDL.Tests.Services
 {
+    public enum MaterializerBackend
+    {
+        Postgres,
+        ElasticSearch,
+    }
+
+    public static class MaterializerBackendExtension
+    {
+        public static string Address(this MaterializerBackend backend, ConfigurationOptions options)
+        {
+            return backend switch
+            {
+                MaterializerBackend.Postgres => options.CDL_MATERIALIZER_GENERAL_POSTGRESQL_ADDRESS,
+                MaterializerBackend.ElasticSearch => options.CDL_MATERIALIZER_GENERAL_ELASTICSEARCH_ADDRESS,
+                _ => throw new ArgumentOutOfRangeException(nameof(backend), backend, null)
+            };
+        }
+    }
+
     public class SchemaRegistryService
     {
         private SchemaRegistryClient _client;
@@ -28,12 +47,13 @@ namespace CDL.Tests.Services
                 InsertDestination = _options.CDL_SCHEMA_REGISTRY_DESTINATION,
                 Name = name,
                 QueryAddress = _options.CDL_QUERY_SERVICE_ADDRESS,
-                SchemaType = new SchemaType(){
+                SchemaType = new SchemaType()
+                {
                     SchemaType_ = type
                 },
                 Definition = ByteString.CopyFromUtf8(definition)
             };
-            
+
             return Task.FromResult(_client.AddSchema(schema));
         }
 
@@ -45,7 +65,8 @@ namespace CDL.Tests.Services
                 InsertDestination = _options.CDL_SCHEMA_REGISTRY_DESTINATION,
                 QueryAddress = _options.CDL_QUERY_SERVICE_ADDRESS,
                 Name = name,
-                SchemaType = new SchemaType(){
+                SchemaType = new SchemaType()
+                {
                     SchemaType_ = type
                 },
                 Definition = ByteString.CopyFromUtf8(definition)
@@ -62,7 +83,8 @@ namespace CDL.Tests.Services
                 InsertDestination = _options.CDL_SCHEMA_REGISTRY_DESTINATION,
                 QueryAddress = _options.CDL_QUERY_SERVICE_ADDRESS,
                 Name = name,
-                SchemaType = new SchemaType(){
+                SchemaType = new SchemaType()
+                {
                     SchemaType_ = type
                 },
                 Definition = ByteString.CopyFromUtf8(definition)
@@ -71,12 +93,20 @@ namespace CDL.Tests.Services
             return await Task.FromResult(_client.UpdateSchemaAsync(newUpdateSchema));
         }
 
-        public Task<Empty> UpdateView(string viewId, string name, bool updateFields, bool updateRelations, IDictionary<string, object> viewFields, IList<Relation> relations, string materializerOptions = "{}")
+        public Task<Empty> UpdateView(
+            string viewId,
+            string name,
+            bool updateFields,
+            bool updateRelations,
+            IDictionary<string, object> viewFields,
+            IList<Relation> relations,
+            string materializerOptions = "{}",
+            MaterializerBackend materializerBackend = MaterializerBackend.Postgres)
         {
             var view = new ViewUpdate()
             {
                 Id = viewId,
-                MaterializerAddress = _options.CDL_MATERIALIZER_GENERAL_ADDRESS,
+                MaterializerAddress = materializerBackend.Address(_options),
                 MaterializerOptions = materializerOptions,
                 Name = name,
                 UpdateFields = updateFields,
@@ -96,24 +126,32 @@ namespace CDL.Tests.Services
                 foreach (var item in relations)
                 {
                     view.Relations.Add(item);
-                } 
+                }
             }
 
             return Task.FromResult(_client.UpdateView(view));
         }
 
-        public async Task UpdateViewAsync(string viewId, string name, bool updateFields, bool updateRelations, IDictionary<string, object> viewFields, IList<Relation> relations, string materializerOptions = "{}")
+        public async Task UpdateViewAsync(
+            string viewId,
+            string name,
+            bool updateFields,
+            bool updateRelations,
+            IDictionary<string, object> viewFields,
+            IList<Relation> relations,
+            string materializerOptions = "{}",
+            MaterializerBackend materializerBackend = MaterializerBackend.Postgres)
         {
             var view = new ViewUpdate()
             {
                 Id = viewId,
-                MaterializerAddress = _options.CDL_MATERIALIZER_GENERAL_ADDRESS,
+                MaterializerAddress = materializerBackend.Address(_options),
                 MaterializerOptions = materializerOptions,
                 Name = name,
                 UpdateFields = updateFields,
                 UpdateRelations = updateRelations
             };
-            
+
             if (view.UpdateFields)
             {
                 foreach (var field in viewFields)
@@ -127,7 +165,7 @@ namespace CDL.Tests.Services
                 foreach (var item in relations)
                 {
                     view.Relations.Add(item);
-                } 
+                }
             }
             await Task.FromResult(_client.UpdateViewAsync(view));
         }
@@ -176,25 +214,28 @@ namespace CDL.Tests.Services
 
         public Task<SchemaViews> GetAllViewsByRelation(string relationId)
         {
-            var id = new Id(){
+            var id = new Id()
+            {
                 Id_ = relationId
             };
-            
+
             return Task.FromResult(_client.GetAllViewsByRelation(id));
         }
 
         public async Task<AsyncUnaryCall<SchemaViews>> GetAllViewsByRelationAsync(string relationId)
         {
-            var id = new Id(){
+            var id = new Id()
+            {
                 Id_ = relationId
             };
-            
+
             return await Task.FromResult(_client.GetAllViewsByRelationAsync(id));
         }
 
         public Task<SchemaViews> GetAllViewsOfSchema(string schemaId)
         {
-            var id = new Id(){
+            var id = new Id()
+            {
                 Id_ = schemaId
             };
 
@@ -203,7 +244,8 @@ namespace CDL.Tests.Services
 
         public async Task<AsyncUnaryCall<SchemaViews>> GetAllViewsOfSchemaAsync(string schemaId)
         {
-            var id = new Id(){
+            var id = new Id()
+            {
                 Id_ = schemaId
             };
 
@@ -212,7 +254,8 @@ namespace CDL.Tests.Services
 
         public Task<Schema> GetBaseSchemaOfView(string viewId)
         {
-            var id = new Id(){
+            var id = new Id()
+            {
                 Id_ = viewId
             };
             return Task.FromResult(_client.GetBaseSchemaOfView(id));
@@ -220,7 +263,8 @@ namespace CDL.Tests.Services
 
         public async Task<AsyncUnaryCall<Schema>> GetBaseSchemaOfViewAsync(string viewId)
         {
-            var id = new Id(){
+            var id = new Id()
+            {
                 Id_ = viewId
             };
             return await Task.FromResult(_client.GetBaseSchemaOfViewAsync(id));
@@ -240,7 +284,7 @@ namespace CDL.Tests.Services
             {
                 Id_ = schemaId
             }));
-        }   
+        }
 
         public Task<FullSchemas> GetAllFullSchemas()
         {
@@ -252,14 +296,20 @@ namespace CDL.Tests.Services
             return Task.FromResult(_client.GetAllFullSchemasAsync(new Empty()));
         }
 
-        public Task<Id> AddViewToSchema(string schemaId, string name, IDictionary<string, object> materializerFields, IList<Relation> relations, string materializerOptions = "{}")
+        public Task<Id> AddViewToSchema(
+            string schemaId,
+            string name,
+            IDictionary<string, object> materializerFields,
+            IList<Relation> relations,
+            string materializerOptions = "{}",
+            MaterializerBackend materializerBackend = MaterializerBackend.Postgres)
         {
-            
+
             var view = new NewView()
             {
                 BaseSchemaId = schemaId,
                 Name = name,
-                MaterializerAddress = string.Empty,
+                MaterializerAddress = materializerBackend.Address(_options),
                 MaterializerOptions = materializerOptions,
             };
 
@@ -271,18 +321,18 @@ namespace CDL.Tests.Services
             foreach (var item in relations)
             {
                 view.Relations.Add(item);
-            }            
-            
+            }
+
             return Task.FromResult(_client.AddViewToSchema(view));
         }
 
-        public async Task<AsyncUnaryCall<Id>> AddViewToSchemaAsync(string schemaId, string name, string materializerOptions = "{}")
+        public async Task<AsyncUnaryCall<Id>> AddViewToSchemaAsync(string schemaId, string name, string materializerOptions = "{}", MaterializerBackend materializerBackend = MaterializerBackend.Postgres)
         {
             var view = new NewView()
             {
                 BaseSchemaId = schemaId,
                 Name = name,
-                MaterializerAddress = _options.CDL_MATERIALIZER_ONDEMAND_ADDRESS,
+                MaterializerAddress = materializerBackend.Address(_options),
                 MaterializerOptions = materializerOptions,
             };
 

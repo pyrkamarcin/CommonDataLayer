@@ -33,7 +33,7 @@ If you want to use druid repository you also need to start druid.
 ## Installing CDL
 To install the solution you need to execute:
 
-`helm install --values ./helm/cdl/values-local.yaml cdl ./deployment/helm/cdl`
+`helm install --values ./deployment/helm/cdl/values-local.yaml cdl ./deployment/helm/cdl`
 
 After a moment Kubernetes pods should get started. You can check their status by `kubectl get pods`
 
