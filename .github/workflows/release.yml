@@ -69,6 +69,6 @@ jobs:
         VERSION_SHORT=$(echo ${VERSION_LONG} | cut -d '.' -f -2)
         cd web-admin
         docker build . -t "epiphanyplatform/cdl-web-admin:${VERSION_LONG}"
-        docker tag "epiphanyplatform/cdl-web-admin:${VERSION_LONG}" "epiphanyplatform/cdl-web-admin:{VERSION_SHORT}"
+        docker tag "epiphanyplatform/cdl-web-admin:${VERSION_LONG}" "epiphanyplatform/cdl-web-admin:${VERSION_SHORT}"
         docker push "epiphanyplatform/cdl-web-admin:${VERSION_LONG}"
         docker push "epiphanyplatform/cdl-web-admin:${VERSION_SHORT}"
