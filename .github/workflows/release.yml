@@ -47,28 +47,6 @@ jobs:
     - name: Build and push crates
       run: |
         echo ${{needs.checkpoint.outputs.version}}
-        VERSION_LONG=${{ needs.checkpoint.outputs.version }}
-        VERSION_SHORT=$(echo ${VERSION_LONG} | cut -d '.' -f -2)
-        echo "current versions are ${VERSION_LONG} and ${VERSION_SHORT}"
-        crates=(data-router command-service query-router query-service query-service-ts schema-registry api edge-registry partial-update-engine object-builder materializer-general materializer-ondemand)
-        for crate in "${crates[@]}"
-        do
-          echo "building ${crate}"
-          docker build . --build-arg BIN=$crate -t "epiphanyplatform/cdl-${crate}:${VERSION_LONG}"
-          docker tag "epiphanyplatform/cdl-${crate}:${VERSION_LONG}" "epiphanyplatform/cdl-${crate}:${VERSION_SHORT}"
-          docker push "epiphanyplatform/cdl-${crate}:${VERSION_LONG}"
-          docker push "epiphanyplatform/cdl-${crate}:${VERSION_SHORT}"
-        done
+        ./.github/scripts/release.sh "${{ needs.checkpoint.outputs.version }}"
       env:
         DOCKER_BUILDKIT: 1
-
-    - name: Build and push web-admin
-      run: |
-        echo ${{needs.checkpoint.outputs.version}}
-        VERSION_LONG=${{ needs.checkpoint.outputs.version }}
-        VERSION_SHORT=$(echo ${VERSION_LONG} | cut -d '.' -f -2)
-        cd web-admin
-        docker build . -t "epiphanyplatform/cdl-web-admin:${VERSION_LONG}"
-        docker tag "epiphanyplatform/cdl-web-admin:${VERSION_LONG}" "epiphanyplatform/cdl-web-admin:${VERSION_SHORT}"
-        docker push "epiphanyplatform/cdl-web-admin:${VERSION_LONG}"
-        docker push "epiphanyplatform/cdl-web-admin:${VERSION_SHORT}"
