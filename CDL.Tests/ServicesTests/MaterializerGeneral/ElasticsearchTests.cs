@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Intrinsics.Arm;
+using System.Security.Cryptography;
 using System.Threading;
 using AutoFixture;
 using CDL.Tests.Configuration;
@@ -11,8 +13,10 @@ using CDL.Tests.TestDataObjects;
 using CDL.Tests.Utils;
 using MassTransit.KafkaIntegration;
 using Microsoft.Extensions.Options;
+using NJsonSchema;
 using SchemaRegistry;
 using Xunit;
+using SchemaType = SchemaRegistry.SchemaType;
 
 namespace CDL.Tests.ServicesTests.MaterializerGeneral
 {
@@ -42,7 +46,9 @@ namespace CDL.Tests.ServicesTests.MaterializerGeneral
             var objectData = _fixture.Create<Person>();
             var objectId = _fixture.Create<string>();
             
-            var schemaId = _schemaRegistryService.AddSchema("test_schema", "", SchemaType.Types.Type.DocumentStorage).Result;
+            var schemaDefinition = JsonSchema.FromType(typeof(Person)).ToJson();
+            
+            var schemaId = _schemaRegistryService.AddSchema("test_schema", schemaDefinition, SchemaType.Types.Type.DocumentStorage).Result;
 
             var materializerFields = new Dictionary<string, object>();
             materializerFields.Add("firstName", new SimpleFiled

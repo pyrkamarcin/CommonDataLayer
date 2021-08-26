@@ -3,6 +3,7 @@ using System.Text.Json;
 
 namespace CDL.Tests.TestDataObjects
 {
+    [Serializable]
     public class Person
     {
         public int Id { get; set; }

@@ -45,7 +45,6 @@ webAdmin:
 partialUpdateEngine:
   sleepPhaseLength: 5
 
-
 postgres-document:
   commandServiceReplicaCount: 1
   queryServiceReplicaCount: 1

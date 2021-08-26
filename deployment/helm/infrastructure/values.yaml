@@ -267,6 +267,7 @@ postgresql:
     nodePort: 32000
 
 elasticsearch:
+  replicas: 1
   antiAffinity: "soft"
   esJavaOpts: "-Xmx128m -Xms128m"
   resources:
