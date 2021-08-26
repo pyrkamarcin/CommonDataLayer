@@ -25,7 +25,7 @@ spec:
     - name: CDL_KAFKA_BROKER
       value: "infrastructure-kafka-headless"
     - name: CDL_ELASTICSEARCH_NODE
-      value: "http://elasticsearch-master:9200"
+      value: "http://infrastructure-elasticsearch-master:9200"
     - name: CDL_KAFKA_DATA_INPUT_TOPIC
       value: "cdl.data.input"
     - name: CDL_KAFKA_EDGE_INPUT_TOPIC

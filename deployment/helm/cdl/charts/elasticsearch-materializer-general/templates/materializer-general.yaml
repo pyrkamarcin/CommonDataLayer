@@ -29,7 +29,7 @@ spec:
             - name: MATERIALIZER_GENERAL_SERVICES__SCHEMA_REGISTRY_URL
               value: "http://{{ .Release.Name }}-schema-registry:6400"
             - name: MATERIALIZER_GENERAL_ELASTICSEARCH__NODE_URL
-              value: "http://elasticsearch-master:9200"
+              value: "http://infrastructure-elasticsearch-master:9200"
             - name: MATERIALIZER_GENERAL_INPUT_PORT
               value: "6400"
             - name: MATERIALIZER_GENERAL_CACHE_CAPACITY

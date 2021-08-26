@@ -36,5 +36,5 @@ dependencies:
   version: "0.6.6"
   repository: "https://victoriametrics.github.io/helm-charts/"
 - name: elasticsearch
-  version: "7.14.0"
-  repository: "https://helm.elastic.co/"
+  version: "15.10.4"
+  repository: "https://charts.bitnami.com/bitnami"

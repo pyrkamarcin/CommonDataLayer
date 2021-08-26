@@ -12,7 +12,7 @@ dependencies:
   repository: https://victoriametrics.github.io/helm-charts/
   version: 0.6.6
 - name: elasticsearch
-  repository: https://helm.elastic.co/
-  version: 7.14.0
-digest: sha256:db1d5413debb08e36f644f888dfd78ce25e19eb95109b0fb0220c549d0d397c8
-generated: "2021-08-24T14:39:42.221761087+02:00"
+  repository: https://charts.bitnami.com/bitnami
+  version: 15.10.4
+digest: sha256:10d7d93a250851fd9f8ecc7a02d7d7ebca8c80ea181e9ae519473b290388ee8a
+generated: "2021-08-26T12:42:26.276010691+02:00"

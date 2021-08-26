@@ -14,6 +14,7 @@ using CDL.Tests.Utils;
 using MassTransit.KafkaIntegration;
 using Microsoft.Extensions.Options;
 using NJsonSchema;
+using RestSharp;
 using SchemaRegistry;
 using Xunit;
 using SchemaType = SchemaRegistry.SchemaType;
@@ -30,7 +31,12 @@ namespace CDL.Tests.ServicesTests.MaterializerGeneral
         private readonly Fixture _fixture;
         private ConfigurationOptions _options;
 
-        public ElasticsearchTests(ITopicProducer<InsertObject> kafkaProducer, SchemaRegistryService schemaRegistryService, EdgeRegistryService edgeRegistryService, Fixture fixture, IOptions<ConfigurationOptions> options)
+        public ElasticsearchTests(
+            ITopicProducer<InsertObject> kafkaProducer,
+            SchemaRegistryService schemaRegistryService,
+            EdgeRegistryService edgeRegistryService,
+            Fixture fixture,
+            IOptions<ConfigurationOptions> options)
         {
             _kafkaProducer = kafkaProducer;
             _schemaRegistryService = schemaRegistryService;
@@ -40,14 +46,14 @@ namespace CDL.Tests.ServicesTests.MaterializerGeneral
         }
 
         [Fact]
-        public void SingleSchemaView()
+        public void NoRelations()
         {
             var indexName = _fixture.Create<string>();
             var objectData = _fixture.Create<Person>();
             var objectId = _fixture.Create<string>();
-            
+
             var schemaDefinition = JsonSchema.FromType(typeof(Person)).ToJson();
-            
+
             var schemaId = _schemaRegistryService.AddSchema("test_schema", schemaDefinition, SchemaType.Types.Type.DocumentStorage).Result;
 
             var materializerFields = new Dictionary<string, object>();
@@ -68,10 +74,8 @@ namespace CDL.Tests.ServicesTests.MaterializerGeneral
                 schemaId = schemaId.Id_,
                 data = objectData,
             });
-            
-            Thread.Sleep(1000);
 
-            var result = ElasticsearchConnector.QueryAll<Person>(new Uri(_options.CDL_ELASTICSEARCH_NODE), indexName).ToArray();
+            var result = RetryHelper.TryFetch(() => ElasticsearchConnector.QueryAll<Person>(new Uri(_options.CDL_ELASTICSEARCH_NODE), indexName), (arr) => arr.Count > 0).ToArray();
 
             Assert.Single(result);
             Assert.Equal(objectData.FirstName, result[0].FirstName);
