@@ -47,3 +47,30 @@ pub struct FullSchema {
     pub definition: Value,
     pub views: Vec<FullView>,
 }
+
+pub struct ObjectFieldDefinition {
+    pub field_type: ScalarType,
+    pub optional: bool,
+}
+
+pub enum ScalarType {
+    Bool(bool),
+    String(String),
+    Integer(i64),
+    Decimal(f64),
+    Any(Value),
+}
+
+pub enum SchemaDefinition {
+    Scalar {
+        scalar_type: ScalarType,
+        optional: bool,
+    },
+    Object {
+        fields: HashMap<String, ObjectFieldDefinition>,
+    },
+    Array {
+        item_type: SchemaChildType,
+        optional: bool,
+    }
+}
