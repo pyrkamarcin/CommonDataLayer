@@ -19,6 +19,7 @@
     - [Branhing strategy](processes/0002_Branching_strategy.md)                         
     - [Documentation structure and RFC process](processes/0003_Documentation_structure_and_RFC_process.md)       
 - [Versioning](versioning.md)
+- [Stability](stability.md)
 - [Protocol schema](protocol.md)
 - [Benchmarks](benchmarks.md)
 - [Architecture](architecture/index.md)
