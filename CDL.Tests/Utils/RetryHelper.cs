@@ -5,9 +5,8 @@ namespace CDL.Tests.Utils
 {
     public class RetryHelper
     {
-        public static T TryFetch<T>(Func<T> request, Func<T, bool> validator, int retries = 8, int delayMs = 3000, int initialDelayMs = 5000)
+        public static T TryFetch<T>(Func<T> request, Func<T, bool> validator, int retries = 10, int delayMs = 3000)
         {
-            Thread.Sleep(initialDelayMs);
             for (var i = 0; i < retries; i++)
             {
                 var resp = request.Invoke();

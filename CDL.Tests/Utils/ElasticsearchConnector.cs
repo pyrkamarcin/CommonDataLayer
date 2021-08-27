@@ -11,6 +11,8 @@ namespace CDL.Tests.Utils
             var settings = new ConnectionSettings(nodeUrl);
             var client = new ElasticClient(settings);
 
+            client.Indices.Refresh(Indices.Index(index));
+
             var res = client.Search<TDocument>(s => s.Index(index).MatchAll());
             
             return res.Documents;
