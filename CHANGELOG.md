@@ -4,7 +4,7 @@
 
 ### Breaking changes
 - Data Router expects `version` field in CDL Ingestion Message in format "MAJOR_VERSION.MINOR_VERSION". In this release
-  the only supported version is "1.0".
+  the only supported version is "1.0.0".
 - Changed ENV variables
 
 ### New components

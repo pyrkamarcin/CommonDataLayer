@@ -123,8 +123,6 @@ Internal layer which materializes views
 
 [schema-registry]: schema_registry.md
 
-[leader-elector]: leader_elector.md
-
 [data-router]: data_router.md
 
 [query-service]: query_service.md

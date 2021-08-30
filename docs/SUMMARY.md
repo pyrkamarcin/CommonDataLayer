@@ -29,7 +29,6 @@
     - [GraphQL API](architecture/api.md)
     - [Configuration Layer](architecture/configuration.md)
         - [Schema Registry](architecture/schema_registry.md)
-        - [Leader Elector](architecture/leader_elector.md)
         - [Edge Registry](architecture/edge_registry.md)
     - [Ingestion Layer](architecture/ingestion.md)
         - [Data Router](architecture/data_router.md)
