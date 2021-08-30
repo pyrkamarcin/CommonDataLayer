@@ -1,5 +1,4 @@
 # Deployment
-
 * [Local deployment][local]
 * [Production-grade deployment][production]
 

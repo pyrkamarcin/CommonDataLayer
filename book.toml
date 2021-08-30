@@ -10,8 +10,8 @@ build-dir = "target/book"
 
 [output.html]
 git-repository-url = "https://github.com/epiphany-platform/CommonDataLayer"
-
-[output.linkcheck]
-warning-policy = "error"
+#
+#[output.linkcheck]
+#warning-policy = "error"
 
 [preprocessor.plantuml]

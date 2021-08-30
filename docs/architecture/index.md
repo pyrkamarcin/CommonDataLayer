@@ -3,19 +3,65 @@
 The CDL consists of six layers, each horizontally scalable and replaceable.
 
 ```plantuml
-{{#include graphs/cdl.puml}}
+@startuml
+skinparam linetype polyline
+skinparam backgroundColor #FEFEFE
+skinparam transparent false
+
+cloud {
+  [External System]
+}
+
+() "Ingestion Layer" as IL
+
+frame Management {
+    [Direct Configuration] as CL
+    [User Interface] as UI
+}
+
+frame "Storage Layer" {
+    node "Repository X" as X
+    node "Repository Y" as Y
+    node "Repository Z" as Z
+}
+
+() "Materialization Layer" as ML
+
+() "Retrieval Layer" as RL
+
+cloud {
+  actor User
+}
+
+[External System] ---> IL
+IL ---> X
+IL ---> Y
+IL ---> Z
+X ---> ML
+Y ---> ML
+Z ---> ML
+X ---> RL
+Y ---> RL
+Z ---> RL
+User <-up-> RL
+ML -down--> User
+User -right--> CL
+User -right--> UI
+UI -down-> CL
+@enduml
+
 ```
 
 ## Management Layer
+
+### Tools / UI
 | Crate Name  | Purpose                                                                                                       |
 |-------------|---------------------------------------------------------------------------------------------------------------|
-| [cdl-cli]   | Provides a command-line interface for managing schemas in the schema registry and storing and retrieving data |
+| [cli]       | Provides a command-line interface for managing schemas in the schema registry and storing and retrieving data |
 | [web-admin] | Admin Web Panel - provides GUI interface for managing schemas and storing and retrieving data                 |
+| [API]       | used as a backend service for web-admin, provides unified interface to manage CDL.                            |
 
-## GraphQL API
-[API] - used as a backend service for web-admin, provides unified interface to manage CDL.
-
-## Configuration Layer
+### Direct Configuration
 | Crate Name        | Purpose                                                                                           |
 |-------------------|---------------------------------------------------------------------------------------------------|
 | [edge-registry]   | Store and manage schema and object relations (for materialization purposes)                       |
@@ -61,25 +107,38 @@ Internal layer which materializes views
 | Directory          | Purpose                                               |
 |--------------------|-------------------------------------------------------|
 | deployment/helm    | helm charts for kubernetes deployment                 |
-| deployment/compose | sample deployment guide for docker (development-only) |
 | xtask              | utility tool to generate code from rpc proto schemas  |
 | benchmarking       | scripts and scaffolding data for benchmarking         |
 | tests              | component tests                                       |
 | examples           | exemplary client of cdl                               |
 | docs               | cdl documentation                                     |
 
-[cdl-cli]: cli.md
+[cli]: cli.md
+
 [web-admin]: web_admin.md
+
 [API]: api.md
+
 [edge-registry]: ./edge_registry.md
+
 [schema-registry]: schema_registry.md
+
 [leader-elector]: leader_elector.md
+
 [data-router]: data_router.md
+
 [query-service]: query_service.md
+
 [command-service]: command_service.md
+
 [db-shrinker-storage]: db_shrinker_storage.md
+
 [query-router]: query_router.md
+
 [object-builder]: object_builder.md
+
 [partial-update-engine]: partial_update_engine.md
+
 [materializer-general]: materializer_general.md
+
 [materializer-ondemand]: materializer_ondemand.md
