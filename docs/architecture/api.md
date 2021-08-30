@@ -62,9 +62,9 @@ mutation AddView {
     newView: {
       name: "Friendly"
       materializerAddress: "http://localhost:50203",
-			materializerOptions: {table: "MATERIALIZED_VIEW"},
+        materializerOptions: {table: "MATERIALIZED_VIEW"},
       fields: {
-				worker_name: { simple: { field_name: "name", field_type: "string" } }
+        worker_name: { simple: { field_name: "name", field_type: "string" } }
       }
       relations: [
         {

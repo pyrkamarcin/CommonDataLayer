@@ -41,10 +41,10 @@ Here is the sample JSON schema format that the CDL anticipates and ultimatley wi
 
 ```
 {
-	"$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "http://example.com/product.schema.json",
-	"definitions": {
-		"1.0.0": {
+    "definitions": {
+        "1.0.0": {
             "description": "A work order",
             "type": "object",
             "properties": {

@@ -20,7 +20,6 @@ The CDL consists of six layers, each horizontally scalable and replaceable.
 |-------------------|---------------------------------------------------------------------------------------------------|
 | [edge-registry]   | Store and manage schema and object relations (for materialization purposes)                       |
 | [schema-registry] | Manage user-defined schemas that define the format of incoming values and their respective topics |
-| [leader-elector]  | Elect master nodes in replicated services (_only for the Schema Repository, currently_)           |
 
 ## Ingestion Layer
 | Crate Name    | Purpose                                                                                 |

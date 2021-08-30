@@ -15,7 +15,7 @@ Is used by:
 Query methods:
 - gRPC (clients may use cdl-cli CLI application)
 
-Communication methods (supported repositores):
+Communication methods (supported repositories):
 - Kafka (with other schema-registry instances)
 
 [CDL-CLI]: cli.md

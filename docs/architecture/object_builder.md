@@ -19,7 +19,7 @@ There are two methods of communicating with `OB` - gRPC and MessageQueue (Rabbit
 
 #### gRPC communication
 
-gRPC communication allows to materialize view on demand. Materialized view is not saved in any database, but sent as a response via gRPC.
+gRPC's communication allows materializing views on demand. Materialized view is not saved in any database, but sent as a response via gRPC.
 
 #### Message queue communication
 

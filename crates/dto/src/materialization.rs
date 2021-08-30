@@ -443,11 +443,13 @@ impl TryFrom<rpc::object_builder::View> for Request {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct PostgresMaterializerOptions {
     pub table: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ElasticsearchMaterializerOptions {
     pub index_name: String,
 }

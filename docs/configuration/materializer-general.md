@@ -1,4 +1,5 @@
 ```toml
+materializer_db = "postgres"
 communication_method = "kafka"
 input_port = 50203
 cache_capacity = 1024
@@ -10,6 +11,9 @@ host = ""
 port = ""
 dbname = ""
 schema = ""
+
+[elasticsearch]
+node_url = "http://path-to-node:9200"
 
 [monitoring]
 metrics_port = 0

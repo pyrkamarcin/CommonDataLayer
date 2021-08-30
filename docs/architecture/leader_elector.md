@@ -1,3 +1,0 @@
-# Leader Elector
-
-TODO

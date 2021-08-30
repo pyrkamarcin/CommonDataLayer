@@ -1,10 +1,10 @@
 # Command Services
-Services that translate messages received from the [Data Router][data-router] into their respective database's format. Currently only one Command Service implementation exists
+Services that translate messages received from the [Data Router][data-router] into their respective database's format. Currently, only one Command Service implementation exists
 and is built in such way that it can support multiple databases (one at a time).
 
 ### Technical Description
 
-The Command-Service (commonly refered also as `CS`, or `CSPG` - indicating posgres instance), interfaces storage repositories with the CDL ecosystem.
+The Command-Service (commonly referred also as `CS`, or `CSPG` - indicating postgres instance), interfaces storage repositories with the CDL ecosystem.
 
 Interacts with:
 - Data Router (optional, either)
@@ -22,7 +22,7 @@ Egest methods (supported repositories):
 - Druid
 - Sleight (CDL's document storage)
 - Troika (CDL's binary data repo)
-- .. or anything with matching GRPC :)
+- ... or anything with matching GRPC :)
 
 
 [data-router]: data_router.md

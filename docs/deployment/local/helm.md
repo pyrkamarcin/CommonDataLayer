@@ -1,5 +1,5 @@
 # Helm
-For most use cases using docker-compose is a good way for local development. However some features can be developed/tested only inside Kubernetes cluster environments.
+For most use cases using docker-compose is a good way for local development. However, some features can be developed/tested only inside Kubernetes cluster environments.
 ## Requirements
 - [docker][docker-www], [docker-compose][docker-compose-www]
 - [kubectl][kubectl-www]
@@ -7,7 +7,7 @@ For most use cases using docker-compose is a good way for local development. How
 - [helm][helm-www]
 ## Setting up local cluster
 ### Start the cluster
-Decide how much resources can be used by the local k8s cluster and start it. 
+Decide how many resources can be used by the local k8s cluster and start it. 
 
 Note: Resources aren't blocked if k8s cluster is idle, parent system can still use them. It's recommended to use all/almost all of available cpus because rust compilation takes place in this environment(and it can take a while especially on a release build).
 
