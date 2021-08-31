@@ -45,7 +45,6 @@ webAdmin:
 partialUpdateEngine:
   sleepPhaseLength: 5
 
-
 postgres-document:
   commandServiceReplicaCount: 1
   queryServiceReplicaCount: 1
@@ -73,3 +72,15 @@ victoria-metrics-timeseries:
   inputSource: cdl.timeseries2.data
   ingestionMethod: MessageQueue
   outputURL: http://infrastructure-victoria-metrics-single-server:8428/
+
+postgres-materializer-general:
+  replicas: 1
+  postgresUsername: postgres
+  postgresPassword: CHANGEME
+  postgresHost: infrastructure-postgresql
+  postgresPort: 5432
+  postgresDbname: CDL
+  postgresSchema: public
+
+elasticsearch-materializer-general:
+  replicas: 1
