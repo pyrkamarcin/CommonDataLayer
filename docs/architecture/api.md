@@ -24,8 +24,7 @@ queries and see responses in real-time. It has built-in documentation, history, 
 state (like past queries) in local storage.
 
 ## API
-All examples below can be executed on the Inte
-ractive GraphQL Route (just copy paste it to the editor) or as a base for
+All examples below can be executed on the Interactive GraphQL Route (just copy and paste it to the editor) or as a base for
 a call from GraphQL library. For example in JavaScript + React:
 
 ```js

@@ -76,7 +76,7 @@ CDL supports three message ordering strategies:
 - Unordered messages (no message ordering guarantees)
 
 Message ordering defined by causality is a middle ground between two opposite strategies. It allows you to keep message
-ordering for some of the messages without performance costs of full linearization. E.g., in our first example we could
+ordering for some messages without performance costs of full linearization. E.g., in our first example we could
 say that order of messages regarding same game is important, but we don't care about order of two messages related to
 different sport events.
 

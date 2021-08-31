@@ -1,14 +1,11 @@
 # Summary
 
 - [Common Data Layer](index.md)
-- [How does it work](how_it_works.md)
 - [Getting Started](getting_started.md)
 - [Deployment](deployment/index.md)
     - [Local deployment](deployment/local/index.md)
-        - [docker-compose](deployment/local/docker-compose.md)
         - [Helm](deployment/local/helm.md)
     - [Production-grade deployment](deployment/production/index.md)
-- [Schemas and Views](schemas_and_views.md)
 - [Examples](examples/index.md)
     - [Materialization](examples/materialization.md)
 - [Features](features/index.md)
@@ -20,8 +17,6 @@
     - [Documentation structure and RFC process](processes/0003_Documentation_structure_and_RFC_process.md)
 - [Versioning](versioning.md)
 - [Stability](stability.md)
-- [Protocol schema](protocol.md)
-- [Benchmarks](benchmarks.md)
 - [Architecture](architecture/index.md)
     - [Management Layer](architecture/management.md)
         - [CLI](architecture/cli.md)
