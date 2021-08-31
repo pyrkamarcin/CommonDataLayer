@@ -10,8 +10,10 @@ spec:
     env:
     - name: CDL_EDGE_REGISTRY_ADDRESS
       value: "http://cdl-edge-registry:6400"
-    - name: CDL_MATERIALIZER_GENERAL_ADDRESS
+    - name: CDL_MATERIALIZER_GENERAL_POSTGRESQL_ADDRESS
       value: "http://cdl-postgres-materializer-general:6400"
+    - name: CDL_MATERIALIZER_GENERAL_ELASTICSEARCH_ADDRESS
+      value: "http://cdl-elasticsearch-materializer-general:6400"
     - name: CDL_MATERIALIZER_ONDEMAND_ADDRESS
       value: "http://cdl-materializer-ondemand:6400"
     - name: CDL_QUERY_ROUTER_ADDRESS
@@ -20,6 +22,8 @@ spec:
       value: "http://cdl-postgres-query-service:6400"
     - name: CDL_SCHEMA_REGISTRY_ADDRESS
       value: "http://cdl-schema-registry:6400"
+    - name: CDL_ELASTICSEARCH_NODE
+      value: "http://infrastructure-elasticsearch-master:9200"
     - name: CDL_KAFKA_BROKER
       value: "infrastructure-kafka-headless"
     - name: CDL_KAFKA_DATA_INPUT_TOPIC
