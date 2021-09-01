@@ -34,7 +34,8 @@ class SchemaRegistry:
             "SCHEMA_REGISTRY_INPUT_PORT": self.input_port,
             "SCHEMA_REGISTRY_MONITORING__OTEL_SERVICE_NAME": 'schema-registry',
             "SCHEMA_REGISTRY_MONITORING__STATUS_PORT": '0',
-            "SCHEMA_REGISTRY_SERVICES__EDGE_REGISTRY_URL": self.edge_registry_addr,
+            "SCHEMA_REGISTRY_SERVICES__EDGE_REGISTRY_URL":
+            self.edge_registry_addr,
             **self.postgres_config.to_dict("SCHEMA_REGISTRY")
         }
 
@@ -54,7 +55,7 @@ class SchemaRegistry:
             stub = pb2_grpc.SchemaRegistryStub(channel)
             resp = stub.AddSchema(
                 pb2.NewSchema(
-                    definition=bytes(body, 'utf-8'),
+                    definition=body,
                     name=name,
                     insert_destination=destination,
                     query_address=query,

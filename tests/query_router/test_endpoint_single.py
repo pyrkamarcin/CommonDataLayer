@@ -24,7 +24,8 @@ def prepare_postgres(tmp_path):
     postgres_config = PostgresConfig()
 
     qs = QueryService(db_config=postgres_config)
-    sr = SchemaRegistry('http://edge_registry_not_used', kafka_input_config.brokers, postgres_config)
+    sr = SchemaRegistry('http://edge_registry_not_used',
+                        kafka_input_config.brokers, postgres_config)
 
     # prepare environment
     psql_clear_data(postgres_config)
@@ -34,7 +35,7 @@ def prepare_postgres(tmp_path):
     sr.start()
 
     schema_id = sr.create_schema('test', kafka_input_config.topic,
-                                 f'http://localhost:{qs.input_port}', '{}', 0)
+                                 f'http://localhost:{qs.input_port}', {}, 0)
 
     with QueryRouter(f'http://localhost:{sr.input_port}') as qr:
         yield data, expected, qr, schema_id
@@ -56,7 +57,8 @@ def prepare_victoria_metrics(tmp_path):
     postgres_config = PostgresConfig()
 
     qs = QueryServiceTs(db_config=victoria_metrics_config)
-    sr = SchemaRegistry('http://edge_registry_not_used', kafka_input_config.brokers, postgres_config)
+    sr = SchemaRegistry('http://edge_registry_not_used',
+                        kafka_input_config.brokers, postgres_config)
 
     # prepare environment
     vm_clear_data(victoria_metrics_config)
@@ -78,7 +80,7 @@ def prepare_victoria_metrics(tmp_path):
     sr.start()
 
     schema_id = sr.create_schema('test', kafka_input_config.topic,
-                                 f'http://localhost:{qs.input_port}', '{}', 1)
+                                 f'http://localhost:{qs.input_port}', {}, 1)
 
     with QueryRouter(f'http://localhost:{sr.input_port}') as qr:
         yield data, expected, start, end, qr, schema_id

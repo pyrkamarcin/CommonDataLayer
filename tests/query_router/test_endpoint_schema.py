@@ -19,13 +19,14 @@ def prepare(tmp_path):
     postgres_config = PostgresConfig()
 
     qs = QueryService(db_config=postgres_config)
-    sr = SchemaRegistry('http://edge_registry_not_used', kafka_input_config.brokers, postgres_config)
+    sr = SchemaRegistry('http://edge_registry_not_used',
+                        kafka_input_config.brokers, postgres_config)
 
     # prepare environment
     sr.start()
 
     schema_id = sr.create_schema('test', kafka_input_config.topic,
-                                 f'http://localhost:{qs.input_port}', '{}', 0)
+                                 f'http://localhost:{qs.input_port}', {}, 0)
 
     clear_data(postgres_config)
 
