@@ -20,8 +20,6 @@ All of the mentioned operators should return errors on parameter conversion and 
 ### Operators
 Each operator defines types it can work on and lists of errors that can be returned. As operators' names should be self-explanatory operator descriptions are skipped. Errors regarding wrong parameter types are not mentioned here as they can always happen and are not related to specific operators or their usage.
 
-The operator list specifies two similar error types - Overflow and Underflow. They're commonly merged into a single error type as handling such errors is almost always done in the same way. It's up to implementator to decide if we'll merge those errors into one.
-
 #### Add
 - Add(i64,i64) -> i64
 Returned errors: Overflow
@@ -29,19 +27,19 @@ Returned errors: Overflow
 Returned errors: None
 #### Subtract
 - Substract(i64,i64) -> i64
-Returned errors: Underflow
+Returned errors: Overflow
 - Substract(f64,f64) -> f64
 Returned errors: None
 #### Multiply
 - Multiply(i64,i64) -> i64
-Returned errors: Overflow, Underflow
+Returned errors: Overflow
 - Multiply(f64,f64) -> f64
 Returned errors: None
 #### Divide
 - Divide(i64,i64) -> i64
 Returned errors: Divide By Zero
 - Divide(f64,f64) -> f64
-Returned errors: Divide By Zero
+Returned errors: None
 #### Modulo
 - Modulo(i64,i64) -> i64
 Returned errors: Divide By Zero
