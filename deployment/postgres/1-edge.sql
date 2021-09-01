@@ -1,7 +1,7 @@
 create extension "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS relations (
-    id UUID NOT NULL UNIQUE DEFAULT uuid_generate_v1(),
+    id UUID NOT NULL UNIQUE DEFAULT uuid_generate_v4(),
     parent_schema_id UUID NOT NULL,
     child_schema_id UUID NOT NULL
 );

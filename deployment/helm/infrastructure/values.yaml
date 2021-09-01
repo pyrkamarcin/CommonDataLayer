@@ -265,3 +265,11 @@ postgresql:
   service:
     type: NodePort
     nodePort: 32000
+
+elasticsearch:
+  master:
+    replicas: 2
+  coordinating:
+    replicas: 1
+  data:
+    replicas: 1

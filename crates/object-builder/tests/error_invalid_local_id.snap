@@ -1,0 +1,60 @@
+[objects]
+{
+    "a0000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000001": {"a": 58},
+    "a0000000-0000-0000-0000-000000000002,00000000-0000-0000-0000-000000000002": { "b": 42 }
+}
+
+[tree_response]
+{
+  "rows":[
+    {
+      "base_object_id": "00000000-0000-0000-0000-000000000001",
+      "relation_object_ids":[
+        "00000000-0000-0000-0000-000000000002"
+      ]
+    }
+  ]
+}
+
+[relation_map]
+{
+  "b0000000-0000-0000-0000-000000000001":
+    ["a0000000-0000-0000-0000-000000000001","a0000000-0000-0000-0000-000000000002"]
+}
+
+[view]
+{
+  "id": "00000000-0000-0000-0000-000000000001",
+  "name": "Sample View",
+  "base_schema_id": "a0000000-0000-0000-0000-000000000001",
+  "materializer_options": {},
+  "materializer_address": "",
+  "fields": {
+    "foo": {
+      "computed": {
+        "computation": {
+          "field_value": {
+            "schema_id": 42,
+            "field_path": "b"
+          }
+        },
+        "field_type": "numeric"
+      }
+    }
+  },
+  "relations": [
+    {
+      "global_id": "b0000000-0000-0000-0000-000000000001",
+      "local_id": 1,
+      "search_for": "CHILDREN"
+    }
+ ]
+}
+
+[expected.error]
+Could not build view plan
+
+Caused by:
+    Could not find a relation 42 in view definition
+
+[end]
