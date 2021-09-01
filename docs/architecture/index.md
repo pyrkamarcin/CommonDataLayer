@@ -58,7 +58,7 @@ UI -down-> CL
 | Crate Name  | Purpose                                                                                                       |
 |-------------|---------------------------------------------------------------------------------------------------------------|
 | [cli]       | Provides a command-line interface for managing schemas in the schema registry and storing and retrieving data |
-| [web-admin] | Admin Web Panel - provides GUI interface for managing schemas and storing and retrieving data                 |
+| [web-admin] | Admin Web Panel - provides GUI for managing schemas and storing and retrieving data                 |
 | [API]       | used as a backend service for web-admin, provides unified interface to manage CDL.                            |
 
 ### Direct Configuration
@@ -113,30 +113,18 @@ Internal layer which materializes views
 | examples           | exemplary client of cdl                               |
 | docs               | cdl documentation                                     |
 
+
 [cli]: cli.md
-
 [web-admin]: web_admin.md
-
 [API]: api.md
-
 [edge-registry]: ./edge_registry.md
-
 [schema-registry]: schema_registry.md
-
 [data-router]: data_router.md
-
 [query-service]: query_service.md
-
 [command-service]: command_service.md
-
 [db-shrinker-storage]: db_shrinker_storage.md
-
 [query-router]: query_router.md
-
 [object-builder]: object_builder.md
-
 [partial-update-engine]: partial_update_engine.md
-
 [materializer-general]: materializer_general.md
-
 [materializer-ondemand]: materializer_ondemand.md

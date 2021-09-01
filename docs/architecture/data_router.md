@@ -1,13 +1,10 @@
 # Data Router
 
 ### Technical Description
-The data router (internally `DR` is also used) is responsible for taking in input data and routing it to the correct
-storage based on the data's schema and its associated topic.
+The data router (internally `DR` is also used) is responsible for taking in input data and routing it to the correct storage based on the data's schema and its associated topic.
 
 ### Communication
-The data router routes requests from RabbitMQ and Kafka to the correct storage solution based on the schema and data
-type. Topic and some basic configuration is obtained from Schema Registry. Data are routed and deposited onto
-configured queues.
+The data router routes requests from RabbitMQ and Kafka to the correct storage solution based on the schema and data type. Topic and some basic configuration is obtained from Schema Registry. Data are routed and deposited onto configured queues.
 
 Interacts with:
 
@@ -45,8 +42,7 @@ Below are the example data required by data router:
 { "objectId": 9056c0b3-2ceb-42a6-a6b6-9718c3e273bc, "schemaId": 9056c0b3-2ceb-42a6-a6b6-9718c3e273bc, "data": {} }
 ```
 
-Messages can be batched together, however please mind, that batched messages works best when used with the same
-schemaId. Otherwise, messages will be split into sub-batches containing messages with the same schemaId
+Messages can be batched together, however please mind, that batched messages works best when used with the same schemaId. Otherwise, messages will be split into sub-batches containing messages with the same schemaId
 
 ```
 [
@@ -57,7 +53,6 @@ schemaId. Otherwise, messages will be split into sub-batches containing messages
 ]
 ```
 
-Please mind that internally, each message will get its own timestamp, with which data started being processed by CDL.
-This information is invisible for user.
+Please mind that internally, each message will get its own timestamp, with which data started being processed by CDL. This information is invisible for user.
 
 

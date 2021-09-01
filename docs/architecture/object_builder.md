@@ -11,8 +11,8 @@ Object Builder Loop:
 - Perform filtering by custom fields, join operations
 - Send data to materializers component or to the requesting party
 
-It is important to note that object builder output contains view id, change list received from partial update engine,
-and requested objects with information how they were created (each returned object contains ids of every object which
+It is important to note that object builder output contains view ID, change list received from partial update engine,
+and requested objects with information how they were created (each returned object contains IDs of every object which
 was used for its creation).
 
 ### Communication

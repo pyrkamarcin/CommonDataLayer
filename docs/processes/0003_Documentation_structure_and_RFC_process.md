@@ -1,3 +1,4 @@
+
 # Documentation structure and RFC process
 
 ## Glossary
@@ -8,7 +9,7 @@ RFC - Request for Comments
 
 ### Architecture
 * path: `docs/architecture`
-* purpose: information about each component, schema registry, object builder, and other applications. It contains only our internal architecture description, the current state of each element. Information what it does, why and how, what algorithms (from a broad perspective without many implementation details) were used, the protocol between the systems, etc. It should be enough information to adapt a new developer to CDL quickly. 
+* purpose: information about each component, schema registry, object builder, and other applications. It contains only our internal architecture description, the current state of each element. Information what it does, why and how, what algorithms (from a broad perspective without many implementation details) were used, the protocol between the systems, etc. It should be enough information to adapt a new developer to CDL quickly.
 * used by: CDL team
 
 ### Configuration
@@ -70,7 +71,7 @@ There may be exceptions to this rule - for example, when during a deadline meeti
 
 ### RFC ordering number
 Each RFC has an assigned ordering number that is an always-increasing integer. In rare situations, there might be gaps between two integers.
-RFC ordering number is encoded by 4 digit (fixed length) decimal integer (values from `0001` to `9999`). In the future it might be extended by prefixing additional zeroes (`9999` becomes `09999`).
+RFC ordering number is encoded by 4 digit (fixed length) decimal integer (values from `0001` to `9999`). In the future, it might be extended by prefixing additional zeroes (`9999` becomes `09999`).
 RFC ordering number has to be unique.
 
 RFC ordering number and feature ID are not the same concepts.
@@ -86,7 +87,7 @@ Format:
 `<RFC ordering number>_<Human readable name>_<Version postfix number>.md`
 
 Each RFC has to contain Front Matter in the format:
-```` 
+````
 # Front Matter
 
 ```
@@ -98,11 +99,11 @@ Created         : 2021-06-24
 Deadline        : 2021-06-26
 CDL feature ID  : CDLF-00016-00
 ```
-```` 
+````
 
 CDL feature ID is only required for feature descriptions. If the RFC describes a process, this field should be omitted.
 
-Team field is optional. If missing, its implied that CDL Team has created it.
+Team field is optional. If missing, it's implied that CDL Team has created it.
 
 RFC format allows other custom fields to be included if necessary, such as why RFC has been abandoned.
 
@@ -115,11 +116,11 @@ When the draft is ready for review, an author should create PR and inform review
 #### Resolution
 Each RFC must result in:
 * When accepted:
-    * If the team decide to implement feature described in the RFC:
+    * If the team decide to implement a feature described in the RFC:
         * Implementator should create tracking issue - he should include its id in `features/index.md` table.
-        * Update in `architecture` - all components that were changed should be updated, so this RFC won't be needed to understand how for example, Object Builder works. It should be done as a part of PR that has been merged.
+        * Update in `architecture` - all components that were changed should be updated, so this RFC won't be needed to understand how, for example, Object Builder works. It should be done as a part of PR that has been merged.
         * Update in `features` - if RFCs category is `Feature` - Update existing or create new feature.md and write a new description of what this feature does. In some cases, the author can selectively copy-paste it from RFC; however, the author must be careful. It should be done as a part of PR that has been merged.
-    * If RFC describes the process: 
+    * If RFC describes the process:
         * `processes/index.md` needs to be updated
         * Update in `processes` - if RFCs category is `Process` - Update existing or create a new process.md and write a further description of how the process looks. In some cases, the author can selectively copy-paste it from RFC; however, the author must be careful. Implementator should do it in PR that has been merged.
 * If the deadline has been met, but no conclusion has been reached - RFC should be updated with the new deadline
@@ -130,7 +131,7 @@ It also means PRs with implementations should not be accepted and merged before 
 Exception: It is allowed to split PR into smaller, by merging the first and then separate PR documentation. However, until the last PR implementation is merged, **tracking issue has to be kept open**.
 
 #### Further changes
-Apart from minor typo fixes, and formatting RFC iss immutable.
+Apart from minor typo fixes, and formatting, RFC is immutable.
 Whenever there is a need to change the feature or the process, one should create another RFC describing new goals and changes.
 
 ### Summary

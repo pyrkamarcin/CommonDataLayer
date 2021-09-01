@@ -1,6 +1,6 @@
+
 # Helm
-For most use cases using docker-compose is a good way for local development. However, some features can be
-developed/tested only inside Kubernetes cluster environments.
+For most use cases, using docker-compose is a good way for local development. However, some features can be developed/tested only inside Kubernetes cluster environments.
 ## Requirements
 - [docker][docker-www], [docker-compose][docker-compose-www]
 - [kubectl][kubectl-www]
@@ -11,50 +11,45 @@ developed/tested only inside Kubernetes cluster environments.
 ### Start the cluster
 Decide how many resources can be used by the local k8s cluster and start it.
 
-Note: Resources aren't blocked if k8s cluster is idle, parent system can still use them. It's recommended to use
-all/almost all of available cpus because rust compilation takes place in this environment(and it can take a while
-especially on a release build).
+Note: Resources aren't blocked if k8s cluster is idle, parent system can still use them. It's recommended to use all/almost all the available CPUs because rust compilation takes place in this environment(and it can take a while, especially on a release build).
 
 `minikube start --cpus 8 --memory 8192 --driver=docker`
 
 ## Building docker image
-Next step is to build docker images which will be used by k8s pods.
+The next step is to build docker images which will be used by k8s pods.
 
 ```shell
 eval $(minikube docker-env)
 ENV=PROD DOCKER_BUILDKIT=1 ./build.sh
 ```
 
-First command will change docker daemon we're communicating with to docker inside minikube. From now on any docker
-command run from current shell will be executed inside minikube docker daemon. To connect to your standard docker daemon
-just start a new shell. Second command builds docker image, it may take some time first time you build the image. You
-can change `ENV=PROD` to `ENV=DEV` if you want shorter build time(in cost of less performant output).
+The first command will change the docker daemon we're communicating with to docker inside minikube. From now on, any docker command run from the current shell will be executed inside minikube docker daemon. To connect to your standard docker daemon, just start a new shell. Second command builds docker image. On the first time building, it will be considerably longer than any following rebuild. You can change `ENV=PROD` to `ENV=DEV` if you want shorter build time(in cost of less performant output).
 
 ## Spin up infrastructure services
-To start necessary infrastructure(not necessary if you've deployed infrastructure yourself/you want to connect to
+To start, necessary infrastructure(not necessary if you've deployed infrastructure yourself/you want to connect to
 services on our azure cluster):
 
 `helm install --values ./deployment/helm/infrastructure/values.yaml infrastructure ./deployment/helm/infrastructure`
 
-If you want to use druid repository you also need to start druid.
+If you want to use druid repository, you also need to start druid.
 `helm install --values ./deployment/helm/infrastructure-druid/values.yaml infrastructure-druid ./deployment/helm/infrastructure-druid`
 
 ## Installing CDL
-To install the solution you need to execute:
+To install the solution, you need to execute:
 
 `helm install --values ./helm/cdl/values-local.yaml cdl ./deployment/helm/cdl`
 
-After a moment Kubernetes pods should get started. You can check their status by `kubectl get pods`
+After a moment, Kubernetes pods should get started. You can check their status by `kubectl get pods`
 
 Note: Using default `values.yaml` file(or skipping this parameter) will install configuration for our cloud cluster.
 ## Removing CDL
-To remove current installation of CDL you can use:
+To remove current installation of CDL, you can use:
 
 `helm uninstall cdl`
 
 This operation will take ~30 seconds(default Kubernetes timeout).
 ## Upgrading CDL
-The easiest way to update whole deployment is to uninstall it, rebuild docker image and reinstall the helm chart.
+The easiest way to update the whole deployment is to uninstall it, rebuild docker image and reinstall the helm chart.
 
 ## Useful commands
 - `minikube list services` - list services running on minikube(port numbers for input, output etc.)
@@ -74,11 +69,7 @@ connect to minikube docker daemon. In order to fix it we have to restart the dae
 _This issue should be fixed on current minikube version._
 
 [docker-www]: https://docs.docker.com/engine/install/
-
 [docker-compose-www]: https://docs.docker.com/compose/install/
-
 [kubectl-www]: https://kubernetes.io/docs/tasks/tools/install-kubectl/
-
 [minikube-www]: https://kubernetes.io/docs/tasks/tools/install-minikube/
-
 [helm-www]: https://helm.sh/docs/intro/install/

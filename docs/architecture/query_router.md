@@ -1,11 +1,8 @@
+
 # Query Router
 
 ### Technical Description
-The Query Router (`QR`), is responsible for forwarding requests to specific query services. In CDL messages can be
-stored in any available repository, data router acts as a single entry point to multi-repo system and query router
-allows that data to be fetched easily. Query Router first queries SR, then basing on received config, finds out specific
-QS that, hopefully, should be able to respond to specific query. Logic of that process is based on repo_type and
-query-service address stored with schema itself.
+The Query Router (`QR`), is responsible for forwarding requests to specific query services. In CDL messages can be stored in any available repository, data router acts as a single entry point to multi-repo system and query router allows that data to be fetched easily. Query Router first queries SR, then basing on received config, finds out specific QS that, hopefully, should be able to respond to a specific query. Logic of that process is based on repo_type and query-service address stored with schema itself.
 
 ### Communication
 Interacts with:
@@ -23,9 +20,7 @@ Communication protocols:
 - gRPC with schema-registry (request-response)
 
 ## Running
-To run the **query-router** requires the [Schema Registry][schema-registry] to be running and
-the [Query Services][query-service] or the [Timeseries Query Services][query-service-ts] connected to their respective
-repositories.
+To run the **query-router** requires the [Schema Registry][schema-registry] to be running and the [Query Services][query-service] connected to its respective repository.
 
 _Note: Currently, the cache is valid forever: changing a schema's **query-service** address will not update in the **
 query-router**._
@@ -61,9 +56,6 @@ QR -> REST: Retrieve document
 ```
 
 [schema-registry]: schema_registry.md
-
 [query-service]: query_service.md
-
 [query-service-ts]: https://github.com/epiphany-platform/CommonDataLayer/tree/develop/crates/query-service-ts
-
 [api-spec]: https://github.com/epiphany-platform/CommonDataLayer/blob/develop/crates/query-router/api.yml

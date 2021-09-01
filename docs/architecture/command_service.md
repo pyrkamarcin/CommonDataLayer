@@ -1,6 +1,6 @@
 # Command Services
 Services that translate messages received from the [Data Router][data-router] into their respective database's format.
-Currently, only one Command Service implementation exists and is built in such way that it can support multiple
+Currently, only one Command Service implementation exists and is built in a such way that it can support multiple
 databases (one at a time).
 
 ### Technical Description
