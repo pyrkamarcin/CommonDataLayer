@@ -35,7 +35,7 @@ fn validate_data_inner(
             return Ok(());
         } else {
             return Err(RegistryError::InvalidData(format!(
-                "Value was unexpectedly null: path `{}`",
+                "Value was unexpectedly null: Path `{}`",
                 path.join(", ")
             )));
         }
@@ -77,7 +77,7 @@ fn validate_data_inner(
                     None => {
                         if !field_definition.optional {
                             return Err(RegistryError::InvalidData(format!(
-                                "Value was null or missing: path `{}`",
+                                "Value was null or missing: Path `{}`",
                                 field_path.join(", ")
                             )));
                         }
@@ -100,7 +100,7 @@ fn validate_data_inner(
 
 pub fn wrong_type(expected_type: &str, path: &Vec<String>) -> RegistryError {
     RegistryError::InvalidData(format!(
-        "Expected data to be a {}: path `{}`",
+        "Expected data to be a {}: Path `{}`",
         expected_type,
         path.join(", ")
     ))
@@ -112,4 +112,122 @@ pub fn extend_path(base_path: &Vec<String>, segment: String) -> Vec<String> {
         .cloned()
         .chain(Some(segment).into_iter())
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use ::types::schemas::{SchemaFieldDefinition, SchemaFieldType};
+    use maplit::hashmap;
+    use rpc::schema_registry::types::ScalarType;
+    use serde_json::json;
+
+    use super::*;
+
+    fn schema_required() -> HashMap<String, SchemaFieldDefinition> {
+        hashmap! {
+            "field A".to_owned() => SchemaFieldDefinition {
+                optional: false,
+                field_type: SchemaFieldType::Scalar(ScalarType::Integer),
+            }
+        }
+    }
+
+    fn schema_optional() -> HashMap<String, SchemaFieldDefinition> {
+        hashmap! {
+            "foo".to_owned() => SchemaFieldDefinition {
+                optional: true,
+                field_type: SchemaFieldType::Object(hashmap! {
+                    "bar".to_owned() => SchemaFieldDefinition {
+                        optional: false,
+                        field_type: SchemaFieldType::Scalar(ScalarType::Bool),
+                    }
+                }),
+            }
+        }
+    }
+
+    fn schema_array(allow_null_elements: bool) -> HashMap<String, SchemaFieldDefinition> {
+        hashmap! {
+            "foo".to_owned() => SchemaFieldDefinition {
+                optional: true,
+                field_type: SchemaFieldType::Array(Box::new(SchemaFieldDefinition {
+                    optional: allow_null_elements,
+                    field_type: SchemaFieldType::Scalar(ScalarType::String),
+                })),
+            }
+        }
+    }
+
+    #[test]
+    fn test_valid_data() {
+        let data = json!({
+            "field A": 1,
+        });
+
+        assert!(validate_data(&data, &schema_required()).is_ok());
+    }
+
+    #[test]
+    fn test_invalid_data() {
+        let data = json!({
+            "field B": 1,
+        });
+
+        assert_eq!(
+            validate_data(&data, &schema_required())
+                .unwrap_err()
+                .to_string(),
+            "Input data does not match schema: Value was unexpectedly null: Path `field A`"
+                .to_owned()
+        );
+    }
+
+    #[test]
+    fn test_data_wrong_type() {
+        let data = json!({
+            "field A": 1.5,
+        });
+
+        assert_eq!(
+            validate_data(&data, &schema_required())
+                .unwrap_err()
+                .to_string(),
+            "Input data does not match schema: Expected data to be a integer: Path `field A`"
+                .to_owned()
+        );
+    }
+
+    #[test]
+    fn test_data_optional_with_missing_field() {
+        let data = json!({});
+
+        assert!(validate_data(&data, &schema_optional()).is_ok());
+    }
+
+    #[test]
+    fn test_data_optional_with_null_field() {
+        let data = json!({});
+
+        assert!(validate_data(&data, &schema_optional()).is_ok());
+    }
+
+    #[test]
+    fn test_array_no_null_elements_allowed() {
+        let data = json!({ "foo": [Some("a"), Some("b"), Option::<&str>::None, Some("d")] });
+
+        assert_eq!(
+            validate_data(&data, &schema_array(false))
+                .unwrap_err()
+                .to_string(),
+            "Input data does not match schema: Value was unexpectedly null: Path `foo, 2`"
+                .to_owned()
+        );
+    }
+
+    #[test]
+    fn test_array_some_null_elements_allowed() {
+        let data = json!({ "foo": [Some("a"), Some("b"), Option::<&str>::None, Some("d")] });
+
+        assert!(validate_data(&data, &schema_array(true)).is_ok());
+    }
 }

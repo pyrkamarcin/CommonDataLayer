@@ -12,12 +12,14 @@ use rpc::schema_registry::{
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "snake_case")]
 pub struct SchemaFieldDefinition {
     pub field_type: SchemaFieldType,
     pub optional: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "snake_case")]
 pub enum SchemaFieldType {
     Scalar(ScalarType),
     Object(HashMap<String, SchemaFieldDefinition>),
