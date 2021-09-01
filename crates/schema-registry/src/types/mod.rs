@@ -1,6 +1,9 @@
+use std::collections::HashMap;
+
+use ::types::schemas::SchemaFieldDefinition;
 use rpc::schema_registry::types::SchemaType;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use sqlx::types::Json;
 use uuid::Uuid;
 
 use self::view::View;
@@ -21,14 +24,16 @@ pub struct ExportSchema {
     pub query_address: String,
     #[serde(rename = "type")]
     pub schema_type: SchemaType,
-    pub definition: Value,
+    pub definition: Json<HashMap<String, SchemaFieldDefinition>>,
     pub views: Vec<View>,
 }
 
 #[cfg(test)]
 mod tests {
+    use ::types::schemas::{SchemaFieldDefinition, SchemaFieldType};
     use cdl_dto::materialization::{FieldDefinition, FieldType};
     use maplit::hashmap;
+    use rpc::schema_registry::types::{ScalarType, SchemaType};
     use serde_json::json;
     use sqlx::types::Json;
 
@@ -48,8 +53,11 @@ mod tests {
                         insert_destination: "cdl.document.1.data".into(),
                         query_address: "http://localhost:50201".into(),
                         schema_type: SchemaType::DocumentStorage,
-                        definition: json!({
-                            "a": "string"
+                        definition: Json(hashmap! {
+                            "foo".into() => SchemaFieldDefinition {
+                                optional: true,
+                                field_type: SchemaFieldType::Scalar(ScalarType::String),
+                            }
                         }),
                         views: vec![View {
                             id: "ec8cc976-412b-11eb-8000-000000000000".parse().unwrap(),
@@ -74,9 +82,11 @@ mod tests {
                         insert_destination: "cdl.document.1.data".into(),
                         query_address: "http://localhost:50201".into(),
                         schema_type: SchemaType::DocumentStorage,
-                        definition: json!({
-                            "name": "string",
-                            "department": "string"
+                        definition: Json(hashmap! {
+                            "foo".into() => SchemaFieldDefinition {
+                                optional: true,
+                                field_type: SchemaFieldType::Scalar(ScalarType::String),
+                            }
                         }),
                         views: vec![]
                     }

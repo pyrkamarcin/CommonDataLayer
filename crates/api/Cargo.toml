@@ -18,6 +18,7 @@ path = "src/lib.rs"
 cdl_dto     = { path = "../dto" }
 misc_utils  = { path = "../utils/misc" }
 rpc         = { path = "../rpc" }
+types       = { path = "../utils/types" }
 settings_utils          = { path = "../utils/settings" }
 communication_utils     = { path = "../utils/communication" }
 tracing_utils           = { path = "../utils/tracing", features = ["with_http", "with_graphql"] }

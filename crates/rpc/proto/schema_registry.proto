@@ -16,7 +16,7 @@ service SchemaRegistry {
     rpc GetAllViewsOfSchema (Id) returns (SchemaViews);
     rpc GetAllViewsByRelation (Id) returns (SchemaViews);
     rpc GetBaseSchemaOfView (Id) returns (Schema);
-    rpc ValidateValue (ValueToValidate) returns (Errors);
+    rpc ValidateValue (ValueToValidate) returns (ValidationResult);
     rpc WatchAllSchemaUpdates (Empty) returns (stream Schema);
     rpc Heartbeat (Empty) returns (Empty);
 }
@@ -26,7 +26,7 @@ message NewSchema {
     required string insert_destination = 2;
     required string query_address = 3;
     required SchemaType schema_type = 4;
-    required bytes definition = 5;
+    map<string, SchemaFieldDefinition> definition = 5;
 }
 
 message Schema {
@@ -35,7 +35,7 @@ message Schema {
     required string insert_destination = 3;
     required string query_address = 4;
     required SchemaType schema_type = 5;
-    required bytes definition = 6;
+    map<string, SchemaFieldDefinition> definition = 6;
 }
 
 message FullSchema {
@@ -44,7 +44,7 @@ message FullSchema {
     required string insert_destination = 3;
     required string query_address = 4;
     required SchemaType schema_type = 5;
-    required bytes definition = 6;
+    map<string, SchemaFieldDefinition> definition = 6;
     repeated View views = 7;
 }
 
@@ -54,7 +54,13 @@ message SchemaUpdate {
     optional string insert_destination = 3;
     optional string query_address = 4;
     optional SchemaType schema_type = 5;
-    optional bytes definition = 6;
+    map<string, SchemaFieldDefinition> definition = 6;
+    required bool update_definition = 7;
+}
+
+message SchemaFieldDefinition {
+    required SchemaFieldType field_type = 1;
+    required bool optional = 2;
 }
 
 message View {
@@ -201,8 +207,8 @@ message ValueToValidate {
     required bytes value = 2;
 }
 
-message Errors {
-    repeated string errors = 1;
+message ValidationResult {
+    optional string error = 1;
 }
 
 message SchemaType {
@@ -211,6 +217,29 @@ message SchemaType {
         Timeseries = 1;
     }
     required Type schema_type = 1;
+}
+
+message ScalarType {
+    enum Type {
+        Bool = 0;
+        String = 1;
+        Integer = 2;
+        Decimal = 3;
+        Any = 4;
+    }
+    required Type scalar_type = 1;
+}
+
+message SchemaFieldType {
+    enum Type {
+        Scalar = 0;
+        Object = 1;
+        Array = 2;
+    }
+    required Type field_type = 1;
+    optional ScalarType scalar_type = 2;
+    map<string, SchemaFieldDefinition> field_types = 3;
+    optional SchemaFieldDefinition item_type = 4;
 }
 
 message Empty {}

@@ -1,4 +1,4 @@
-use super::schema_type;
+use super::{scalar_type, schema_type};
 
 rpc_enum! {
     SchemaType,
@@ -9,5 +9,20 @@ rpc_enum! {
     [
         DocumentStorage,
         Timeseries
+    ]
+}
+
+rpc_enum! {
+    ScalarType,
+    scalar_type::Type,
+    scalar_type,
+    "scalar type",
+    "scalar_type_enum",
+    [
+        Bool,
+        String,
+        Integer,
+        Decimal,
+        Any
     ]
 }

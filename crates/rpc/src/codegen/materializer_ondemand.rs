@@ -14,7 +14,7 @@ pub struct Schema {
 pub struct Empty {}
 #[doc = r" Generated client implementations."]
 pub mod on_demand_materializer_client {
-    #![allow(unused_variables, dead_code, missing_docs)]
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     #[derive(Debug, Clone)]
     pub struct OnDemandMaterializerClient<T> {
@@ -47,14 +47,14 @@ pub mod on_demand_materializer_client {
             interceptor: F,
         ) -> OnDemandMaterializerClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
-            T: Service<
+            F: tonic::service::Interceptor,
+            T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
                     <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
                 >,
             >,
-            <T as Service<http::Request<tonic::body::BoxBody>>>::Error:
+            <T as tonic::codegen::Service<http::Request<tonic::body::BoxBody>>>::Error:
                 Into<StdError> + Send + Sync,
         {
             OnDemandMaterializerClient::new(InterceptedService::new(inner, interceptor))
@@ -113,7 +113,7 @@ pub mod on_demand_materializer_client {
 }
 #[doc = r" Generated server implementations."]
 pub mod on_demand_materializer_server {
-    #![allow(unused_variables, dead_code, missing_docs)]
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     #[doc = "Generated trait containing gRPC methods that should be implemented for use with OnDemandMaterializerServer."]
     #[async_trait]
@@ -151,12 +151,12 @@ pub mod on_demand_materializer_server {
         }
         pub fn with_interceptor<F>(inner: T, interceptor: F) -> InterceptedService<Self, F>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
         {
             InterceptedService::new(Self::new(inner), interceptor)
         }
     }
-    impl<T, B> Service<http::Request<B>> for OnDemandMaterializerServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for OnDemandMaterializerServer<T>
     where
         T: OnDemandMaterializer,
         B: Body + Send + Sync + 'static,

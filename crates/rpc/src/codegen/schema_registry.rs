@@ -8,8 +8,9 @@ pub struct NewSchema {
     pub query_address: ::prost::alloc::string::String,
     #[prost(message, required, tag = "4")]
     pub schema_type: SchemaType,
-    #[prost(bytes = "vec", required, tag = "5")]
-    pub definition: ::prost::alloc::vec::Vec<u8>,
+    #[prost(map = "string, message", tag = "5")]
+    pub definition:
+        ::std::collections::HashMap<::prost::alloc::string::String, SchemaFieldDefinition>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Schema {
@@ -23,8 +24,9 @@ pub struct Schema {
     pub query_address: ::prost::alloc::string::String,
     #[prost(message, required, tag = "5")]
     pub schema_type: SchemaType,
-    #[prost(bytes = "vec", required, tag = "6")]
-    pub definition: ::prost::alloc::vec::Vec<u8>,
+    #[prost(map = "string, message", tag = "6")]
+    pub definition:
+        ::std::collections::HashMap<::prost::alloc::string::String, SchemaFieldDefinition>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FullSchema {
@@ -38,8 +40,9 @@ pub struct FullSchema {
     pub query_address: ::prost::alloc::string::String,
     #[prost(message, required, tag = "5")]
     pub schema_type: SchemaType,
-    #[prost(bytes = "vec", required, tag = "6")]
-    pub definition: ::prost::alloc::vec::Vec<u8>,
+    #[prost(map = "string, message", tag = "6")]
+    pub definition:
+        ::std::collections::HashMap<::prost::alloc::string::String, SchemaFieldDefinition>,
     #[prost(message, repeated, tag = "7")]
     pub views: ::prost::alloc::vec::Vec<View>,
 }
@@ -55,8 +58,18 @@ pub struct SchemaUpdate {
     pub query_address: ::core::option::Option<::prost::alloc::string::String>,
     #[prost(message, optional, tag = "5")]
     pub schema_type: ::core::option::Option<SchemaType>,
-    #[prost(bytes = "vec", optional, tag = "6")]
-    pub definition: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
+    #[prost(map = "string, message", tag = "6")]
+    pub definition:
+        ::std::collections::HashMap<::prost::alloc::string::String, SchemaFieldDefinition>,
+    #[prost(bool, required, tag = "7")]
+    pub update_definition: bool,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SchemaFieldDefinition {
+    #[prost(message, required, boxed, tag = "1")]
+    pub field_type: ::prost::alloc::boxed::Box<SchemaFieldType>,
+    #[prost(bool, required, tag = "2")]
+    pub optional: bool,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct View {
@@ -300,9 +313,9 @@ pub struct ValueToValidate {
     pub value: ::prost::alloc::vec::Vec<u8>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Errors {
-    #[prost(string, repeated, tag = "1")]
-    pub errors: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+pub struct ValidationResult {
+    #[prost(string, optional, tag = "1")]
+    pub error: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SchemaType {
@@ -319,10 +332,49 @@ pub mod schema_type {
     }
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ScalarType {
+    #[prost(enumeration = "scalar_type::Type", required, tag = "1")]
+    pub scalar_type: i32,
+}
+/// Nested message and enum types in `ScalarType`.
+pub mod scalar_type {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum Type {
+        Bool = 0,
+        String = 1,
+        Integer = 2,
+        Decimal = 3,
+        Any = 4,
+    }
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SchemaFieldType {
+    #[prost(enumeration = "schema_field_type::Type", required, tag = "1")]
+    pub field_type: i32,
+    #[prost(message, optional, tag = "2")]
+    pub scalar_type: ::core::option::Option<ScalarType>,
+    #[prost(map = "string, message", tag = "3")]
+    pub field_types:
+        ::std::collections::HashMap<::prost::alloc::string::String, SchemaFieldDefinition>,
+    #[prost(message, optional, boxed, tag = "4")]
+    pub item_type: ::core::option::Option<::prost::alloc::boxed::Box<SchemaFieldDefinition>>,
+}
+/// Nested message and enum types in `SchemaFieldType`.
+pub mod schema_field_type {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum Type {
+        Scalar = 0,
+        Object = 1,
+        Array = 2,
+    }
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Empty {}
 #[doc = r" Generated client implementations."]
 pub mod schema_registry_client {
-    #![allow(unused_variables, dead_code, missing_docs)]
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     #[derive(Debug, Clone)]
     pub struct SchemaRegistryClient<T> {
@@ -355,14 +407,14 @@ pub mod schema_registry_client {
             interceptor: F,
         ) -> SchemaRegistryClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
-            T: Service<
+            F: tonic::service::Interceptor,
+            T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
                     <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
                 >,
             >,
-            <T as Service<http::Request<tonic::body::BoxBody>>>::Error:
+            <T as tonic::codegen::Service<http::Request<tonic::body::BoxBody>>>::Error:
                 Into<StdError> + Send + Sync,
         {
             SchemaRegistryClient::new(InterceptedService::new(inner, interceptor))
@@ -571,7 +623,7 @@ pub mod schema_registry_client {
         pub async fn validate_value(
             &mut self,
             request: impl tonic::IntoRequest<super::ValueToValidate>,
-        ) -> Result<tonic::Response<super::Errors>, tonic::Status> {
+        ) -> Result<tonic::Response<super::ValidationResult>, tonic::Status> {
             self.inner.ready().await.map_err(|e| {
                 tonic::Status::new(
                     tonic::Code::Unknown,
@@ -622,7 +674,7 @@ pub mod schema_registry_client {
 }
 #[doc = r" Generated server implementations."]
 pub mod schema_registry_server {
-    #![allow(unused_variables, dead_code, missing_docs)]
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     #[doc = "Generated trait containing gRPC methods that should be implemented for use with SchemaRegistryServer."]
     #[async_trait]
@@ -678,7 +730,7 @@ pub mod schema_registry_server {
         async fn validate_value(
             &self,
             request: tonic::Request<super::ValueToValidate>,
-        ) -> Result<tonic::Response<super::Errors>, tonic::Status>;
+        ) -> Result<tonic::Response<super::ValidationResult>, tonic::Status>;
         #[doc = "Server streaming response type for the WatchAllSchemaUpdates method."]
         type WatchAllSchemaUpdatesStream: futures_core::Stream<Item = Result<super::Schema, tonic::Status>>
             + Send
@@ -712,12 +764,12 @@ pub mod schema_registry_server {
         }
         pub fn with_interceptor<F>(inner: T, interceptor: F) -> InterceptedService<Self, F>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
         {
             InterceptedService::new(Self::new(inner), interceptor)
         }
     }
-    impl<T, B> Service<http::Request<B>> for SchemaRegistryServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for SchemaRegistryServer<T>
     where
         T: SchemaRegistry,
         B: Body + Send + Sync + 'static,
@@ -1089,7 +1141,7 @@ pub mod schema_registry_server {
                     impl<T: SchemaRegistry> tonic::server::UnaryService<super::ValueToValidate>
                         for ValidateValueSvc<T>
                     {
-                        type Response = super::Errors;
+                        type Response = super::ValidationResult;
                         type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
                         fn call(
                             &mut self,

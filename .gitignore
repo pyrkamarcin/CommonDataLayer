@@ -7,3 +7,5 @@ __pycache__
 tests/rpc/
 docs/mdbook-plantuml-img/
 .tmp
+**/.env
+crates/**/Cargo.lock

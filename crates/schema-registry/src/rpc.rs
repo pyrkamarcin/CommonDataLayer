@@ -1,5 +1,11 @@
-use std::{collections::HashMap, convert::TryInto, pin::Pin, time::Duration};
+use std::{
+    collections::HashMap,
+    convert::{TryFrom, TryInto},
+    pin::Pin,
+    time::Duration,
+};
 
+use ::types::schemas::SchemaFieldDefinition;
 use bb8::Pool;
 use cdl_dto::{materialization::Relation, TryFromRpc, TryIntoRpc};
 use communication_utils::{metadata_fetcher::MetadataFetcher, Result};
@@ -9,10 +15,11 @@ use rpc::{
     schema_registry::{
         schema_registry_server::SchemaRegistry,
         Empty,
-        Errors,
         Id,
+        SchemaFieldDefinition as SchemaFieldDefinitionRpc,
         SchemaUpdate as RpcSchemaUpdate,
         SchemaViews,
+        ValidationResult,
         ValueToValidate,
     },
 };
@@ -78,7 +85,7 @@ impl SchemaRegistry for SchemaRegistryImpl {
         let request = request.into_inner();
         let new_schema = NewSchema {
             name: request.name,
-            definition: parse_json_and_deserialize(&request.definition)?,
+            definition: Json(convert_definition_from_rpc(request.definition)?),
             query_address: request.query_address,
             insert_destination: request.insert_destination,
             schema_type: request
@@ -123,10 +130,8 @@ impl SchemaRegistry for SchemaRegistryImpl {
             None
         };
 
-        let definition = if let Some(def) = request.definition {
-            Some(serde_json::from_slice(&def).map_err(|e| {
-                Status::invalid_argument(format!("Definition was not valid JSON: {:?}", e))
-            })?)
+        let definition = if request.update_definition {
+            Some(Json(convert_definition_from_rpc(request.definition)?))
         } else {
             None
         };
@@ -298,7 +303,7 @@ impl SchemaRegistry for SchemaRegistryImpl {
             insert_destination: schema.insert_destination,
             query_address: schema.query_address,
             schema_type: schema.schema_type.into(),
-            definition: serialize_json(&schema.definition)?,
+            definition: convert_definition_to_rpc(schema.definition.0)?,
         }))
     }
 
@@ -318,7 +323,7 @@ impl SchemaRegistry for SchemaRegistryImpl {
             insert_destination: schema.insert_destination,
             query_address: schema.query_address,
             schema_type: schema.schema_type.into(),
-            definition: serialize_json(&schema.definition)?,
+            definition: convert_definition_to_rpc(schema.definition.0)?,
             views: schema
                 .views
                 .into_iter()
@@ -406,7 +411,7 @@ impl SchemaRegistry for SchemaRegistryImpl {
                         insert_destination: schema.insert_destination,
                         query_address: schema.query_address,
                         schema_type: schema.schema_type.into(),
-                        definition: serialize_json(&schema.definition)?,
+                        definition: convert_definition_to_rpc(schema.definition.0)?,
                     })
                 })
                 .collect::<Result<Vec<_>, Status>>()?,
@@ -430,7 +435,7 @@ impl SchemaRegistry for SchemaRegistryImpl {
                         insert_destination: schema.insert_destination,
                         query_address: schema.query_address,
                         schema_type: schema.schema_type.into(),
-                        definition: serialize_json(&schema.definition)?,
+                        definition: convert_definition_to_rpc(schema.definition.0)?,
                         views: schema
                             .views
                             .into_iter()
@@ -520,27 +525,24 @@ impl SchemaRegistry for SchemaRegistryImpl {
             insert_destination: schema.insert_destination,
             query_address: schema.query_address,
             schema_type: schema.schema_type.into(),
-            definition: serialize_json(&schema.definition)?,
+            definition: convert_definition_to_rpc(schema.definition.0)?,
         }))
     }
 
     async fn validate_value(
         &self,
         request: Request<ValueToValidate>,
-    ) -> Result<Response<Errors>, Status> {
+    ) -> Result<Response<ValidationResult>, Status> {
         let request = request.into_inner();
         let json = parse_json_and_deserialize(&request.value)?;
         let schema_id = parse_uuid(&request.schema_id)?;
 
-        let definition = self.db.get_schema(schema_id).await?.definition;
-        let schema = jsonschema::JSONSchema::compile(&definition)
-            .map_err(|err| RegistryError::InvalidJsonSchema(err.to_string()))?;
-        let errors = match schema.validate(&json) {
-            Ok(()) => vec![],
-            Err(errors) => errors.map(|err| err.to_string()).collect(),
-        };
+        let definition = self.db.get_schema(schema_id).await?.definition.0;
+        let error = crate::validation::validate_data(&json, &definition)
+            .err()
+            .map(|err| err.to_string());
 
-        Ok(Response::new(Errors { errors }))
+        Ok(Response::new(ValidationResult { error }))
     }
 
     type WatchAllSchemaUpdatesStream = Pin<
@@ -557,7 +559,7 @@ impl SchemaRegistry for SchemaRegistryImpl {
 
         Ok(Response::new(Box::pin(
             tokio_stream::wrappers::UnboundedReceiverStream::new(schema_rx).map(|schema| {
-                let schema = schema?;
+                let schema = schema.map_err(|err| Status::internal(err.to_string()))?;
 
                 Ok(rpc::schema_registry::Schema {
                     id: schema.id.to_string(),
@@ -565,7 +567,7 @@ impl SchemaRegistry for SchemaRegistryImpl {
                     insert_destination: schema.insert_destination,
                     query_address: schema.query_address,
                     schema_type: schema.schema_type.into(),
-                    definition: serialize_json(&schema.definition)?,
+                    definition: convert_definition_to_rpc(schema.definition.0)?,
                 })
             }),
         )))
@@ -616,11 +618,6 @@ fn parse_uuid(id: &str) -> Result<Uuid, Status> {
         .map_err(|err| Status::invalid_argument(format!("Failed to parse UUID: {}", err)))
 }
 
-fn serialize_json<T: serde::Serialize>(json: &T) -> Result<Vec<u8>, Status> {
-    serde_json::to_vec(json)
-        .map_err(|err| Status::internal(format!("Unable to serialize JSON: {}", err)))
-}
-
 fn vec_into_rpc(views: Vec<FullView>) -> Result<Vec<rpc::schema_registry::FullView>, Status> {
     views
         .into_iter()
@@ -649,4 +646,35 @@ fn vec_into_rpc(views: Vec<FullView>) -> Result<Vec<rpc::schema_registry::FullVi
             })
         })
         .collect::<Result<Vec<_>, tonic::Status>>()
+}
+
+fn convert_definition_from_rpc(
+    definition: HashMap<String, SchemaFieldDefinitionRpc>,
+) -> Result<HashMap<String, SchemaFieldDefinition>, Status> {
+    definition
+        .into_iter()
+        .map(|(field_name, field_definition)| {
+            Ok((
+                field_name,
+                SchemaFieldDefinition::try_from(field_definition)
+                    .map_err(|err| Status::internal(format!("Invalid definition: {}", err)))?,
+            ))
+        })
+        .collect::<Result<_, Status>>()
+}
+
+fn convert_definition_to_rpc(
+    definition: HashMap<String, SchemaFieldDefinition>,
+) -> Result<HashMap<String, SchemaFieldDefinitionRpc>, Status> {
+    definition
+        .into_iter()
+        .map(|(field_name, field_definition)| {
+            Ok((
+                field_name,
+                field_definition
+                    .try_into()
+                    .map_err(|err| Status::internal(format!("Invalid definition: {}", err)))?,
+            ))
+        })
+        .collect::<Result<_, Status>>()
 }

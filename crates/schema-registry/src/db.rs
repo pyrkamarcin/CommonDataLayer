@@ -21,7 +21,6 @@ use crate::{
         DbExport,
         ExportSchema,
     },
-    utils::build_full_schema,
 };
 
 const SCHEMAS_LISTEN_CHANNEL: &str = "schemas";
@@ -75,7 +74,7 @@ impl SchemaRegistryDb {
         sqlx::query_as!(
             Schema,
             "SELECT id, name, insert_destination, query_address,
-               schema_type as \"schema_type: _\", definition
+               schema_type as \"schema_type: _\", definition as \"definition: _\"
              FROM schemas WHERE id = $1",
             id
         )
@@ -90,7 +89,7 @@ impl SchemaRegistryDb {
         sqlx::query_as!(
             Schema,
             "SELECT id, name, insert_destination, query_address,
-               schema_type as \"schema_type: _\", definition
+               schema_type as \"schema_type: _\", definition as \"definition: _\"
              FROM schemas WHERE id = (SELECT base_schema FROM views WHERE id = $1)",
             id
         )
@@ -191,7 +190,7 @@ impl SchemaRegistryDb {
         sqlx::query_as!(
             Schema,
             "SELECT id, name, insert_destination, query_address,
-               schema_type as \"schema_type: _\", definition
+               schema_type as \"schema_type: _\", definition as \"definition: _\"
              FROM schemas ORDER BY name"
         )
         .fetch_all(&mut conn)
@@ -205,7 +204,7 @@ impl SchemaRegistryDb {
         let all_schemas = sqlx::query_as!(
             Schema,
             "SELECT id, name, insert_destination, query_address,
-               schema_type as \"schema_type: _\", definition
+               schema_type as \"schema_type: _\", definition as \"definition: _\"
              FROM schemas"
         )
         .fetch_all(&mut conn)
@@ -241,21 +240,22 @@ impl SchemaRegistryDb {
             .collect()
     }
 
-    pub async fn add_schema(&self, mut schema: NewSchema) -> RegistryResult<Uuid> {
+    pub async fn add_schema(&self, schema: NewSchema) -> RegistryResult<Uuid> {
         let mut conn = self.connect().await?;
 
         let new_id = Uuid::new_v4();
-        build_full_schema(&mut schema.definition, self).await?;
 
         sqlx::query!(
-            "INSERT INTO schemas(id, name, schema_type, insert_destination, query_address, definition) \
+            "INSERT INTO schemas(
+                id, name, schema_type, insert_destination,
+                query_address, definition) \
              VALUES($1, $2, $3, $4, $5, $6)",
             &new_id,
             &schema.name,
             &schema.schema_type as &rpc::schema_registry::types::SchemaType,
             &schema.insert_destination,
             &schema.query_address,
-            &schema.definition,
+            &schema.definition as _,
         )
         .execute(&mut conn)
         .await?;
@@ -302,7 +302,7 @@ impl SchemaRegistryDb {
                 .insert_destination
                 .unwrap_or(old_schema.insert_destination),
             update.query_address.unwrap_or(old_schema.query_address),
-            update.definition.unwrap_or(old_schema.definition),
+            update.definition.unwrap_or(old_schema.definition) as _,
             id
         )
         .execute(&mut conn)
@@ -341,18 +341,9 @@ impl SchemaRegistryDb {
         schema_id: Uuid,
         json: &Value,
     ) -> RegistryResult<()> {
-        let definition = self.get_schema(schema_id).await?.definition;
-        let schema = jsonschema::JSONSchema::compile(&definition)
-            .map_err(|err| RegistryError::InvalidJsonSchema(err.to_string()))?;
+        let definition = self.get_schema(schema_id).await?.definition.0;
 
-        let result = match schema.validate(json) {
-            Ok(()) => Ok(()),
-            Err(errors) => Err(RegistryError::InvalidData(
-                errors.map(|err| err.to_string()).collect(),
-            )),
-        };
-
-        result
+        crate::validation::validate_data(json, &definition)
     }
 
     pub async fn listen_to_schema_updates(
@@ -432,7 +423,7 @@ impl SchemaRegistryDb {
                             schema.schema_type as _,
                             schema.insert_destination,
                             schema.query_address,
-                            schema.definition
+                            schema.definition as _
                         )
                         .execute(c.acquire().await?)
                         .await?;

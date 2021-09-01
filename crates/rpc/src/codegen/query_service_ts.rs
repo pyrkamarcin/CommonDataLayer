@@ -33,7 +33,7 @@ pub struct ValueBytes {
 }
 #[doc = r" Generated client implementations."]
 pub mod query_service_ts_client {
-    #![allow(unused_variables, dead_code, missing_docs)]
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     #[derive(Debug, Clone)]
     pub struct QueryServiceTsClient<T> {
@@ -66,14 +66,14 @@ pub mod query_service_ts_client {
             interceptor: F,
         ) -> QueryServiceTsClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
-            T: Service<
+            F: tonic::service::Interceptor,
+            T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
                     <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
                 >,
             >,
-            <T as Service<http::Request<tonic::body::BoxBody>>>::Error:
+            <T as tonic::codegen::Service<http::Request<tonic::body::BoxBody>>>::Error:
                 Into<StdError> + Send + Sync,
         {
             QueryServiceTsClient::new(InterceptedService::new(inner, interceptor))
@@ -142,7 +142,7 @@ pub mod query_service_ts_client {
 }
 #[doc = r" Generated server implementations."]
 pub mod query_service_ts_server {
-    #![allow(unused_variables, dead_code, missing_docs)]
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     #[doc = "Generated trait containing gRPC methods that should be implemented for use with QueryServiceTsServer."]
     #[async_trait]
@@ -179,12 +179,12 @@ pub mod query_service_ts_server {
         }
         pub fn with_interceptor<F>(inner: T, interceptor: F) -> InterceptedService<Self, F>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
         {
             InterceptedService::new(Self::new(inner), interceptor)
         }
     }
-    impl<T, B> Service<http::Request<B>> for QueryServiceTsServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for QueryServiceTsServer<T>
     where
         T: QueryServiceTs,
         B: Body + Send + Sync + 'static,

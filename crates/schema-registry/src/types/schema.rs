@@ -1,6 +1,9 @@
+use std::collections::HashMap;
+
+use ::types::schemas::SchemaFieldDefinition;
 use rpc::schema_registry::types::SchemaType;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use sqlx::types::Json;
 use uuid::Uuid;
 
 use crate::types::view::FullView;
@@ -13,7 +16,7 @@ pub struct Schema {
     pub query_address: String,
     #[serde(rename = "type")]
     pub schema_type: SchemaType,
-    pub definition: Value,
+    pub definition: Json<HashMap<String, SchemaFieldDefinition>>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -23,7 +26,7 @@ pub struct NewSchema {
     pub query_address: String,
     #[serde(rename = "type")]
     pub schema_type: SchemaType,
-    pub definition: Value,
+    pub definition: Json<HashMap<String, SchemaFieldDefinition>>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -33,7 +36,7 @@ pub struct SchemaUpdate {
     pub query_address: Option<String>,
     #[serde(rename = "type")]
     pub schema_type: Option<SchemaType>,
-    pub definition: Option<Value>,
+    pub definition: Option<Json<HashMap<String, SchemaFieldDefinition>>>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -44,33 +47,6 @@ pub struct FullSchema {
     pub query_address: String,
     #[serde(rename = "type")]
     pub schema_type: SchemaType,
-    pub definition: Value,
+    pub definition: Json<HashMap<String, SchemaFieldDefinition>>,
     pub views: Vec<FullView>,
-}
-
-pub struct ObjectFieldDefinition {
-    pub field_type: ScalarType,
-    pub optional: bool,
-}
-
-pub enum ScalarType {
-    Bool(bool),
-    String(String),
-    Integer(i64),
-    Decimal(f64),
-    Any(Value),
-}
-
-pub enum SchemaDefinition {
-    Scalar {
-        scalar_type: ScalarType,
-        optional: bool,
-    },
-    Object {
-        fields: HashMap<String, ObjectFieldDefinition>,
-    },
-    Array {
-        item_type: SchemaChildType,
-        optional: bool,
-    }
 }

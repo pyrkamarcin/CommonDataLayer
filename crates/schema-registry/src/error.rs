@@ -17,10 +17,8 @@ pub enum RegistryError {
     NoInsertDestination(String),
     #[error("Given schema type is invalid")]
     InvalidSchemaType,
-    #[error("Input data does not match schema: {}", join_with_commas(.0))]
-    InvalidData(Vec<String>),
-    #[error("Invalid JSON schema: {0}")]
-    InvalidJsonSchema(String),
+    #[error("Input data does not match schema: {0}")]
+    InvalidData(String),
     #[error("Error receiving notification from database: {0}")]
     NotificationError(sqlx::Error),
     #[error("Malformed notification payload: {0}")]
@@ -41,23 +39,15 @@ pub enum RegistryError {
 
 pub type RegistryResult<T> = Result<T, RegistryError>;
 
-fn join_with_commas<'a>(errors: impl IntoIterator<Item = &'a String>) -> String {
-    errors
-        .into_iter()
-        .map(|e| e.to_string())
-        .collect::<Vec<_>>()
-        .join(", ")
-}
-
 impl From<RegistryError> for Status {
     fn from(error: RegistryError) -> Status {
         match error {
             RegistryError::NoInsertDestination(_)
             | RegistryError::NoSchemaWithId(_)
             | RegistryError::NoViewWithId(_) => Status::not_found(error.to_string()),
-            RegistryError::InvalidSchemaType
-            | RegistryError::InvalidData(_)
-            | RegistryError::InvalidJsonSchema(_) => Status::invalid_argument(error.to_string()),
+            RegistryError::InvalidSchemaType | RegistryError::InvalidData(_) => {
+                Status::invalid_argument(error.to_string())
+            }
             RegistryError::ConnectionError(_)
             | RegistryError::DbError(_)
             | RegistryError::MQError(_)

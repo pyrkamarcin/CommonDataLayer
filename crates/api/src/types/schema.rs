@@ -1,9 +1,11 @@
-use std::convert::TryInto;
+use std::{
+    collections::HashMap,
+    convert::{TryFrom, TryInto},
+};
 
-use anyhow::Context;
+use ::types::schemas::SchemaFieldDefinition;
 use async_graphql::{FieldResult, InputObject, Json, SimpleObject};
 use rpc::schema_registry::types::SchemaType;
-use serde_json::Value;
 use uuid::Uuid;
 
 use crate::types::view::View;
@@ -22,7 +24,7 @@ pub struct FullSchema {
     /// Whether this schema represents documents or timeseries data.
     pub schema_type: SchemaType,
     /// The format of data stored under this schema.
-    pub definition: Value,
+    pub definition: Json<HashMap<String, SchemaFieldDefinition>>,
     /// All views belonging to this schema.
     pub views: Vec<View>,
 }
@@ -37,7 +39,18 @@ impl FullSchema {
             insert_destination: schema.insert_destination,
             query_address: schema.query_address,
             schema_type,
-            definition: serde_json::from_slice(&schema.definition)?,
+            definition: Json(
+                schema
+                    .definition
+                    .into_iter()
+                    .map(|(field_name, field_definition)| {
+                        Ok((
+                            field_name,
+                            SchemaFieldDefinition::try_from(field_definition)?,
+                        ))
+                    })
+                    .collect::<FieldResult<HashMap<_, _>>>()?,
+            ),
             views: schema
                 .views
                 .into_iter()
@@ -58,7 +71,7 @@ pub struct NewSchema {
     /// Destination to which data is inserted by data-router.
     pub insert_destination: String,
     /// Definition is stored as a JSON value and therefore needs to be valid JSON.
-    pub definition: Json<Value>,
+    pub definition: Json<HashMap<String, SchemaFieldDefinition>>,
     /// Whether the schema stores documents or timeseries data.
     #[graphql(name = "type")]
     pub schema_type: SchemaType,
@@ -71,7 +84,14 @@ impl NewSchema {
             schema_type: self.schema_type.into(),
             insert_destination: self.insert_destination,
             query_address: self.query_address,
-            definition: serde_json::to_vec(&self.definition)?,
+            definition: self
+                .definition
+                .0
+                .into_iter()
+                .map(|(field_name, field_definition)| {
+                    Ok((field_name, field_definition.try_into()?))
+                })
+                .collect::<FieldResult<HashMap<_, _>>>()?,
         })
     }
 }
@@ -90,22 +110,32 @@ pub struct UpdateSchema {
     #[graphql(name = "type")]
     pub schema_type: Option<SchemaType>,
     /// Definition of the data stored under this schema.
-    pub definition: Option<Json<Value>>,
+    pub definition: Option<Json<HashMap<String, SchemaFieldDefinition>>>,
 }
 
 impl UpdateSchema {
     pub fn into_rpc(self, id: Uuid) -> anyhow::Result<rpc::schema_registry::SchemaUpdate> {
+        let (update_definition, definition) = if let Some(def) = self.definition {
+            (
+                true,
+                def.0.into_iter()
+                    .map(|(field_name, field_definition)| {
+                        Ok((field_name, field_definition.try_into()?))
+                    })
+                    .collect::<anyhow::Result<HashMap<String, rpc::schema_registry::SchemaFieldDefinition>>>()?,
+            )
+        } else {
+            (false, HashMap::new())
+        };
+
         Ok(rpc::schema_registry::SchemaUpdate {
             id: id.to_string(),
             name: self.name,
             insert_destination: self.insert_destination,
             query_address: self.query_address,
             schema_type: self.schema_type.map(Into::into),
-            definition: if let Some(def) = self.definition {
-                Some(serde_json::to_vec(&def).context("Error serializing JSON")?)
-            } else {
-                None
-            },
+            update_definition,
+            definition,
         })
     }
 }

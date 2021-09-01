@@ -9,7 +9,7 @@ pub struct Message {
 pub struct Empty {}
 #[doc = r" Generated client implementations."]
 pub mod generic_rpc_client {
-    #![allow(unused_variables, dead_code, missing_docs)]
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     #[derive(Debug, Clone)]
     pub struct GenericRpcClient<T> {
@@ -42,14 +42,14 @@ pub mod generic_rpc_client {
             interceptor: F,
         ) -> GenericRpcClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
-            T: Service<
+            F: tonic::service::Interceptor,
+            T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
                     <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
                 >,
             >,
-            <T as Service<http::Request<tonic::body::BoxBody>>>::Error:
+            <T as tonic::codegen::Service<http::Request<tonic::body::BoxBody>>>::Error:
                 Into<StdError> + Send + Sync,
         {
             GenericRpcClient::new(InterceptedService::new(inner, interceptor))
@@ -85,7 +85,7 @@ pub mod generic_rpc_client {
 }
 #[doc = r" Generated server implementations."]
 pub mod generic_rpc_server {
-    #![allow(unused_variables, dead_code, missing_docs)]
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     #[doc = "Generated trait containing gRPC methods that should be implemented for use with GenericRpcServer."]
     #[async_trait]
@@ -114,12 +114,12 @@ pub mod generic_rpc_server {
         }
         pub fn with_interceptor<F>(inner: T, interceptor: F) -> InterceptedService<Self, F>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
         {
             InterceptedService::new(Self::new(inner), interceptor)
         }
     }
-    impl<T, B> Service<http::Request<B>> for GenericRpcServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for GenericRpcServer<T>
     where
         T: GenericRpc,
         B: Body + Send + Sync + 'static,

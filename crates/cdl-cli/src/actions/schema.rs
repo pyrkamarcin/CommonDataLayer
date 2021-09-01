@@ -1,5 +1,6 @@
-use std::{convert::TryInto, path::PathBuf};
+use std::{collections::HashMap, convert::TryInto, path::PathBuf};
 
+use ::types::schemas::SchemaFieldDefinition;
 use rpc::schema_registry::{
     types::SchemaType,
     Empty,
@@ -8,7 +9,6 @@ use rpc::schema_registry::{
     SchemaUpdate,
     ValueToValidate,
 };
-use serde_json::Value;
 use uuid::Uuid;
 
 use crate::utils::*;
@@ -23,7 +23,9 @@ pub async fn get_schema_definition(schema_id: Uuid, registry_addr: String) -> an
 
     println!(
         "{:#}",
-        serde_json::from_slice::<Value>(&response.into_inner().definition)?
+        serde_json::to_value(convert_definition_from_rpc(
+            response.into_inner().definition
+        )?)?
     );
 
     Ok(())
@@ -37,7 +39,7 @@ pub async fn add_schema(
     schema_type: SchemaType,
     registry_addr: String,
 ) -> anyhow::Result<()> {
-    let definition = read_json(file)?;
+    let definition = read_json::<HashMap<String, SchemaFieldDefinition>>(file)?;
 
     let mut client = rpc::schema_registry::connect(registry_addr).await?;
     let response = client
@@ -46,7 +48,7 @@ pub async fn add_schema(
             query_address,
             insert_destination,
             schema_type: schema_type.into(),
-            definition: serde_json::to_vec(&definition)?,
+            definition: convert_definition_to_rpc(definition)?,
         })
         .await?;
 
@@ -72,6 +74,12 @@ pub async fn update_schema(
     registry_addr: String,
 ) -> anyhow::Result<()> {
     let mut client = rpc::schema_registry::connect(registry_addr).await?;
+    let definition = if update_definition {
+        convert_definition_to_rpc(read_json::<HashMap<String, SchemaFieldDefinition>>(file)?)?
+    } else {
+        HashMap::new()
+    };
+
     client
         .update_schema(SchemaUpdate {
             id: id.to_string(),
@@ -79,11 +87,8 @@ pub async fn update_schema(
             insert_destination,
             query_address,
             schema_type: schema_type.map(|t| t.into()),
-            definition: if update_definition {
-                Some(serde_json::to_vec(&read_json(file)?)?)
-            } else {
-                None
-            },
+            update_definition,
+            definition,
         })
         .await?;
 
@@ -130,19 +135,19 @@ pub async fn validate_value(
     let value = read_json(file)?;
 
     let mut client = rpc::schema_registry::connect(registry_addr).await?;
-    let errors = client
+    let error = client
         .validate_value(ValueToValidate {
             schema_id: schema_id.to_string(),
             value: serde_json::to_vec(&value)?,
         })
         .await?
         .into_inner()
-        .errors;
+        .error;
 
-    if !errors.is_empty() {
-        anyhow::bail!("The value is not valid. {}", errors.join(", "));
+    if let Some(err) = error {
+        Err(anyhow::anyhow!("The value is not valid. {}", err))
+    } else {
+        println!("The value is valid.");
+        Ok(())
     }
-
-    println!("The value is valid.");
-    Ok(())
 }
