@@ -15,7 +15,7 @@ For the feature to work correctly we have to determine the value type before doi
 ### Auto conversion:
 All mentioned in this document operators take the same input types as output types. However, i64 values should be automatically converted to f64 type if the expected output is of f64 type.
 ### Errors
-All of the mentioned operators should returns errors on parameter conversion and others, mentioned per operator type, as non-critical errors. That means that processing of the row should be aborted, an error should be reported, but processing of the whole process should be allowed to continue.
+All of the mentioned operators should return errors on parameter conversion and others, mentioned per operator type, as non-critical errors. That means that processing of the row should be aborted, an error should be reported, but processing of the whole process should be allowed to continue.
 
 ### Operators
 Each operator defines types it can work on and lists of errors that can be returned. As operators' names should be self-explanatory operator descriptions are skipped. Errors regarding wrong parameter types are not mentioned here as they can always happen and are not related to specific operators or their usage.
