@@ -17,8 +17,8 @@ pub fn validate_data(
     for (field_name, definition) in schema_definition.iter() {
         validate_data_inner(
             fields.get(field_name).as_ref().unwrap_or(&&Value::Null),
-            &definition,
-            &vec![field_name.to_owned()],
+            definition,
+            &[field_name.to_owned()],
         )?;
     }
 
@@ -28,7 +28,7 @@ pub fn validate_data(
 fn validate_data_inner(
     data: &Value,
     type_: &SchemaFieldDefinition,
-    path: &Vec<String>,
+    path: &[String],
 ) -> RegistryResult<()> {
     if data.is_null() {
         if type_.optional {
@@ -72,7 +72,7 @@ fn validate_data_inner(
                 let field_path = extend_path(path, field_name.to_owned());
                 match data_fields.get(field_name).filter(|f| !f.is_null()) {
                     Some(field_data) => {
-                        validate_data_inner(field_data, &field_definition, &field_path)?;
+                        validate_data_inner(field_data, field_definition, &field_path)?;
                     }
                     None => {
                         if !field_definition.optional {
@@ -90,7 +90,7 @@ fn validate_data_inner(
 
             for (index, item) in items.iter().enumerate() {
                 let item_path = extend_path(path, index.to_string());
-                validate_data_inner(item, &item_type, &item_path)?;
+                validate_data_inner(item, item_type, &item_path)?;
             }
         }
     }
@@ -98,7 +98,7 @@ fn validate_data_inner(
     Ok(())
 }
 
-pub fn wrong_type(expected_type: &str, path: &Vec<String>) -> RegistryError {
+pub fn wrong_type(expected_type: &str, path: &[String]) -> RegistryError {
     RegistryError::InvalidData(format!(
         "Expected data to be a {}: Path `{}`",
         expected_type,
@@ -106,7 +106,7 @@ pub fn wrong_type(expected_type: &str, path: &Vec<String>) -> RegistryError {
     ))
 }
 
-pub fn extend_path(base_path: &Vec<String>, segment: String) -> Vec<String> {
+pub fn extend_path(base_path: &[String], segment: String) -> Vec<String> {
     base_path
         .iter()
         .cloned()
