@@ -10,24 +10,24 @@ Tools used:
 * `psql` - for checking materialized data in Postgres
 * web browser - for checking Jaeger traces & GraphQL interactive API.
 
-### Preparing environment
+# Preparing environment
 The easiest way to set up an environment is to use [Common Data Layer deployment repository](https://github.com/epiphany-platform/CommonDataLayer-deployment).
 
 You can use one of the examples provided there to run everything with one command.
 
-### Setup
+## Setup
 To materialize view, one needs proper setup.
 
 Firstly, the system needs schema which informs where to store data (for example in document storage like Postgres). Secondly, it needs view definition which informs what fields are necessary and from which schema it should take it. It also defines where to put materialized data.
 
 During this tutorial, we are going to introduce several ways of inserting and mutating state of CDL. One of them (GraphQL) is designed only for management and test purposes. However, it is the easiest way to quickly manually test the materialization pipeline.
 
-#### A) Manual setup
+### Manual setup
 The most common and production-like way to set up is by sending requests to the schema registry.
 
-##### Adding new schema
+#### Adding new schema
 
-######  GRPC API
+##### - GRPC API
 To add new schema, we need to load schema_registry.proto to our client. In this tutorial, we are going to use BloomRPC.
 All proto files are stored in `crates/rpc/proto` directory.
 In the proto file, we can see that message `NewSchema` uses `bytes` as a definition. In BloomRPC it means we need to encode our JSON definition in base 64:
@@ -72,7 +72,7 @@ RPC response:
 
 Let's save this UUID for later. It is `schema_id`.
 
-######  GraphQL API (management and test purposes only)
+##### - GraphQL API (management and test purposes only)
 Instead of using GRPC, we can also leverage GraphQL Gateway API to manage all schemas: An easy-to-use interface is available at [http://localhost:50106/graphiql](http://localhost:50106/graphiql)
 
 Mutation request:
@@ -93,10 +93,10 @@ mutation addSchema {
 
 As you can see, it does not require encoding definition, and it can return all schema metadata. Therefore, we filter it to retrieve only `schema_id`.
 
-##### Adding new view
+#### Adding new view
 Next, we need to add a new view definition.
 
-######  GRPC API
+##### - GRPC API
 GRPC request (`schema_registry.SchemaRegistry.AddViewToSchema`):
 
 ```json
@@ -124,7 +124,7 @@ GRPC response:
 
 This is the `view_id`.
 
-######  GraphQL API (management and test purposes only)
+##### - GraphQL API (management and test purposes only)
 Mutation request:
 
 ```graphql
@@ -147,15 +147,13 @@ mutation addView{
 }
 ```
 
-#### Loading initial schema
-While manual setup is fine for a one-time test, it quickly becomes mundane work. To mitigate this problem, we created a solution to pre-populate the schema registry.
-
-In fact, [Common Data Layer deployment repository](https://github.com/epiphany-platform/CommonDataLayer-deployment) already contains, [`bare/setup/schema-registry/initial-schema.kafka.json`](https://github.com/epiphany-platform/CommonDataLayer-deployment/blob/develop/bare/setup/schema-registry/initial-schema.kafka.json) which describes what views and schemas should be inserted on startup.
+### Loading initial schema
+While manual setup is fine for a one-time test, it quickly becomes mundane work. To mitigate this problem, we created a solution to pre-populate the schema registry. In fact, [Common Data Layer deployment repository](Common Data Layer deployment repository) already contains a file which describes what views and schemas should be inserted on startup (`bare/setup/schema-registry/initial-schema.kafka.json`)
 
 ### Inserting data
 To materialize data first we need to insert it in the CDL.
 
-#### A) Python script
+##### - Python script
 For that purpose, we can write very simple Python script:
 
 ```python
@@ -200,7 +198,7 @@ with open('data.json', rb) as binary_file:
 ]
 ```
 
-#### GraphQL API (management and test purposes only)
+##### - GraphQL API (management and test purposes only)
 GraphQL's request:
 
 ```graphql
@@ -320,3 +318,6 @@ Unfortunately, GraphQL does not support streaming, which means all rows are coll
 
 ### Appendix: Checking traces in Jaeger
 For troubleshooting or when you are curious, how CDL works, we recommend using Jaeger telemetry sink, which by default is available at [http://localhost:16686/search](http://localhost:16686/search).
+
+
+[Common Data Layer deployment repository]: https://github.com/epiphany-platform/CommonDataLayer-deployment

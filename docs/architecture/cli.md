@@ -1,5 +1,9 @@
 # CLI
 
+## Important
+This component is marked as obsolete and will be removed at some point!
+
+
 ## Technical Description
 The CDL-CLI is the official tool for interacting with the CDL's Schema Registry, used both for viewing and manipulating
 schemas and their respective data.

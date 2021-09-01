@@ -21,11 +21,9 @@ Ingest methods:
 
 Egest methods (supported repositories):
 
-- Postgresql (tested on 12, should support anything >=9, advised 13)
+- Postgresql (tested on 13, should support anything >=9, advised 13)
 - VictoriaMetrics
 - Druid
-- Sleight (CDL's document storage)
-- Troika (CDL's binary data repo)
 - ... or anything with matching GRPC :)
 
 [data-router]: data_router.md
