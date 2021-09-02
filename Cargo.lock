@@ -479,22 +479,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e70cc2f62c6ce1868963827bd677764c62d07c3d9a3e1fb1177ee1a9ab199eb2"
 
 [[package]]
-name = "cdl-cli"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "cdl_dto",
- "clap",
- "rpc",
- "serde 1.0.127",
- "serde_json",
- "tokio",
- "tonic",
- "tracing_utils",
- "uuid",
-]
-
-[[package]]
 name = "cdl_dto"
 version = "0.1.0"
 dependencies = [
