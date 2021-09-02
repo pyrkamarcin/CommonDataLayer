@@ -32,7 +32,7 @@ Schema:
 
 ScalarType:
 ```
-Bool | String | Integer | Decimal | Any // Any represents arbitrary JSON data
+Bool | String | Integer | Float | Any // Any represents arbitrary JSON data
 ```
 
 ObjectFieldDefinition:
@@ -99,7 +99,7 @@ further on in this proposal.
 
 In an effort to maintain a similar structure to JSON data and not added unnecessary complexity, SD's will be
 represented as sum types. Beyond a variant for each of the scalars available in JSON (`Boolean`, `String`,
-`Integer`, and `Decimal`), the other two types of JSON data are `Array`s and `Object`s. `Array`s will refer
+`Integer`, and `Float`), the other two types of JSON data are `Array`s and `Object`s. `Array`s will refer
 to a single child definition, whether that be a scalar type or a different schema's definition. `Object`s will
 refer to a list of string-named fields, where the definition of each field is either a scalar or another Schema's
 definition. `Array` or `Object` child definitions can all be optional, which allows items to either be `Null`
@@ -131,6 +131,12 @@ Proposed is the suggestion to store for each database materialized data is store
 would be in the config service (really, wherever the materialization configuration data is stored).
 
 ## Further Considerations
+
+### Decimal vs Float
+Though `Float` means that it can be inprecise, there are many fields and industries where it is required. 
+CDL has to support it and can not replace it with `Decimal` (fixed-point fractional arithmetic).
+
+`Decimal` type is not required for the MVP, but can be added later as an extension to the type system.
 
 ### Impact on Other Teams/Clients
 Though validation is not currently being done on incoming data and therefore schema definitions don't matter

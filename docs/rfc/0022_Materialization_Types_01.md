@@ -32,21 +32,24 @@ This rfc aims to provide and standardize types in CDL schemas, views and materia
 # TLDR
 Schemas support
 ```
-number
+bool
 string
-boolean
+integer
+float
 object
+any (arbitrary JSON data)
 ```
 
-Any other type used within JSON schema should cause an error when view materialization is requested.
+`array` type would be treated as `any` in materialization.
 
 Views support (names are arbitrary, implementor may choose suitable naming)
 ```
-f64
-i64
-string
 boolean
+string
+i64
+f64
 object - Field::Object
+any
 ```
 
 PSQL mapping is
@@ -56,6 +59,7 @@ i64 -> int8
 string -> text
 boolean -> bool
 object -> each value resides in a column with `_` delimited json field path as a name
+any -> JSON column
 ```
 
 ES mapping is
@@ -65,6 +69,7 @@ i64 -> long
 string -> text
 boolean -> boolean
 object -> !supported by default
+any -> !supported by default
 ```
 
 We require users to specify all types within the view, including deeply nested objects. This is supported by materialization.
@@ -72,7 +77,6 @@ We require users to specify all types within the view, including deeply nested o
 We can later expand this type list with per database custom types (and type casting/mapping) but this requires schema language extension or parsing strings in JSON object.
 
 SR emits a notification when a view is added, initiating materialization for it and provisioning the database.
-
 
 # Configuration layer
 
@@ -97,24 +101,24 @@ Blobs are stored as is. You cannot perform any operations on it (except for fetc
 > From this point on we are going to focus on document storage only.
 
 ## JSON
-JSON has fairly limited type system. We can read more about it in [JSON Schema spec][json-schema-basic-types].
-CDL currently requires users to provide JSON Schema when declaring object's schema in SR.
+CDL currently requires users to provide simplified schema type (see [RFC-0019][rfc-0019]) when declaring object's schema in SR.
+
 > SIDENOTE:  
 > While it's required in SR, it's not really "used". It is planned to be incorporated in validation, and may be useful with views.
-> [rfc 0019][rfc-0019] talks about simpler format, as a replacement and for the sake of Materialization I will explore expanding it later.
+> [rfc 0019][rfc-0019] is not implemented yet as well but should be before RFC gets to the implementation phase.
 
-| type name | description                                            |
-|:----------|:-------------------------------------------------------|
-| number    | any number of any precision                            |
-| string    | Unicode string of characters of any length             |
-| boolean   | "true" or "false" keyword                              |
-| null      | a null value, or, to be precise, lack of thereof       |
-| object    | a json key-value, unordered, map                       |
-| array     | an ordered collection of records, can hold mixed types |
+| type name | description                                                             |
+|:----------|:------------------------------------------------------------------------|
+| bool      | "true" or "false" keyword                                               |
+| string    | Unicode string of characters of any length                              |
+| integer   | any integer represented internally in JSON as a number of any precision |
+| float     | any float of any precision                                              |
+| null      | a null value, or, to be precise, lack of thereof                        |
+| any       | any arbitrary JSON value that is subtype of all other types             |
+| object    | a json key-value, unordered, map                                        |
+| array     | an ordered collection of records, can hold mixed types                  |
 
-JSON Schema allows also to construct "one_of" ADTs. This is slightly controversial, as neither PSQL nor ES support that kind of construct for most of their types.
-With one exception. Nullability is often described in json schema with `"one_of": any | null` and both databases house nullability feature.
-This means that CDL may have to be able to recognize this pattern and act accordingly, setting up materialization output with nullability in mind.
+CDL simplified schema allows for optional fields, which are explicit and opt-in (instead of providing null type).
 
 # Materialization Storage Layer
 
@@ -220,6 +224,12 @@ ES is able to deduce types based on insertions (first insertion to a given index
 Another main difference is that ES allows for storage of documents. While currently our PSQL implementation is flat (or to be more specific, it flattens everything to one table),
 ES can store deeply nested objects. It also keeps an index on every field in a document.
 
+### Array Type
+In ES there is no dedicated `array` data type. Any field can contain zero or more values by default, however, all values in the array must be of the same data type. In case of Schema definition type it is required and validated by `Array::item_type`
+
+### Any Type
+Because `any` type still has to be a valid JSON it is supported out of the box.
+
 # Proposal
 
 ## Type coverage
@@ -230,11 +240,7 @@ We should aim to, as an MVP, support a minimal subset of common types in both da
 > SIDENOTE:  
 > For types that are database specific (eg. psql::timestamp) we may add them in the form of an `optional feature`.
 
-> SIDENOTE:
-> JSON Schema is abstract here, however my choice of initial types is based on in and on Rust's `serde_json` ability to discern JSON types.
-> To support more than just base, we will have to either extend JSON Schema or provide homebrew schema solution
-
-I propose to use `String`, `bool`, `i64` and `f64` as base types for the first iteration, with addition of nullability and arrays of base types.
+I propose to use `String`, `bool`, `i64` and `f64` as base types for the first iteration, with addition of optional fields.
 Objects, or complex arrays, are much more problematic, and we have to review whether we need them. I'll get to this in a moment.
 
 PSQL mapping in this case:
@@ -244,7 +250,6 @@ PSQL mapping in this case:
 `i64` -> `psql::int8`
 `f64` -> `psql::float8`
 `null` -> COLUMN IS NULLABLE # supported later as an extension
-`array` -> type[] # supported later as an extension
 ```
 
 ES mapping:
@@ -254,13 +259,7 @@ ES mapping:
 `i64` -> `es::long`
 `f64` -> `es::double`
 `null` -> See note below # supported later as an extension
-`array` -> See note below # supported later as an extension
 ```
-> SIDENOTE:  
-> Arrays and nullability are treated the same in ES, a field can contain 0 or more entries. [reference][es-arrays]
-
-I propose to disallow mixed type arrays on schema level. This is not supported by either of our materialization databases.
-If in future a client asks for those, we may consider `array[JSON]`.
 
 ### About `object` Type
 ES requires that object schema is specified to each leaf. In Postgres, we can't really have leaves without introducing multiple tables per view.
@@ -311,25 +310,25 @@ Having types map from schema to view, we can add validation to the process of cr
 
 ## Type Storage
 > DECISION:
-> TLDR section refers to currently supported subset of json schema. In basics, we can store number, boolean, string and object (composed of 3 previously mentioned base types).
+> TLDR section refers to currently WIP Simple Schema Definition.
 > Other types in json schema are supported by CDL but not materialization.
 
 There are several options where types should be stored. In my opinion, it's view responsibility to store types of columns, and it's schema responsibility to store type of data.
-We keep current schema format, with JSON compatible types (`string`, `number`, `boolean`, `one_of null`, `array`, `object`) and require users to specify type mapping for view.
+We keep current schema format, with JSON compatible types (`string`, `integer`, `float`, `boolean`, `array`, `object`) and require users to specify type mapping for view.
 In view, we'll support more granular types that are implicitly converted from JSON:
 ```
 basic_type:
-  f64 <- number
-  i64 <- number # will panic when number is float
+  f64 <- float
+  i64 <- integer
   string <- string
   bool <- boolean
 
 complex_type:
-  array[basic_type] <- array # will panic when array contains mixed types
+  array[basic_type] <- array # In first draft we can convert it to `any`
   object(nested) <- object
   
 nullability:
-  additional field `nullable` that maps to `one_of: any | null` # `nullable = false` will have behaviour similar to .unwrap()
+  additional field `optional` for object field definition and array
 ```
 
 Once added to SR, view will emit a notification that's caught by OB, initiating materialization for it.
@@ -402,15 +401,14 @@ We should aim for first option if possible, as it looks cleaner and provides bet
 As in title, CDL may assume that nullability is by default, and thus we have less work in case of PSQL materialization. We still have to be able to parse
 `one_of: any | null` but now that's extraction of type information, rather than special behavior.
 
-## Use Custom Schema Definitions With Custom Set of Data Types
-Using custom implementation of JSON schema, or, what's mentioned in [rfc 0019][rfc-0019], creating custom standard may, in the future,
-allow us to provide type mapping on the SCHEMA level, thus requiring less explicit view declarations (we'd only have to require mapping there, no implicit conversions from `number` to `f64`).
-This custom schema would also allow us to provide more types as a base. 
+## Type Inference based on Simplified Schema Definition
+In the future we can require less explicit view declarations. We'd only have to require mapping in Schema (defined in [RFC-0019][rfc-0019]).
+Materialization could infer both view field types and computation types based on mappings in Schema.
 
 ## Instead of Adding Notifications to SR, Send Types With Each Request
 Personally, I don't like this idea. It adds to the message payload a redundant piece of data, increasing the number of bytes that have to be sent through the network.
 
-## Infer Types Instead of Specifying Them
+## Infer Types based on raw JSON values Instead of requiring any type declaration
 This comes with a disadvantage. We can infer types on the first materialized row (however, everything must be nullable).
 If in the field value `null` is present, we have to assign most generic type in materialization db (in PSQL it'd be JSON for example).
 
@@ -432,7 +430,6 @@ We have to remember to emit errors on invalid casting from "json::number" to "vi
 
 Within this rfc is mentioned topic of provisioning database on view insertion. This is moved to new, separate issue.
 
-[json-schema-basic-types]: http://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.2.1
 [rfc-0019]: ./0019_Simplify_Schema_Definitions_01.md
 [wiki-adt]: https://en.wikipedia.org/wiki/Algebraic_data_type
 [es-basic-data-types]: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
