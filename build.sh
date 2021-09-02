@@ -30,7 +30,7 @@ do
 	docker build -t ${CDL_REPOSITORY_PATH}cdl-${i}:${CDL_VERSION:-latest} --build-arg BIN=${i} --build-arg ENV=${ENV:-PROD} .
 done
 
-cd web-admin
+cd "web-admin"
 docker build -t ${CDL_REPOSITORY_PATH}cdl-web-admin:${CDL_VERSION:-latest} .
 
 if [[ ! -z "$CDL_PUSH" ]]

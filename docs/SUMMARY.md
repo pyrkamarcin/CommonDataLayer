@@ -18,6 +18,7 @@
     - [Commit message formalization and enforcement](processes/0001_Commit_message_formalization_and_enforcement.md)
     - [Branhing strategy](processes/0002_Branching_strategy.md)                         
     - [Documentation structure and RFC process](processes/0003_Documentation_structure_and_RFC_process.md)       
+    - [CDL Performance Testing](processes/0004_Internal_performance_testing.md)
 - [Versioning](versioning.md)
 - [Stability](stability.md)
 - [Protocol schema](protocol.md)
