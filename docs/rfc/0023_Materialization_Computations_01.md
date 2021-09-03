@@ -11,11 +11,11 @@
 ## Proposed Changes
 CDL currently is very limited when it comes to processing data during the materialization process. In this RFC we propose adding some computable operators on numeric and booleans values. This will allow for simple computations to generate values returned by the materializer as well as used in filtering.
 
-For the feature to work correctly we have to determine the value type before doing any computation.
+Types of materialization input values will be extracted from schema registry. That means that schemas on which views are based on needs to have a proper definition.
 ### Auto conversion:
 All mentioned in this document operators take the same input types as output types. However, i64 values should be automatically converted to f64 type if the expected output is of f64 type.
 ### Errors
-All of the mentioned operators should return errors on parameter conversion and others, mentioned per operator type, as non-critical errors. That means that processing of the row should be aborted, an error should be reported, but processing of the whole process should be allowed to continue.
+All of the mentioned operators should return errors on value types not matching schema, auto conversion errors and others, mentioned per operator type, as non-critical errors. That means that processing of the row should be aborted, an error should be reported, but processing of the whole process should be allowed to continue.
 
 ### Operators
 Each operator defines types it can work on and lists of errors that can be returned. As operators' names should be self-explanatory operator descriptions are skipped. Errors regarding wrong parameter types are not mentioned here as they can always happen and are not related to specific operators or their usage.
