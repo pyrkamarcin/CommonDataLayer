@@ -43,6 +43,12 @@ Returned errors: None
 #### Modulo
 - Modulo(i64,i64) -> i64
 Returned errors: Divide By Zero
+#### Ceiling
+- Ceiling(f64) -> i64
+Returned errors: NaN (on input parameter being NaN, Inf or other special value)
+#### Floor
+- Floor(f64) -> i64
+Returned errors: NaN (on input parameter being NaN, Inf or other special value)
 #### And
 - And(Boolean,Boolean) -> Boolean
 Returned errors: None
