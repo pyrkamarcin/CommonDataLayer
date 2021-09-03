@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using AutoFixture;
 using CDL.Tests.MessageBroker.Kafka;
 using CDL.Tests.Services;
 using CDL.Tests.TestDataObjects;
 using Common;
 using EdgeRegistry;
+using Grpc.Core;
 using MassTransit.KafkaIntegration;
 using SchemaRegistry;
 using Xunit;
@@ -820,6 +822,73 @@ namespace CDL.Tests.ServicesTests
         }
 
         [Fact]
+        public void GetEdges(){
+            var objectIdParent1 = Guid.NewGuid().ToString(); 
+            var objectIdChild1 = Guid.NewGuid().ToString(); 
+            var objectIdChild2 = Guid.NewGuid().ToString(); 
+            var parent1 = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Person>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var child1 = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Car>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var child2 = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Car>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+                        
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = parent1.Id_,
+                objectId = objectIdParent1,
+                data = _fixture.Create<Person>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = child1.Id_,
+                objectId = objectIdChild1,
+                data = _fixture.Create<Car>(),
+            });
+            _kafkaProducer.Produce(new InsertObject()
+            {
+                schemaId = child2.Id_,
+                objectId = objectIdChild2,
+                data = _fixture.Create<Car>(),
+            });   
+
+            Thread.Sleep(1000);
+
+            var relation1 = _edgeRegistryService.AddRelation(child1.Id_, parent1.Id_).Result;
+            var relation2 = _edgeRegistryService.AddRelation(child2.Id_, parent1.Id_).Result;
+            var edge1 = new Edge()
+                {
+                    RelationId = relation1.RelationId_,
+                    ParentObjectId = objectIdParent1,                  
+                };
+            edge1.ChildObjectIds.Add(objectIdChild1);
+            var edge2 = new Edge()
+                {
+                    RelationId = relation2.RelationId_,
+                    ParentObjectId = objectIdParent1,                  
+                };
+            edge2.ChildObjectIds.Add(objectIdChild2);   
+            _edgeRegistryService.AddEdges(new List<Edge>(){ 
+                edge1,
+                edge2
+             });  
+            Thread.Sleep(500);  
+            var edgeFromService = _edgeRegistryService.GetEdges(objectIdParent1).Result;
+
+            Assert.True(edgeFromService.Relations.Count == 2, "Not all relations were found");
+            Assert.True(edgeFromService.Relations.IndexOf(edge1) > -1, 
+                $"Relation {edge1.RelationId} not found in edge relations: {edgeFromService.Relations}");
+            Assert.True(edgeFromService.Relations.IndexOf(edge2) > -1, 
+                $"Relation {edge2.RelationId} not found in edge relations: {edgeFromService.Relations}"); 
+        }        
+
+        [Fact]
         public void GetSchemaRelations()
         {          
             var parentSchemaName = _fixture.Create<string>();
@@ -842,6 +911,34 @@ namespace CDL.Tests.ServicesTests
             Assert.True(item.HasChildSchemaId);
             Assert.Equal(childSchema.Id_, item.ChildSchemaId);
         }
+
+        [Fact]
+        public void ValidateRelation_EdgeWithRelation_NoValidationErrors()
+        {
+            var parent1 = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Person>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;
+            var child1 = _schemaRegistryService.AddSchema(
+                _fixture.Create<string>(), 
+                _fixture.Create<Car>().ToJSONString(), 
+                SchemaType.Types.Type.DocumentStorage).Result;                    
+
+            var relation = _edgeRegistryService.AddRelation(child1.Id_, parent1.Id_).Result;
+            var results = _edgeRegistryService.ValidateRelation(relation.RelationId_).Result;
+
+            Assert.IsType<Empty>(results);
+        }
+
+        [Fact]
+        public async void ValidateRelation_NoRelation_ValidationErrors()
+        {
+            var exception = await Assert.ThrowsAsync<RpcException>(() => _edgeRegistryService.ValidateRelation("1d1cc7a5-9277-48bc-97d3-3d99cfb63002"));
+            Assert.Contains("InvalidArgument", exception.Message);
+            Assert.Contains("1d1cc7a5-9277-48bc-97d3-3d99cfb63002 does not exist", exception.Message);
+        }
+
+
 
         [Fact]
         public void Heartbeat()

@@ -136,5 +136,9 @@ def test_get_edges(prepare):
     result = list(
         map(lambda x: (x.relation_id, x.child_object_ids),
             prepare.GetEdges(ObjectIdQuery(object_id=parent)).relations))
+    result.sort()
 
-    assert [(relation1, [child1]), (relation2, [child2])] == result
+    expected = [(relation1, [child1]), (relation2, [child2])]
+    expected.sort()
+
+    assert expected == result
