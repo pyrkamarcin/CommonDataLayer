@@ -3,11 +3,35 @@ name: Configuration
 on:
   pull_request:
 
-
 jobs:
+  checkpoint:
+    runs-on: ubuntu-latest
+    name: Check if job prerequisites are valid
+    outputs:
+      decision: ${{ steps.decision.outputs.value }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 32
+
+      - id: decision
+        run: |
+          echo "commit file list:"
+          if git --no-pager diff --name-only HEAD~1 | grep -v .sh | grep -v .md
+          then
+            echo "it looks like a valid commit, enabling the tests"
+            echo "::set-output name=value::true"
+          else
+            echo "This does not look like the testable commit"
+            echo "::set-output name=value::false"
+          fi
+
   check-config:
     name: Check .cdl configuration
+    needs: checkpoint
     runs-on: ubuntu-latest
+    if: ${{ needs.checkpoint.outputs.decision == 'true' }}
 
     steps:
       - name: Checkout source code
