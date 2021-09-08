@@ -12,7 +12,7 @@ path = "src/main.rs"
 [dependencies]
 # Workspace
 rpc         = { path = "../rpc" }
-types       = { path = "../utils/types" }
+types       = { path = "../types" }
 cdl_dto     = { path = "../dto" }
 tracing_utils           = { path = "../utils/tracing" }
 

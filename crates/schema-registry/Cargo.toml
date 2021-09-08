@@ -18,7 +18,7 @@ path = "src/main.rs"
 cdl_dto     = { path = "../dto" }
 misc_utils  = { path = "../utils/misc" }
 rpc         = { path = "../rpc" }
-types       = { path = "../utils/types" }
+types       = { path = "../types" }
 communication_utils     = { path = "../utils/communication" }
 tracing_utils           = { path = "../utils/tracing", features = ["with_grpc"] }
 settings_utils          = { path = "../utils/settings" }
