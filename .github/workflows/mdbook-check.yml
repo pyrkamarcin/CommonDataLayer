@@ -62,7 +62,7 @@ jobs:
           mdbook-version: "0.4.6"
 
       - name: Setup linkcheck
-        run: ./.github/scripts/install-executable-from-git.sh --git Michael-F-Bryan/mdbook-linkcheck --archive-type .zip --exec-name mdbook-linkcheck
+        run: ./.github/scripts/install-executable-from-git.sh --git Michael-F-Bryan/mdbook-linkcheck --tag v0.7.4 --archive-type .zip --exec-name mdbook-linkcheck
 
       - name: Build book
         run: mdbook build

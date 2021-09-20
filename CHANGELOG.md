@@ -3,7 +3,8 @@
 ## 1.0.0
 
 ### Breaking changes
-- Data Router expects `version` field in CDL Ingestion Message in format "MAJOR_VERSION.MINOR_VERSION". In this release the only supported version is "1.0".
+- Data Router expects `version` field in CDL Ingestion Message in format "MAJOR_VERSION.MINOR_VERSION". In this release
+  the only supported version is "1.0.0".
 - Changed ENV variables
 
 ### New components
@@ -75,7 +76,7 @@
 - Added non-default namespace support
 - Added string escape mechanism for schema query
 - Fixed building docker images in some environments
--
+
 ### Documentation
 - Updated documentation for basic services
 - Added UML diagrams of our services

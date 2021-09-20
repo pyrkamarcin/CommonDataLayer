@@ -1,29 +1,28 @@
 # Data Router
 
 ### Technical Description
-
-The data router (internally `DR` is also used) is responsible for taking in input data and routing it to the correct storage based on 
-the data's schema and its associated topic. 
+The data router (internally `DR` is also used) is responsible for taking in input data and routing it to the correct storage based on the data's schema and its associated topic.
 
 ### Communication
-
-The data router routes requests from RabbitMQ and Kafka to the correct storage solution based on the schema and data type.
-Topic and some of the basic configuration is obtained from Schema Registry. Data are routed and deposited onto configured queues.
+The data router routes requests from RabbitMQ and Kafka to the correct storage solution based on the schema and data type. Topic and some basic configuration is obtained from Schema Registry. Data are routed and deposited onto configured queues.
 
 Interacts with:
+
 - Command Service (optional, either)
 - Message Queue (optional, either)
 - Schema Registry
 
 Ingest methods:
+
 - Kafka
 
 Internal communication methods:
+
 - Kafka (command-service)
 - gRPC (schema-registry)
 
-
 Below are the example data required by data router:
+
 ```
 # high level description
 {
@@ -43,8 +42,8 @@ Below are the example data required by data router:
 { "objectId": 9056c0b3-2ceb-42a6-a6b6-9718c3e273bc, "schemaId": 9056c0b3-2ceb-42a6-a6b6-9718c3e273bc, "data": {} }
 ```
 
-Messages can be batched together, however please mind, that batched messages works best when used with the same schemaId.
-Otherwise, messages will be split into sub-batches containing messages with the same schemaId
+Messages can be batched together, however please mind, that batched messages works best when used with the same schemaId. Otherwise, messages will be split into sub-batches containing messages with the same schemaId
+
 ```
 [
   { "objectId": 9056c0b3-2ceb-42a6-a6b6-9718c3e273bc, "schemaId": f79d7ebd-4260-4919-9ba3-45ea6701f065, "data": {} }

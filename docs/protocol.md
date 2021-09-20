@@ -1,3 +1,0 @@
-# Protocol schema
-
-TODO
