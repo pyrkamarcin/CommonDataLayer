@@ -1,3 +1,8 @@
+# This Project is Suspended
+The decision to suspend the project was taken on 2021-09, and therefore we halted all work related to it.
+
+Latest released verion is 1.1, however this is still open source, so it can be resurrected later or forked at any time. The team will try to track the community-generated issues that will be added to the official repository and resolve those if possible.
+
 # Common Data Layer
 A collection of microservices that make up the Common Data Layer, implemented in the [Rust][rust] language.
 

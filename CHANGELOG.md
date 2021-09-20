@@ -1,5 +1,57 @@
 # Common Data Layer Changelog
 
+## 1.1.0
+
+### Breaking Changes:
+None! :D
+Also we provided document of which api is stable and which is not.
+
+### API Changes:
+- SR - Schema's version field removed
+
+### Fixes:
+- Change uuid v1 to v4 in psql to avoid clashes (#727)
+- human friendly message in API (#702)
+- Add timeout handlers for RPC (#669)
+- group by on unsorted elements in ER (#653)
+- change fetch-many to fetch in schema_registry/db.rs (#654)
+- materialization filtering (#650)
+
+### Features:
+- change ER resolve tree to new format (allow for two directional searches) (#683)
+- materialization to elasticsearch (#704)
+- config generator - provide grpc and rabbitmq development env for developers (#643)
+- store schema_id, object_id information in postgres materializer (#674)
+- Remove Versioning From Schema Definitions (#670)
+- Error reporting for materialization (#663)
+- pass (schema_id, object_id) pair to materializer general (#660)
+
+### Documentation:
+- performance testing process (#719)
+- GraphQL (#725)
+- Stability docs (#706)
+- short description of resolve tree (#713)
+
+### RFC's
+- materialization types (#699)
+- Custom Data Passthrough (#687)
+- Configuration Service (#666)
+- edge registry - resolving relation trees (#624)
+- CI/CD setup R&D (#640)
+- Simplify Schema Definitions (#631)
+- Transport headers passthrough (#635)
+- Documentation restructure and RFC process (#608)
+- codegen (#607)
+
+### Testing
+- Add test for GetEdges (#733)
+- materializer-general : elasticsearch support (#728)
+- Add SchemaRegistry Relation tests (#698)
+- SR Add tests for all endpoints (#665)
+- tests Fetch in schema registry (#655)
+- remove unused env and update readme file (#646)
+- general cdl tests (new, revised framework) (#562)
+
 ## 1.0.0
 
 ### Breaking changes
